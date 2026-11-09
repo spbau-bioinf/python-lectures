@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="claude:viewport-fit-sides" content="cover">
+  <title>Строки и текстовые данные</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Unbounded:wght@500;600&display=swap">
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/course.js"></script>
+  <script src="assets/app.js"></script>
+</head>
+<body data-lecture="02">
+<div class="read-progress" aria-hidden="true"><i></i></div>
+<header class="topbar">
+  <button class="icon-btn menu-btn" type="button" aria-label="Содержание курса"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+  <a class="brand" href="index.html" data-logo><span class="brand-name">PYTHON</span></a>
+  <nav class="crumbs" aria-label="Путь"></nav>
+  <div class="tools">
+    <button class="icon-btn theme-btn" type="button" aria-label="Сменить тему"></button>
+  </div>
+</header>
+<div class="scrim"></div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Лекции курса"></aside>
+
+  <main class="lecture">
+    <header class="lecture-head rise">
+      <p class="eyebrow" data-slot="eyebrow"></p>
+      <h1>Строки и текстовые данные</h1>
+      <p class="lead">Как программа хранит текст и как получить из него нужные данные: символы и срезы, методы строк, разбор и сборка, f-строки и последовательности ДНК.</p>
+      <div class="meta" data-slot="meta"></div>
+    </header>
+
+    <div class="goals rise" style="--i:1">
+      <p>После лекции вы сможете</p>
+      <ul>
+        <li>получать символы и срезы строки по индексам и объяснять, почему строку нельзя изменить на месте;</li>
+        <li>искать, чистить и заменять текст методами строк, разбирать строку <code>split</code> и собирать <code>join</code>;</li>
+        <li>выводить результат f-строкой и считать длину, состав и GC-состав последовательности ДНК.</li>
+      </ul>
+    </div>
+
+    <div class="slides" data-src="slides/lecture-02.html" data-title="Презентация лекции 2"></div>
+
+    <section id="str-type">
+      <h2>Строка как последовательность символов</h2>
+      <p>Почти любые данные попадают в программу текстом: имя из анкеты, последовательность ДНК, имя файла <code>reads_01.fastq</code>, строка таблицы. Для Python у всего этого один тип, <code>str</code>. Числа складывают, а текст режут, в нем ищут и из него собирают.</p>
+      <div class="ask" data-slide="S5">
+        <p class="ask-q">Сколько значений хранит строка <code>"Python"</code>: одно или шесть?</p>
+        <p class="ask-hint">Подсказка: подумайте, что такое переменная <code>text = "Python"</code> и из чего состоит ее значение.</p>
+        <div class="ask-a"><p>Строка <code>"Python"</code> хранит одно значение, один объект типа <code>str</code>. Внутри этого объекта шесть элементов, символов, и к каждому можно обратиться по номеру.</p></div>
+      </div>
+      <p class="def"><span class="term">Строка</span>&nbsp;— неизменяемая последовательность символов. Отдельного типа «символ» в Python нет: один символ представлен строкой длины 1.</p>
+      <p>Слово «неизменяемая» здесь главное. Типы Python делятся на изменяемые (mutable) и неизменяемые (immutable): объект изменяемого типа можно поменять на месте, объект неизменяемого нельзя.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Изменяемые типы</th><th>Неизменяемые типы</th></tr></thead>
+        <tbody>
+          <tr><td>списки <code>list</code></td><td>числа <code>int</code>, <code>float</code>, <code>complex</code></td></tr>
+          <tr><td>словари <code>dict</code></td><td>логический тип <code>bool</code></td></tr>
+          <tr><td>множества <code>set</code></td><td>строки <code>str</code></td></tr>
+          <tr><td>массивы байтов <code>bytearray</code></td><td>кортежи <code>tuple</code></td></tr>
+          <tr><td>объекты пользовательских классов</td><td>замороженные множества <code>frozenset</code>, байты <code>bytes</code>, <code>None</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>Строку записывают в одинарных или двойных кавычках, лишь бы в начале и в конце стояли кавычки одного вида. Внутри одинарных можно писать двойные, и наоборот.</p>
+      <div class="runner" data-file="create.py"><textarea>
+name = "Василиса"
+city = 'Санкт-Петербург'   # одинарные тоже можно
+empty = ""                 # пустая строка
+print(type(name))
+print(bool(empty))
+quote = 'Он сказал: "Привет"'
+print(quote)
+</textarea></div>
+      <p>Некоторые символы не видны на экране. <code>\n</code> переносит строку, <code>\t</code> ставит табуляцию. В коде это два знака, а в строке один символ. Текст из нескольких строк пишут в тройных кавычках.</p>
+      <div class="runner" data-file="special.py"><textarea>
+print("Первая строка\nВторая строка")
+print("ATG\tGCC\tTAA")
+print(len("A\nT"))   # три символа: A, перевод строки, T
+text = """Первая строка
+Вторая строка"""
+print(text)
+</textarea></div>
+      <p>Обратный слеш внутри строки начинает специальный символ. Чтобы получить сам слеш, пишут <code>\\</code>, а кавычку того же вида, что и обрамляющие, пишут <code>\"</code>. Такая запись называется <span class="term">экранированием</span>.</p>
+      <div class="runner" data-file="escape.py"><textarea>
+quote = "Книга \"Мастер и Маргарита\""
+print(quote)
+windows_path = "C:\\Users\\file.txt"
+print(windows_path)
+</textarea></div>
+      <h3>Индексы</h3>
+      <p>У каждого символа строки есть номер, <span class="term">индекс</span>. Счет идет с нуля от начала и с <code>-1</code> от конца. Функция <code>len()</code> дает число символов, поэтому последний индекс равен <code>len(text) - 1</code>.</p>
+      <div class="table-wrap"><table>
+        <tbody>
+          <tr><th>Символ</th><td><code>P</code></td><td><code>y</code></td><td><code>t</code></td><td><code>h</code></td><td><code>o</code></td><td><code>n</code></td></tr>
+          <tr><th>Индекс от начала</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+          <tr><th>Индекс от конца</th><td>-6</td><td>-5</td><td>-4</td><td>-3</td><td>-2</td><td>-1</td></tr>
+        </tbody>
+      </table></div>
+      <div class="runner" data-file="index.py"><textarea>
+text = "Python"
+print(len(text))
+print(text[0], text[1])
+print(text[-1], text[len(text) - 1])
+</textarea></div>
+      <p>Индекс за пределами строки и нецелый индекс дают ошибки. Запустите пример и прочитайте последнюю строку сообщения.</p>
+      <div class="runner" data-file="index_error.py" data-error><textarea>
+text = "Python"
+print(text[6])   # символа с индексом 6 нет: индексы от 0 до 5
+</textarea></div>
+      <div class="more">
+        <p>Нецелый индекс, например <code>text[1.5]</code>, дает <code>TypeError: string indices must be integers</code>. Индексы всегда целые: символа «между» вторым и третьим не бывает.</p>
+      </div>
+      <div class="quiz" data-id="neg-index-minus2" data-slide="S14">
+        <p class="quiz-q">Что даст <code>text[-2]</code>, если <code>text = "Python"</code>?</p>
+        <ul>
+          <li data-correct>а) <code>'o'</code></li>
+          <li>б) <code>'n'</code></li>
+          <li>в) <code>'h'</code></li>
+          <li>г) <code>IndexError</code></li>
+        </ul>
+        <p class="quiz-why"><code>text[-1]</code> дает последний символ <code>'n'</code>, а <code>text[-2]</code> предпоследний <code>'o'</code>. Ответ <code>'n'</code> получается, если начать счет с конца с <code>-2</code> вместо <code>-1</code>, ответ <code>'h'</code>, если сбиться на одну ячейку дальше. Ошибки нет: в строке из шести символов отрицательные индексы допустимы от <code>-1</code> до <code>-6</code>.</p>
+      </div>
+    </section>
+
+    <section id="slices">
+      <h2>Срезы, операции, неизменяемость</h2>
+      <div class="ask" data-slide="S17">
+        <p class="ask-q">Как получить из строки не один символ, а целый кусок?</p>
+        <p class="ask-hint">Подсказка: например, первые три буквы.</p>
+        <div class="ask-a"><p>Можно взять три символа по индексам и склеить, но для длинного куска это неудобно. Для кусков строки есть отдельная запись, срез: две границы через двоеточие.</p></div>
+      </div>
+      <p class="def"><span class="term">Срез</span>&nbsp;— часть строки <code>s[start:stop:step]</code>. Индексы среза удобно представлять стоящими между символами: <code>start</code> входит в срез, <code>stop</code> не входит.</p>
+      <p>Пропущенная граница означает начало или конец строки. Шаг <code>2</code> берет символы через один, шаг <code>-1</code> разворачивает строку. Срез за пределами строки ошибки не дает.</p>
+      <div class="runner" data-file="slices.py"><textarea>
+text = "Python"
+print(text[:3])      # от начала
+print(text[2:5])
+print(text[3:])      # до конца
+print(text[-3:])     # три последних
+print(text[::2])     # через один
+print(text[::-1])    # разворот
+print(text[2:100])   # без ошибки
+</textarea></div>
+      <h3>Склеить, повторить, найти</h3>
+      <p><code>+</code> склеивает строки, <code>*</code> повторяет строку, а <code>in</code> проверяет, есть ли подстрока в строке, и дает <code>True</code> или <code>False</code>. Оператор <code>in</code> учитывает регистр.</p>
+      <div class="runner" data-file="operations.py"><textarea>
+print("bio" + "informatics")
+print("37" + "42")              # строки, а не числа: не 79
+print("-" * 20)                 # линия из 20 дефисов
+print("DNA" in "DNA sequence")
+print("dna" in "DNA sequence")
+</textarea></div>
+      <p>Строки сравнивают <code>==</code> и <code>!=</code> символ за символом, с учетом регистра и пробелов: <code>"Прохор" == "прохор"</code> и <code>"Прохор " == "Прохор"</code> дают <code>False</code>.</p>
+      <div class="more">
+        <p>Операторы <code>&lt;</code> и <code>&gt;</code> сравнивают строки как в словаре: <code>"apple" &lt; "banana"</code> дает <code>True</code>. Но заглавные буквы идут раньше строчных, поэтому <code>"Zebra" &lt; "apple"</code> тоже <code>True</code>. Перед сравнением текст приводят к одному регистру.</p>
+        <p>Причина в номерах символов. В таблице Unicode (и в ASCII) заглавные латинские буквы A–Z имеют коды от 65 до 90, а строчные a–z от 97 до 122. Python сравнивает строки посимвольно: код <code>"Z"</code> равен 90, код <code>"a"</code> равен 97, и <code>90 &lt; 97</code>. Код символа возвращает функция <code>ord()</code>: <code>ord("Z")</code> дает 90.</p>
+      </div>
+      <h3>Строку нельзя изменить</h3>
+      <p>Присваивание символу строки дает <code>TypeError</code>. Вместо изменения собирают новую строку из кусков старой и присваивают ее имени; исходная строка при этом не меняется.</p>
+      <div class="more">
+        <p>После <code>text = "J" + text[1:]</code> строка <code>"Python"</code> остается в памяти прежней, но имя <code>text</code> перестает на нее ссылаться. Память под строку, на которую больше никто не ссылается, Python освобождает сам.</p>
+      </div>
+      <div class="runner" data-file="immutable.py" data-error><textarea>
+text = "Python"
+print("J" + text[1:])   # новая строка: Jython
+text[0] = "J"           # а так нельзя
+</textarea></div>
+      <div class="quiz" data-id="slice-tho" data-slide="S27">
+        <p class="quiz-q">Что даст <code>"Python"[2:5]</code>?</p>
+        <ul>
+          <li>а) <code>'yth'</code></li>
+          <li data-correct>б) <code>'tho'</code></li>
+          <li>в) <code>'thon'</code></li>
+          <li>г) <code>'ytho'</code></li>
+        </ul>
+        <p class="quiz-why"><code>[2:5]</code> берет символы с индексами 2, 3 и 4: <code>t</code>, <code>h</code>, <code>o</code>. Символ с индексом 5 в срез не входит. Ответ <code>'yth'</code> получается при счете с единицы, <code>'thon'</code> включает границу <code>stop</code>, а <code>'ytho'</code> совмещает обе ошибки.</p>
+      </div>
+    </section>
+
+    <section id="methods">
+      <h2>Методы строк</h2>
+      <div class="ask" data-slide="S30">
+        <p class="ask-q">Как привести <code>"пРОХОР"</code> к виду <code>"Прохор"</code>?</p>
+        <p class="ask-hint">Подсказка: менять буквы по одной срезами долго.</p>
+        <div class="ask-a"><p>Срезами и склейкой это возможно, но долго. У строки есть готовые действия, методы: <code>"пРОХОР".capitalize()</code> дает <code>'Прохор'</code>.</p></div>
+      </div>
+      <p class="def"><span class="term">Метод</span>&nbsp;— функция, которую вызывают у значения через точку: <code>text.upper()</code>. Скобки обязательны, даже если внутри пусто.</p>
+      <p>Метод строки не меняет строку, а возвращает результат: новую строку, число или <code>True</code>/<code>False</code>. Отсюда две частые ошибки. Без скобок метод не вызывается: <code>text.lower</code> дает сам метод, а не текст. А вызов без присваивания ничего не сохраняет: после <code>text.lower()</code> в <code>text</code> прежние буквы, нужно <code>text = text.lower()</code>.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Группа</th><th>Методы</th><th>Что возвращают</th></tr></thead>
+        <tbody>
+          <tr><td>регистр</td><td><code>lower</code>, <code>upper</code>, <code>capitalize</code>, <code>title</code>, <code>swapcase</code></td><td>новую строку</td></tr>
+          <tr><td>поиск</td><td><code>find</code>, <code>rfind</code>, <code>count</code></td><td>индекс или число</td></tr>
+          <tr><td>начало и конец</td><td><code>startswith</code>, <code>endswith</code></td><td><code>True</code> или <code>False</code></td></tr>
+          <tr><td>проверка содержимого</td><td><code>isalpha</code>, <code>isdigit</code>, <code>isalnum</code>, <code>isspace</code>, <code>islower</code>, <code>isupper</code></td><td><code>True</code> или <code>False</code></td></tr>
+          <tr><td>очистка и замена</td><td><code>strip</code>, <code>lstrip</code>, <code>rstrip</code>, <code>replace</code></td><td>новую строку</td></tr>
+        </tbody>
+      </table></div>
+      <div class="runner" data-file="case_search.py"><textarea>
+text = "Python programming"
+print(text.lower())
+print(text.upper())
+print(text.swapcase())          # меняет регистр каждой буквы
+print("пРОХОР".capitalize())
+print("python для биологов".title())
+print(text.find("program"))   # индекс первого вхождения
+print(text.rfind("m"))        # индекс последнего вхождения
+print(text.count("m"))
+print(text.startswith("Python"), text.endswith("ing"))
+</textarea></div>
+      <p>Данные приходят с лишним: пробелы по краям, перевод строки в конце, разный регистр. На экране <code>"Прохор "</code> и <code>"Прохор"</code> выглядят одинаково, а для Python это разные строки. Поэтому перед сравнением и подсчетом строку чистят, а очищенный результат сохраняют отдельно.</p>
+      <div class="runner" data-file="clean.py"><textarea>
+name = "   Василиса   "
+print("[" + name.strip() + "]")
+print("[" + name.lstrip() + "]")
+print("[" + name.rstrip() + "]")
+seq = "AT-GC-GA-TC"
+print(seq.replace("-", ""))      # все вхождения
+print(seq.replace("-", "", 1))   # только первое
+print("2026".isdigit(), "ATGC".isalpha(), "AT GC".isalpha())
+</textarea></div>
+      <aside class="note"><p>Список всех методов строки показывает <code>dir(str)</code>, справку по одному методу&nbsp;— <code>help(str.find)</code>. Попробуйте в редакторе выше.</p></aside>
+      <div class="quiz" data-id="find-not-found" data-slide="S37">
+        <p class="quiz-q">Что вернет <code>"Python programming".find("Java")</code>?</p>
+        <ul>
+          <li>а) <code>0</code></li>
+          <li>б) <code>None</code></li>
+          <li data-correct>в) <code>-1</code></li>
+          <li>г) ошибку <code>ValueError</code></li>
+        </ul>
+        <p class="quiz-why">Если подстроки нет, <code>find</code> возвращает <code>-1</code>: такого индекса от начала не бывает. Ошибку <code>ValueError</code> дал бы похожий метод <code>index</code>, поэтому вариант «г» не бессмысленный. Ответ <code>0</code> опасен: он означал бы, что подстрока найдена в самом начале.</p>
+      </div>
+    </section>
+
+    <section id="split-join">
+      <h2>Разбор, сборка и форматирование</h2>
+      <div class="ask" data-slide="S40">
+        <p class="ask-q">Как разобрать <code>"Василиса;Прохор"</code> на отдельные имена?</p>
+        <p class="ask-hint">Подсказка: <code>find</code> и срезы справятся, но сколько строк кода понадобится?</p>
+        <div class="ask-a"><p>С <code>find</code> и срезами понадобится искать каждый разделитель и вырезать кусок между ними. Метод <code>split</code> делает это одним вызовом и возвращает список частей.</p></div>
+      </div>
+      <p>Строку с несколькими значениями разбирают по разделителю. Метод <code>split</code> режет строку и возвращает список строк; к частям обращаются по индексу, как к символам. Метод <code>join</code> собирает список строк обратно и вызывается у разделителя: разделитель пишут перед точкой.</p>
+      <div class="runner" data-file="split_join.py"><textarea>
+line = "Василиса;Прохор"
+names = line.split(";")
+print(names)
+print(names[1])
+print(", ".join(names))
+print("ATG  GCC TAA".split())   # без аргумента: по любым пробелам
+</textarea></div>
+      <p>Частая ошибка: вызвать <code>join</code> у списка. У списка такого метода нет, поэтому Python сообщит <code>AttributeError</code>.</p>
+      <div class="runner" data-file="join_error.py" data-error><textarea>
+names = ["Василиса", "Прохор"]
+print(", ".join(names))   # так правильно
+print(names.join(", "))   # у списка нет метода join
+</textarea></div>
+      <h3>f-строки</h3>
+      <p>Перед кавычками f-строки стоит буква <code>f</code>, а в фигурные скобки ставят любое выражение, в том числе вызов метода. После двоеточия задают число знаков после запятой, ширину поля и выравнивание.</p>
+      <div class="runner" data-file="fstrings.py"><textarea>
+name = "василиса"
+age = 19
+print(f"{name} is {age} years old")
+print(f"{name.title()} will be {age + 1}")
+print(f"{3.14159:.2f}")       # два знака после точки
+print(f"{'ATG':<6}|")         # влево, ширина 6
+print(f"{'ATG':>6}|")         # вправо
+print(f"{42:>6}|")
+</textarea></div>
+      <p>Если в скобках f-строки после имени поставить знак <code>=</code>, Python выведет и имя, и значение. Так удобно быстро проверить переменные при отладке.</p>
+      <div class="runner" data-file="fdebug.py"><textarea>
+x = 10
+y = "Привет"
+print(f"{x=}, {y=}")
+</textarea></div>
+      <p>После двоеточия в скобках стоит описание формата. Для текста оно задает выравнивание и символ-заполнитель, который пишут перед знаком выравнивания.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Символ</th><th>Значение</th><th>Пример</th><th>Результат при <code>x = "test"</code></th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;</code></td><td>по левому краю (для строк по умолчанию)</td><td><code>{x:&lt;8}</code></td><td><code>'test    '</code></td></tr>
+          <tr><td><code>&gt;</code></td><td>по правому краю (для чисел по умолчанию)</td><td><code>{x:&gt;8}</code></td><td><code>'    test'</code></td></tr>
+          <tr><td><code>^</code></td><td>по центру</td><td><code>{x:^8}</code></td><td><code>'  test  '</code></td></tr>
+          <tr><td>символ</td><td>заполнитель</td><td><code>{x:*^8}</code></td><td><code>'**test**'</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>Для чисел формат задает вид записи, разделитель разрядов и знак.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Символ</th><th>Значение</th><th>Пример</th><th>Результат</th></tr></thead>
+        <tbody>
+          <tr><td><code>f</code></td><td>фиксированное число знаков после точки</td><td><code>{3.14159:.2f}</code></td><td><code>'3.14'</code></td></tr>
+          <tr><td><code>e</code></td><td>экспоненциальная запись</td><td><code>{1000000:.1e}</code></td><td><code>'1.0e+06'</code></td></tr>
+          <tr><td><code>d</code></td><td>целое число</td><td><code>{42:d}</code></td><td><code>'42'</code></td></tr>
+          <tr><td><code>b</code>, <code>o</code>, <code>x</code></td><td>двоичная, восьмеричная, шестнадцатеричная запись</td><td><code>{5:b}</code>, <code>{8:o}</code>, <code>{255:x}</code></td><td><code>'101'</code>, <code>'10'</code>, <code>'ff'</code></td></tr>
+          <tr><td><code>%</code></td><td>проценты: умножает на 100 и добавляет знак</td><td><code>{0.75:.0%}</code></td><td><code>'75%'</code></td></tr>
+          <tr><td><code>,</code> и <code>_</code></td><td>разделитель разрядов</td><td><code>{1000000:,}</code>, <code>{1000000:_}</code></td><td><code>'1,000,000'</code>, <code>'1_000_000'</code></td></tr>
+          <tr><td><code>+</code></td><td>знак всегда, и у положительных чисел</td><td><code>{42:+}</code></td><td><code>'+42'</code></td></tr>
+          <tr><td>пробел</td><td>пробел перед положительным числом, для выравнивания</td><td><code>{42: }</code></td><td><code>' 42'</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>Запустите пример, затем поменяйте форматы в скобках.</p>
+      <div class="runner" data-file="formats.py"><textarea>
+x = "test"
+print(f"[{x:*^8}]")
+print(f"{1000000:.1e} {255:x} {255:X} {5:b}")
+print(f"{0.75:%} {0.75:.0%}")
+print(f"{1000000:,} {1000000:_}")
+print(f"{42:+} {-42:+} [{42: }]")
+</textarea></div>
+      <h3>Собираем все вместе</h3>
+      <p><code>input()</code> всегда возвращает строку, поэтому ее сразу чистят и при необходимости переводят в число. Методы можно выстроить цепочкой: <code>input().strip().title()</code>. Ниже строка анкеты разбирается за пять шагов: <code>strip</code>, <code>split</code>, обращение к частям, преобразование типа, f-строка. Поменяйте текст в поле «Ввод» и запустите снова.</p>
+      <div class="runner" data-file="parse.py" data-stdin="  прохор; 25; Bioinformatics; SPbPU  "><textarea>
+s = input()
+parts = s.strip().split(";")
+print(parts)
+name = parts[0].strip().title()
+age = int(parts[1])
+spec = parts[2].strip()
+univ = parts[3].strip()
+print(f"{name}, {age} лет, {spec}, {univ}")
+</textarea></div>
+      <div class="quiz" data-id="split-to-list" data-slide="S51">
+        <p class="quiz-q">Что вернет <code>"Василиса;Прохор".split(";")</code>?</p>
+        <ul>
+          <li>а) <code>"Василиса Прохор"</code></li>
+          <li>б) <code>2</code></li>
+          <li>в) <code>['Василиса;', 'Прохор']</code></li>
+          <li data-correct>г) <code>['Василиса', 'Прохор']</code></li>
+        </ul>
+        <p class="quiz-why"><code>split(";")</code> режет строку по <code>;</code> и возвращает список; сам разделитель в части не входит. Строку выбирают те, кто путает <code>split</code> с <code>replace</code>, части с <code>;</code> те, кто думает, что разделитель остается. Число частей дал бы <code>len()</code> от результата.</p>
+      </div>
+    </section>
+
+    <section id="unicode">
+      <h2>Unicode кратко</h2>
+      <div class="ask" data-slide="S54">
+        <p class="ask-q">Почему Python спокойно работает с кириллицей?</p>
+        <p class="ask-hint">Подсказка: компьютер хранит только числа.</p>
+        <div class="ask-a"><p>У каждого символа, и латинского, и русского, есть свой номер в таблице Unicode. Строка Python состоит из таких символов, поэтому алфавит для нее не важен. Числа превращаются в байты только при записи в файл или отправке в сеть.</p></div>
+      </div>
+      <p>Строка в Python состоит из символов Unicode, поэтому в ней можно хранить и латиницу, и кириллицу, и греческие буквы. У каждого символа есть номер, <span class="term">кодовая точка</span>: <code>ord("П")</code> дает 1055, <code>chr(1055)</code> дает <code>"П"</code>. Имена функций сокращены от слов ordinal и character.</p>
+      <p>В файл и в сеть текст уходит байтами. Правило перевода символов в байты называют <span class="term">кодировкой</span>. Кодировка UTF-8 записывает латинскую букву одним байтом, русскую двумя. <code>encode</code> переводит строку <code>str</code> в байты <code>bytes</code>, <code>decode</code>&nbsp;— обратно.</p>
+      <div class="runner" data-file="unicode.py"><textarea>
+text = "Привет"
+print(len(text))                  # символов
+data = text.encode("utf-8")
+print(type(data), len(data))      # байт
+print(data.decode("utf-8"))
+print(data.decode("cp1251"))      # чужая кодировка портит текст
+</textarea></div>
+      <div class="more">
+        <p>Набор странных символов вроде <code>РџСЂРёРІРµС‚</code> на месте русского текста почти всегда означает, что байты UTF-8 прочитали в другой кодировке. При работе с файлами в лекции 9 кодировку будем указывать явно: <code>encoding="utf-8"</code>.</p>
+      </div>
+    </section>
+
+    <section id="bio">
+      <h2>Строки в биоинформатике</h2>
+      <p>Для Python последовательность ДНК&nbsp;— обычная строка из букв A, T, G и C, поэтому к ней применимо все из этой лекции. Последовательности хранят в формате FASTA: строка описания начинается с <code>&gt;</code>, за ней идет сама последовательность. В описании до первого пробела стоит идентификатор, после него комментарий.</p>
+      <pre class="code">
+&gt;gene_00284728 length=231;type=dna
+GAGAACTGATTCTGTTACCGCAGGGCATTCGG
+</pre>
+      <p class="def"><span class="term">GC-состав</span>&nbsp;— доля гуанина и цитозина среди всех нуклеотидов, обычно в процентах: (число G + число C) / длина × 100.</p>
+      <p>Пара G–C связана тремя водородными связями, пара A–T двумя, поэтому по GC-составу, например, оценивают температуру плавления праймера. Строчные буквы в геномных данных обычны, и перед подсчетом регистр приводят к одному.</p>
+      <div class="runner" data-file="composition.py"><textarea>
+raw = "ATGCGATCGATCGatcg"
+print(raw.count("G"))     # строчная g не посчитана
+seq = raw.upper()
+print(len(seq), seq.count("A"), seq.count("T"), seq.count("G"), seq.count("C"))
+gc = seq.count("G") + seq.count("C")
+gc_percent = gc / len(seq) * 100
+print(f"GC: {gc_percent:.1f} %")
+</textarea></div>
+      <p>Фрагмент ищут через <code>in</code>, <code>find</code> и <code>count</code>, начало и конец последовательности берут срезами, а нуклеотид заменяют сборкой новой строки.</p>
+      <div class="runner" data-file="fragments.py"><textarea>
+seq = "ATGCGATCGATCGATCG"
+print("GATC" in seq, seq.find("GATC"), seq.count("GATC"))
+print(seq[:3])     # первые 3
+print(seq[-5:])    # последние 5
+mutant = "G" + seq[1:]
+print(mutant)
+</textarea></div>
+      <p>Из заголовка FASTA метод <code>removeprefix</code> убирает <code>&gt;</code>, а <code>split(maxsplit=1)</code> режет только по первому пробелу: получаются идентификатор и комментарий. Строку отчета собирают f-строкой, колонки разделяет <code>\t</code>.</p>
+      <div class="runner" data-file="fasta_header.py"><textarea>
+header = ">gene_00284728 length=231;type=dna"
+seq = "ATGCGATCGATCGATCG"
+body = header.removeprefix(">")
+seq_id, comment = body.split(maxsplit=1)
+gc_percent = (seq.count("G") + seq.count("C")) / len(seq) * 100
+print(comment)
+print(f"{seq_id}\t{len(seq)}\t{gc_percent:.1f}")
+</textarea></div>
+      <div class="quiz" data-id="replace-nucleotide" data-slide="S64">
+        <p class="quiz-q">Как в <code>seq = "ATGCGATCGATCGATCG"</code> заменить третий нуклеотид на <code>"A"</code>?</p>
+        <ul>
+          <li>а) <code>seq[2] = "A"</code></li>
+          <li>б) <code>seq.replace(seq[2], "A")</code></li>
+          <li data-correct>в) <code>seq[:2] + "A" + seq[3:]</code></li>
+          <li>г) <code>seq[:3] + "A" + seq[3:]</code></li>
+        </ul>
+        <p class="quiz-why">Третий нуклеотид имеет индекс 2. Нужны срез до индекса 2, новая буква и срез с индекса 3. <code>seq[2] = "A"</code> дает <code>TypeError</code>: строка неизменяема. <code>replace</code> заменит все буквы G и даст <code>'ATACAATCAATCAATCA'</code>. Срез до 3 оставит старый символ и вставит лишний.</p>
+      </div>
+    </section>
+
+    <section id="summary">
+      <h2>Итоги и типичные ошибки</h2>
+      <ul>
+        <li>Символ и срез берут по индексам: <code>s[i]</code>, <code>s[start:stop:step]</code>.</li>
+        <li>Строка неизменяема: операции и методы дают новую строку, результат присваивают.</li>
+        <li>Методы ищут, чистят и заменяют; <code>split</code> разбирает, <code>join</code> собирает.</li>
+        <li>Результат выводят f-строкой с нужным числом знаков.</li>
+        <li>Длину, состав и GC-состав ДНК считают методами строк.</li>
+      </ul>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Так не работает</th><th>Так правильно</th></tr></thead>
+        <tbody>
+          <tr><td><code>"25" + 5</code></td><td><code>int("25") + 5</code></td></tr>
+          <tr><td><code>s[0] = "P"</code></td><td><code>s = "P" + s[1:]</code></td></tr>
+          <tr><td>считать, что <code>s[2:5]</code> включает <code>s[5]</code></td><td>граница <code>stop</code> в срез не входит</td></tr>
+          <tr><td><code>s.lower</code></td><td><code>s.lower()</code></td></tr>
+          <tr><td><code>s.upper()</code> без присваивания</td><td><code>s = s.upper()</code></td></tr>
+          <tr><td>ждать от <code>split</code> строку</td><td><code>split</code> возвращает список</td></tr>
+          <tr><td><code>names.join(", ")</code></td><td><code>", ".join(names)</code></td></tr>
+          <tr><td>ждать от <code>input()</code> число</td><td><code>int(input())</code></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="test">
+      <h2>Итоговый тест</h2>
+      <p>Десять вопросов по всей лекции. Ответьте на все и нажмите «Проверить»: тест засчитывается от восьми верных ответов. Пройти его можно сколько угодно раз, в прогресс идет лучший результат.</p>
+      <div class="final-test" data-id="final">
+        <div class="ft-q">
+          <p class="quiz-q">Сколько символов в строке <code>"A\nT"</code>?</p>
+          <ul>
+            <li><code>4</code></li>
+            <li data-correct><code>3</code></li>
+            <li><code>2</code></li>
+            <li>ошибка: перевод строки нельзя хранить в строке</li>
+          </ul>
+          <p class="quiz-why"><code>\n</code> записывается двумя знаками, но в строке это один символ, перевод строки. Символы: <code>A</code>, перевод строки, <code>T</code>.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что даст <code>"Python"[6]</code>?</p>
+          <ul>
+            <li><code>'n'</code></li>
+            <li>пустую строку <code>''</code></li>
+            <li data-correct><code>IndexError</code></li>
+            <li><code>'P'</code></li>
+          </ul>
+          <p class="quiz-why">В строке из шести символов индексы идут от 0 до 5, символа с индексом 6 нет, поэтому возникает <code>IndexError</code>. Последний символ дает <code>[5]</code> или <code>[-1]</code>. Срез <code>[6:]</code>, в отличие от индекса, вернул бы пустую строку без ошибки.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что даст <code>"ATGC"[::-1]</code>?</p>
+          <ul>
+            <li data-correct><code>'CGTA'</code></li>
+            <li><code>'GCAT'</code></li>
+            <li><code>'TACG'</code></li>
+            <li><code>'ATGC'</code></li>
+          </ul>
+          <p class="quiz-why">Шаг <code>-1</code> проходит строку с конца: <code>'CGTA'</code>. Вариант <code>'GCAT'</code>&nbsp;— обратно-комплементарная последовательность, для нее нужно еще заменить каждую букву на парную.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа <code>seq = "ATG"</code>, <code>seq.lower()</code>, <code>print(seq)</code>?</p>
+          <ul>
+            <li><code>atg</code></li>
+            <li data-correct><code>ATG</code></li>
+            <li><code>None</code></li>
+            <li>ошибку <code>AttributeError</code></li>
+          </ul>
+          <p class="quiz-why">Метод не меняет строку, а возвращает новую. Результат <code>seq.lower()</code> никуда не присвоен, поэтому в <code>seq</code> осталось <code>ATG</code>. Нужно было <code>seq = seq.lower()</code>.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Какой из типов изменяемый?</p>
+          <ul>
+            <li><code>str</code></li>
+            <li><code>tuple</code></li>
+            <li data-correct><code>list</code></li>
+            <li><code>int</code></li>
+          </ul>
+          <p class="quiz-why">Список <code>list</code> можно поменять на месте. Строки, кортежи и числа неизменяемы: операции над ними создают новые объекты.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что даст <code>"  at g  ".strip()</code>?</p>
+          <ul>
+            <li><code>'atg'</code></li>
+            <li><code>'  at g'</code></li>
+            <li data-correct><code>'at g'</code></li>
+            <li><code>'at g  '</code></li>
+          </ul>
+          <p class="quiz-why"><code>strip</code> убирает пробельные символы только по краям строки. Пробел внутри остается; убрать все пробелы можно через <code>replace(" ", "")</code>.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Как из списка <code>bases = ["A", "T", "G"]</code> получить строку <code>"A-T-G"</code>?</p>
+          <ul>
+            <li><code>bases.join("-")</code></li>
+            <li data-correct><code>"-".join(bases)</code></li>
+            <li><code>"-".split(bases)</code></li>
+            <li><code>bases + "-"</code></li>
+          </ul>
+          <p class="quiz-why"><code>join</code>&nbsp;— метод строки-разделителя: разделитель пишут перед точкой, список передают в скобках. У списка метода <code>join</code> нет, а <code>split</code> разбирает строку, а не собирает.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет <code>print(f"{0.25:.0%}")</code>?</p>
+          <ul>
+            <li><code>0.25%</code></li>
+            <li data-correct><code>25%</code></li>
+            <li><code>25.000000%</code></li>
+            <li><code>0%</code></li>
+          </ul>
+          <p class="quiz-why">Формат <code>%</code> умножает число на 100 и добавляет знак процента, а <code>.0</code> оставляет ноль знаков после точки. Без <code>.0</code> было бы <code>25.000000%</code>: по умолчанию шесть знаков.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Сколько байт занимает строка <code>"ДНК"</code> в кодировке UTF-8?</p>
+          <ul>
+            <li><code>3</code></li>
+            <li data-correct><code>6</code></li>
+            <li><code>12</code></li>
+            <li><code>1</code></li>
+          </ul>
+          <p class="quiz-why">UTF-8 записывает русскую букву двумя байтами: три буквы дают 6 байт. При этом <code>len("ДНК")</code> равно 3: строка считает символы, а не байты.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Чему равен GC-состав последовательности <code>"GGCA"</code> в процентах?</p>
+          <ul>
+            <li><code>50.0</code></li>
+            <li><code>0.75</code></li>
+            <li data-correct><code>75.0</code></li>
+            <li><code>3</code></li>
+          </ul>
+          <p class="quiz-why">G и C вместе встречаются 3 раза из 4: <code>(seq.count("G") + seq.count("C")) / len(seq) * 100</code> дает <code>75.0</code>. <code>0.75</code> получится без умножения на 100, а <code>3</code> равно числу нуклеотидов G и C.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="finish" data-slot="finish"></div>
+  </main>
+
+  <nav class="toc" data-slot="toc" aria-label="Разделы лекции"></nav>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</body>
+</html>

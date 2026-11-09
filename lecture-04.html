@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="claude:viewport-fit-sides" content="cover">
+  <title>Циклы и итеративная обработка данных</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Unbounded:wght@500;600&display=swap">
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/course.js"></script>
+  <script src="assets/app.js"></script>
+</head>
+<body data-lecture="04">
+<div class="read-progress" aria-hidden="true"><i></i></div>
+<header class="topbar">
+  <button class="icon-btn menu-btn" type="button" aria-label="Содержание курса"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+  <a class="brand" href="index.html" data-logo><span class="brand-name">PYTHON</span></a>
+  <nav class="crumbs" aria-label="Путь"></nav>
+  <div class="tools">
+    <button class="icon-btn theme-btn" type="button" aria-label="Сменить тему"></button>
+  </div>
+</header>
+<div class="scrim"></div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Лекции курса"></aside>
+
+  <main class="lecture">
+    <header class="lecture-head rise">
+      <p class="eyebrow" data-slot="eyebrow"></p>
+      <h1>Циклы и итеративная обработка данных</h1>
+      <p class="lead">Как повторить действие для каждой буквы последовательности: циклы for и while, break и continue, счетчики и накопители, инвариант и вложенные циклы.</p>
+      <div class="meta" data-slot="meta"></div>
+    </header>
+
+    <div class="goals rise" style="--i:1">
+      <p>После лекции вы сможете</p>
+      <ul>
+        <li>обходить последовательность циклом <code>for</code>, перебирать числа и индексы через <code>range()</code> и выбирать между <code>for</code> и <code>while</code> так, чтобы цикл останавливался;</li>
+        <li>управлять циклом через <code>break</code>, <code>continue</code> и <code>else</code> и собирать результат счетчиком, накопителем и поиском максимума;</li>
+        <li>обосновывать верность цикла инвариантом и оценивать число шагов вложенных циклов при поиске мотива в ДНК.</li>
+      </ul>
+    </div>
+
+    <div class="slides" data-src="slides/lecture-04.html" data-title="Презентация лекции 4"></div>
+
+    <section id="for-range">
+      <h2>Цикл <code>for</code> и <code>range()</code></h2>
+      <div class="ask" data-slide="S4">
+        <p class="ask-q">Как проверить каждую букву последовательности, если длина заранее неизвестна?</p>
+        <p class="ask-hint">Подсказка: Вспомните проверку одной буквы: <code>base in "ACGT"</code>.</p>
+        <div class="ask-a"><p>Отдельная проверка для <code>seq[0]</code>, <code>seq[1]</code> и дальше не годится: длина строки становится известна только при запуске. Нужна конструкция «сделай это для каждой буквы». Это цикл <code>for</code>.</p></div>
+      </div>
+      <p>В лекции 3 программа проверяла одну букву: <code>base in "ACGT"</code>. Строку из восьми букв можно проверить восемью такими строками с <code>seq[0]</code>, <code>seq[1]</code> и так далее. Для тысячи букв так уже не написать, а длина последовательности часто становится известна только при запуске программы. Нужна конструкция «сделай это для каждой буквы».</p>
+      <p class="def"><span class="term">Цикл <code>for</code></span>&nbsp;— конструкция, которая берет элементы последовательности по одному, по порядку, и для каждого выполняет одни и те же строки, тело цикла.</p>
+      <p>Строка тоже последовательность, поэтому <code>for base in seq:</code> дает букву за буквой. Имя в заголовке (<code>base</code>) называют <span class="term">переменной цикла</span>: Python сам кладет в нее очередной элемент. Одно выполнение тела называют <span class="term">итерацией</span>. Сколько элементов, столько и итераций, и длину заранее знать не нужно. Заголовок кончается двоеточием, а тело выделяется отступом, как у <code>if</code>.</p>
+      <p>Обработку строки от первой буквы до последней называют <span class="term">обходом</span>. Аргумент <code>end=" "</code> просит <code>print()</code> ставить после значения пробел вместо перевода строки, поэтому буквы окажутся в одной строке. Запустите пример, затем замените <code>"GATTACA"</code> на <code>"ATG"</code> и запустите снова.</p>
+      <div class="runner" data-file="traverse.py"><textarea>
+seq = "GATTACA"
+for base in seq:
+    print(base, end=" ")   # тело: по разу на букву
+print()                    # без отступа: один раз после цикла
+print("обход закончен")
+</textarea></div>
+      <p>На первой итерации <code>base</code> равна <code>"G"</code>, на второй <code>"A"</code>, и так семь раз. Пустой <code>print()</code> заканчивает строку с буквами, а последняя строка программы выполняется уже после того, как буквы кончились.</p>
+      <div class="more">
+        <p>В Python <code>for</code> перебирает элементы любой последовательности. В Паскале цикл идет по арифметической прогрессии чисел, а в C программист сам задает шаг и условие остановки. Цикл <code>for</code> в Python ближе к фразе «для каждого элемента», чем к счету.</p>
+      </div>
+      <h3>Отступ решает, что повторяется</h3>
+      <p>Две программы ниже отличаются четырьмя пробелами в одной строке. Границу тела цикла Python находит только по отступу. Запустите и сравните, сколько раз напечатано «готово».</p>
+      <div class="runner" data-file="indent.py"><textarea>
+for base in "GAT":
+    print(base)
+    print("готово")    # в теле: после каждой буквы
+
+print("----------")
+
+for base in "GAT":
+    print(base)
+print("готово")        # после цикла: один раз
+</textarea></div>
+      <aside class="note warn"><p>Лишний отступ повторяет строку на каждой итерации, и Python об этом не сообщает: синтаксис верен, ошибка в логике. Если действие повторилось, хотя должно было выполниться один раз, уберите отступ. Если выполнилось один раз вместо каждого, добавьте.</p></aside>
+      <div class="more">
+        <p>Бывают и явные ошибки. Если после заголовка нет ни одной строки с отступом, Python сообщает <code>IndentationError: expected an indented block</code>. Если забыть двоеточие, получится <code>SyntaxError: expected ':'</code>. Такие ошибки найти легко: программа не запустится. Логическую ошибку с лишним отступом видно только по выводу.</p>
+      </div>
+      <h3>Числа: <code>range()</code></h3>
+      <div class="ask" data-slide="S8">
+        <p class="ask-q">А если нужны не буквы, а числа 0, 1, 2, …?</p>
+        <p class="ask-hint">Подсказка: Повторить действие ровно 5 раз.</p>
+        <div class="ask-a"><p>Нужна последовательность чисел, которую цикл обходит так же, как строку. Ее дает <code>range()</code>. Строка <code>"12345"</code> тоже дала бы пять повторов, но переменная цикла была бы строкой, а не числом.</p></div>
+      </div>
+      <p>Часто циклу нужна не буква, а ее номер, или нужно просто повторить действие пять раз. Для этого нужна последовательность чисел, которую можно обходить так же, как строку.</p>
+      <p class="def"><span class="term"><code>range(start, stop, step)</code></span>&nbsp;— последовательность целых чисел, которая начинается со <code>start</code>, растет на <code>step</code> и заканчивается перед <code>stop</code>: конечное значение в нее не входит.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Вызов</th><th>Числа</th><th>Что заметить</th></tr></thead>
+        <tbody>
+          <tr><td><code>range(5)</code></td><td>0 1 2 3 4</td><td>начало 0, число 5 не входит</td></tr>
+          <tr><td><code>range(1, 5)</code></td><td>1 2 3 4</td><td>конец не входит</td></tr>
+          <tr><td><code>range(1, 6)</code></td><td>1 2 3 4 5</td><td>так получают числа 1–5</td></tr>
+          <tr><td><code>range(0, 10, 3)</code></td><td>0 3 6 9</td><td>шаг 3</td></tr>
+          <tr><td><code>range(5, 0, -1)</code></td><td>5 4 3 2 1</td><td>счет вниз, 0 не входит</td></tr>
+          <tr><td><code>range(1, 0)</code></td><td>нет чисел</td><td>тело не выполнится ни разу</td></tr>
+        </tbody>
+      </table></div>
+      <p>Из того, что конец не входит, следует удобное свойство: <code>range(10)</code> дает ровно 10 чисел, и это как раз индексы строки длины 10. Поэтому <code>range(len(seq))</code> перебирает все индексы <code>seq</code>, от 0 до <code>len(seq) - 1</code>. Отсюда же частая ошибка на единицу: числа от 1 до 5 дает <code>range(1, 6)</code>, а не <code>range(1, 5)</code>. При отрицательном шаге числа идут вниз и должны оставаться больше конца. Если уже первое число не подходит, диапазон пуст.</p>
+      <div class="runner" data-file="range_demo.py"><textarea>
+for i in range(1, 6):
+    print(i, end=" ")
+print()
+for i in range(0, 10, 3):
+    print(i, end=" ")
+print()
+for i in range(5, 0, -1):
+    print(i, end=" ")
+print()
+for i in range(1, 0):
+    print("эта строка не напечатается")
+print("пустой диапазон: тело не выполнилось ни разу")
+</textarea></div>
+      <p>Индексы и буквы строки перебирают вместе: <code>range(len(seq))</code> дает номер, а <code>seq[i]</code> букву с этим номером. Для более длинной строки заголовок цикла менять не придется.</p>
+      <pre class="code">
+seq = "GATC"
+for i in range(len(seq)):
+    print(i, seq[i])
+# 0 G, 1 A, 2 T, 3 C по одной паре на строке
+</pre>
+      <div class="more">
+        <p>Строго говоря, <code>range</code> не функция, а неизменяемый тип последовательности. Он не хранит все числа в памяти, а помнит только <code>start</code>, <code>stop</code> и <code>step</code>, поэтому <code>range(1000000)</code> занимает столько же места, сколько <code>range(5)</code>. При шаге 0 возникает <code>ValueError</code>. Команда <code>print(range(5))</code> покажет <code>range(0, 5)</code>, а не числа.</p>
+        <p>Цикл <code>for i in "12345"</code> тоже повторит тело пять раз, но <code>i</code> будет строкой <code>"1"</code>, <code>"2"</code> и так далее, а не числом: <code>i + 1</code> даст <code>TypeError</code>.</p>
+      </div>
+      <div class="quiz" data-id="range-negative-step" data-slide="S10">
+        <p class="quiz-q">Что напечатает цикл <code>for i in range(10, 0, -3): print(i, end=" ")</code>?</p>
+        <ul>
+          <li>ничего: диапазон пуст</li>
+          <li><code>1 4 7 10</code></li>
+          <li data-correct><code>10 7 4 1</code></li>
+          <li><code>10 7 4 1 -2</code></li>
+        </ul>
+        <p class="quiz-why">Счет идет от 10 вниз с шагом 3: 10, 7, 4, 1. Следующее число <code>-2</code> уже не больше конца 0, поэтому в диапазон не входит. Пустым диапазон был бы при положительном шаге, а <code>1 4 7 10</code> получится, если считать, что <code>range()</code> всегда идет вверх. Проверьте в редакторе выше.</p>
+      </div>
+      <div class="walk" data-slide="S61">
+        <p class="task"><b>Задача 1.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">s = "GATTACA"
+for i in range(1, len(s), 2):
+    print(s[i], end="")</pre>
+        <div class="anim" data-id="range-step-two" data-title="Разбор задачи 1">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>i</code></th><th><code>s[i]</code></th><th>напечатано</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>1</code></td><td><code>A</code></td><td><code>A</code></td></tr>
+              <tr data-fx="in@2"><td><code>3</code></td><td><code>T</code></td><td><code>AT</code></td></tr>
+              <tr data-fx="in@3"><td><code>5</code></td><td><code>C</code></td><td><code>ATC</code></td></tr>
+              <tr data-fx="in@4"><td>дальше</td><td></td><td>числа 7 в <code>range</code> нет: цикл закончен, <code>i</code> остается 5</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@5">ATC</pre>
+          <p data-fx="in@5">Ответ <code>ATC</code>: <code>range(1, 7, 2)</code> дает индексы 1, 3, 5, и печатаются буквы с этими индексами без пробелов.</p>
+          <p data-fx="in@5">Ответ <code>GTAA</code> получается, если начать с индекса 0, а не 1. Ответ «<code>ATC</code>, а затем ошибка» дают те, кто решил, что 7 входит в диапазон: тогда <code>s[7]</code> завершился бы ошибкой <code>IndexError</code>, потому что буквы с индексом 7 нет.</p>
+        </div>
+        <p>Замените шаг 2 на 3, предскажите вывод и проверьте запуском.</p>
+        <div class="runner" data-file="task_1.py"><textarea>
+s = "GATTACA"
+for i in range(1, len(s), 2):
+    print(s[i], end="")
+</textarea></div>
+      </div>
+    </section>
+
+    <section id="while">
+      <h2>Цикл <code>while</code></h2>
+      <div class="ask" data-slide="S14">
+        <p class="ask-q">Сколько раз читать ввод, если число строк заранее неизвестно?</p>
+        <p class="ask-hint">Подсказка: Остановиться нужно, когда наступит событие, а не когда кончатся элементы.</p>
+        <div class="ask-a"><p>Перебирать нечего: строки появляются по одной, и известно только правило остановки «повторять, пока не введено done». Слово «пока» и дает название следующей конструкции, <code>while</code>.</p></div>
+      </div>
+      <p>Цикл <code>for</code> удобен, когда перед нами готовый набор элементов. Но бывает, что набора нет, а есть только правило остановки. Программа принимает последовательности, пока пользователь не напишет <code>done</code>: сколько строк он введет, заранее неизвестно. Остановиться нужно, когда наступит событие, а не когда кончатся элементы.</p>
+      <p class="def"><span class="term">Цикл <code>while</code></span>&nbsp;— конструкция, которая повторяет тело, пока условие истинно; условие проверяется перед каждой итерацией.</p>
+      <p>Работа <code>while</code> состоит из трех шагов. Сначала Python вычисляет условие. Если оно ложно, цикл заканчивается и выполняется следующая после него строка. Если истинно, выполняется тело, и все начинается с первого шага. Если условие ложно с самого начала, тело не выполнится ни разу. В примере ниже обратный отсчет: пока <code>n</code> больше нуля, программа печатает его и уменьшает на единицу.</p>
+      <pre class="code">
+n = 5
+while n &gt; 0:
+    print(n)
+    n = n - 1
+print("старт")
+# 5, 4, 3, 2, 1 по одному на строке, затем старт
+</pre>
+      <p>При <code>n = 0</code> условие ложно сразу, и программа напечатает только «старт». Если цикл кончается по условию, проверок всегда на одну больше, чем итераций: для <code>n = 5</code> их шесть.</p>
+      <h3>Обход строки через <code>while</code></h3>
+      <p>Тот же обход строки можно написать вручную. Индекс <code>i</code> программист создает сам, сам проверяет, что он не вышел за строку, и сам увеличивает.</p>
+      <div class="runner" data-file="while_index.py"><textarea>
+seq = "GATC"
+i = 0
+while i &lt; len(seq):
+    print(seq[i], end=" ")
+    i = i + 1
+print()
+print("i =", i)
+</textarea></div>
+      <p>Условие <code>i &lt; len(seq)</code> становится ложным, когда <code>i</code> равно длине строки, поэтому последняя прочитанная буква <code>seq[3]</code>. После цикла <code>i</code> равно 4: это не индекс буквы, а число пройденных букв. Для обхода готовой строки <code>for</code> короче и надежнее, а <code>while</code> с индексом нужен, когда шаг или остановка нестандартные.</p>
+      <h3>Бесконечный цикл</h3>
+      <p>Тело <code>while</code> должно менять переменную, от которой зависит условие. Если в программе выше забыть <code>i = i + 1</code>, индекс навсегда останется нулем, условие всегда будет истинным, и цикл не кончится. Такой цикл называют <span class="term">бесконечным</span>.</p>
+      <pre class="code">
+seq = "GATC"
+i = 0
+while i &lt; len(seq):
+    print(seq[i])   # i не меняется: G, G, G, ... без конца
+</pre>
+      <p>Зависшую программу в терминале останавливают клавишами Ctrl+C. Редактор на этой странице сам перезапускает Python через 10 секунд, но такой код в него вставлять незачем. Каждый программист время от времени случайно пишет бесконечный цикл, поэтому полезна привычка: прежде чем запускать <code>while</code>, найдите в теле строку, которая приближает условие к ложному.</p>
+      <aside class="note warn"><p>Перед запуском <code>while</code> спросите себя: что сделает условие ложным? Если ни одна строка тела не меняет переменную условия, цикл бесконечный.</p></aside>
+      <div class="more">
+        <p>Инструкция на шампуне «намылить, смыть, повторить» тоже бесконечный цикл: в ней нет ничего, что сказало бы, сколько раз повторять. В VS Code перед Ctrl+C нужно щелкнуть мышью по окну вывода, иначе нажатие уйдет в редактор кода.</p>
+      </div>
+      <h3>Проверка в конце: <code>while True</code> и <code>break</code></h3>
+      <p>Условие <code>True</code> истинно всегда, поэтому сам по себе цикл <code>while True</code> бесконечен. Выход из него ставят внутрь тела: оператор <code>break</code> сразу завершает цикл. Так условие выхода можно проверить в любом месте тела и сформулировать утвердительно: «остановись, когда это случилось». Тело при этом выполнится хотя бы один раз.</p>
+      <div class="runner" data-file="doubling.py"><textarea>
+n = 1
+steps = 0
+while True:
+    n = n * 2
+    steps = steps + 1
+    if n &gt; 1000:
+        break
+print(steps, n)
+</textarea></div>
+      <p>Здесь можно было написать и <code>while n &lt;= 1000:</code>. Форма <code>while True</code> нужна, когда значение для проверки появляется только внутри тела, например при чтении ввода. Программа ниже читает последовательности, пока не встретит строку <code>done</code>. Поменяйте строки в поле «Ввод» и запустите снова.</p>
+      <div class="runner" data-file="read_until_done.py" data-stdin="GATTACA\nGGCATG\ndone"><textarea>
+count = 0
+while True:
+    line = input()
+    if line == "done":
+        break
+    count = count + 1
+    print("прочитано:", line)
+print("всего последовательностей:", count)
+</textarea></div>
+      <div class="more">
+        <p>В некоторых языках для цикла с проверкой в конце есть конструкция do-while. Для Python ее предлагали в PEP 315 и отклонили: рекомендуемой формой осталась <code>while True</code> с <code>break</code>.</p>
+      </div>
+      <h3><code>for</code> или <code>while</code></h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th><code>for</code></th><th><code>while</code></th></tr></thead>
+        <tbody>
+          <tr><td>Повторяет</td><td>для каждого элемента</td><td>пока условие истинно</td></tr>
+          <tr><td>Число итераций</td><td>известно: сколько элементов</td><td>заранее неизвестно</td></tr>
+          <tr><td>Переменную меняет</td><td>Python</td><td>программист в теле</td></tr>
+          <tr><td>Частая ошибка</td><td>лишний отступ</td><td>бесконечный цикл</td></tr>
+          <tr><td>Пример</td><td>обход строки, <code>range()</code></td><td>ввод до <code>done</code>, удвоение до порога</td></tr>
+        </tbody>
+      </table></div>
+      <p>Любой <code>for</code> можно переписать через <code>while</code>, как обход строки выше; обратное не всегда удобно. Правило выбора: если можно назвать, что перебираем, берите <code>for</code>, он сам следит за переменной и не зациклится. Если можно назвать только момент остановки, берите <code>while</code> и отвечайте за остановку сами. Ч. Северанс называет <code>for</code> определенным циклом, а <code>while</code> неопределенным.</p>
+      <div class="quiz" data-id="while-check-before" data-slide="S20">
+        <p class="quiz-q">Что напечатает программа <code>n = 10</code>, <code>while n &gt; 0:</code>, в теле <code>n = n - 3</code> и <code>print(n, end=" ")</code>?</p>
+        <ul>
+          <li data-correct><code>7 4 1 -2</code></li>
+          <li><code>7 4 1</code></li>
+          <li><code>10 7 4 1</code></li>
+          <li>ничего: цикл бесконечный</li>
+        </ul>
+        <p class="quiz-why">Условие проверяется только перед итерацией. Перед четвертой итерацией <code>n</code> равно 1, условие истинно, и тело выполняется целиком: вычитание дает <code>-2</code>, а <code>print</code> его печатает. Только следующая проверка завершает цикл. Ответ <code>7 4 1</code> предполагает, что <code>while</code> следит за условием непрерывно; <code>10 7 4 1</code> не учитывает, что печать стоит после вычитания. Бесконечным цикл был бы, если бы <code>n</code> не менялось.</p>
+      </div>
+      <div class="walk" data-slide="S62">
+        <p class="task"><b>Задача 2.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">n = 1
+while n &lt; 50:
+    n = n * 3
+print(n)</pre>
+        <div class="anim" data-id="while-multiply" data-title="Разбор задачи 2">
+          <div class="table-wrap"><table>
+            <thead><tr><th>проверка <code>n &lt; 50</code></th><th><code>n = n * 3</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>1 &lt; 50</code>: да</td><td><code>n = 3</code></td></tr>
+              <tr data-fx="in@2"><td><code>3 &lt; 50</code>: да</td><td><code>n = 9</code></td></tr>
+              <tr data-fx="in@3"><td><code>9 &lt; 50</code>: да</td><td><code>n = 27</code></td></tr>
+              <tr data-fx="in@4"><td><code>27 &lt; 50</code>: да</td><td><code>n = 81</code></td></tr>
+              <tr data-fx="in@5"><td><code>81 &lt; 50</code>: нет</td><td>цикл закончен</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@6">81</pre>
+          <p data-fx="in@6">Ответ <code>81</code>: цикл выходит, когда условие стало ложным, поэтому <code>n</code> уже больше 50.</p>
+          <p data-fx="in@6">Ответ <code>27</code> дают те, кто считает, что цикл остановится перед превышением 50. Условие проверяется только в начале итерации, поэтому последнее умножение уже выполнено.</p>
+        </div>
+        <p>Замените 50 на 81 и предскажите вывод до запуска.</p>
+        <div class="runner" data-file="task_2.py"><textarea>
+n = 1
+while n &lt; 50:
+    n = n * 3
+print(n)
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S63">
+        <p class="task"><b>Задача 3.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">seq = "GGCATG"
+i = 0
+while seq[i] != "T":
+    i = i + 1
+print(i)</pre>
+        <div class="anim" data-id="while-find-t" data-title="Разбор задачи 3">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>i</code></th><th><code>seq[i]</code></th><th><code>seq[i] != "T"</code></th><th>действие</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>0</code></td><td><code>G</code></td><td>да</td><td><code>i = 1</code></td></tr>
+              <tr data-fx="in@2"><td><code>1</code></td><td><code>G</code></td><td>да</td><td><code>i = 2</code></td></tr>
+              <tr data-fx="in@3"><td><code>2</code></td><td><code>C</code></td><td>да</td><td><code>i = 3</code></td></tr>
+              <tr data-fx="in@4"><td><code>3</code></td><td><code>A</code></td><td>да</td><td><code>i = 4</code></td></tr>
+              <tr data-fx="in@5"><td><code>4</code></td><td><code>T</code></td><td>нет</td><td>цикл закончен</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@6">4</pre>
+          <p data-fx="in@6">Ответ <code>4</code>: индекс первой буквы T. Если бы T в строке не было, индекс вышел бы за конец строки и программа упала бы с <code>IndexError</code>.</p>
+          <p data-fx="in@6">Если бы буквы T в строке не было, индекс дошел бы до конца строки, и <code>seq[i]</code> завершилось бы ошибкой <code>IndexError</code>. Безопаснее перебирать индексы циклом <code>for</code> и выходить через <code>break</code>: об этом следующий раздел.</p>
+        </div>
+        <p>Замените строку на <code>"GGCA"</code> и запустите: программа завершится ошибкой.</p>
+        <div class="runner" data-file="task_3.py"><textarea>
+seq = "GGCATG"
+i = 0
+while seq[i] != "T":
+    i = i + 1
+print(i)
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S64">
+        <p class="task"><b>Задача 4.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">total = 0
+while True:
+    total = total + 7
+    if total &gt; 30:
+        break
+print(total)</pre>
+        <div class="anim" data-id="while-true-sum" data-title="Разбор задачи 4">
+          <div class="table-wrap"><table>
+            <thead><tr><th>итерация</th><th><code>total = total + 7</code></th><th><code>total &gt; 30</code></th><th>действие</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td>1</td><td><code>total = 7</code></td><td>нет</td><td>дальше</td></tr>
+              <tr data-fx="in@2"><td>2</td><td><code>total = 14</code></td><td>нет</td><td>дальше</td></tr>
+              <tr data-fx="in@3"><td>3</td><td><code>total = 21</code></td><td>нет</td><td>дальше</td></tr>
+              <tr data-fx="in@4"><td>4</td><td><code>total = 28</code></td><td>нет</td><td>дальше</td></tr>
+              <tr data-fx="in@5"><td>5</td><td><code>total = 35</code></td><td>да</td><td><code>break</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@6">35</pre>
+          <p data-fx="in@6">Ответ <code>35</code>: проверка стоит после сложения, поэтому цикл выходит на первом значении больше 30.</p>
+          <p data-fx="in@6">Ответ <code>28</code> дают те, кто думает, что цикл остановится перед превышением 30, как <code>27</code> в задаче 2. Проверка стоит после сложения, поэтому значение 35 успевает получиться.</p>
+        </div>
+        <p>Перепишите цикл через <code>while total &lt;= 30:</code> с тем же сложением в теле и проверьте, что ответ остался 35.</p>
+        <div class="runner" data-file="task_4.py"><textarea>
+total = 0
+while True:
+    total = total + 7
+    if total &gt; 30:
+        break
+print(total)
+</textarea></div>
+      </div>
+    </section>
+
+    <section id="break-continue">
+      <h2><code>break</code>, <code>continue</code> и <code>else</code></h2>
+      <div class="ask" data-slide="S24">
+        <p class="ask-q">Нашли первую N в последовательности. Зачем смотреть дальше?</p>
+        <p class="ask-hint">Подсказка: А если в последовательности миллион букв?.</p>
+        <div class="ask-a"><p>Смотреть дальше незачем: ответ уже найден. Остановить цикл досрочно позволяет оператор <code>break</code>, о нем этот раздел.</p></div>
+      </div>
+      <p>До сих пор цикл либо проходил все элементы, либо останавливался по условию в заголовке. Теперь им можно управлять изнутри тела. Пусть нужно узнать, есть ли в последовательности неоднозначные позиции, и показать первую. Цикл <code>for</code> пройдет все буквы до конца, даже если нужная нашлась на третьей. Для короткой строки это неважно, для генома важно.</p>
+      <p class="def"><span class="term"><code>break</code></span>&nbsp;— оператор, который сразу завершает ближайший цикл, в теле которого он стоит.</p>
+      <p class="def"><span class="term"><code>continue</code></span>&nbsp;— оператор, который пропускает остаток тела и переходит к следующей итерации.</p>
+      <p>Оба оператора почти всегда стоят внутри <code>if</code>: «если нашли, выйти», «если эта буква не нужна, перейти к следующей». Если циклы вложены, они действуют только на самый внутренний. После <code>break</code> переменная цикла <code>for</code> хранит элемент, на котором цикл остановился. Перебор, который заканчивается на первой находке, называют <span class="term">линейным поиском</span>. Запустите пример, затем замените строку на <code>"ACGT"</code>.</p>
+      <div class="anim" data-slide="S65" data-title="Куда ведут break и continue">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+            <div>
+              <pre class="code" data-lines="1:mark@1 2-3:mark@1 5:ok@1">for base in seq:
+    if base == "N":
+        break
+    print(base)
+print("готово")</pre>
+              <p data-fx="in@1">Путь <code>break</code>: от условия мимо остатка тела и мимо заголовка сразу к первой строке после цикла.</p>
+            </div>
+            <div>
+              <pre class="code" data-lines="1:ok@2 2-3:mark@2">for base in seq:
+    if base == "N":
+        continue
+    print(base)
+print("готово")</pre>
+              <p data-fx="in@2">Путь <code>continue</code>: от условия мимо остатка тела обратно к заголовку цикла, к следующему элементу.</p>
+            </div>
+          </div>
+      </div>
+      <div class="runner" data-file="first_ambiguous.py"><textarea>
+seq = "ACGTRACN"
+for i in range(len(seq)):
+    if seq[i] not in "ACGT":
+        break
+print(i, seq[i])
+</textarea></div>
+      <p>Буквы с индексами 0–3 допустимы, условие ложно, и цикл берет следующий индекс. На индексе 4 стоит R, условие истинно, и <code>break</code> заканчивает цикл, а <code>i</code> остается равным 4. Букву N на индексе 7 программа даже не видела: в этом и состоит экономия линейного поиска.</p>
+      <div class="anim" data-slide="S66" data-title="break по шагам">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>i</code></th><th><code>seq[i]</code></th><th>в <code>"ACGT"</code>?</th><th>действие</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>0</code></td><td><code>A</code></td><td>да</td><td>следующая буква</td></tr>
+              <tr data-fx="in@2"><td><code>1</code></td><td><code>C</code></td><td>да</td><td>следующая буква</td></tr>
+              <tr data-fx="in@3"><td><code>2</code></td><td><code>G</code></td><td>да</td><td>следующая буква</td></tr>
+              <tr data-fx="in@4"><td><code>3</code></td><td><code>T</code></td><td>да</td><td>следующая буква</td></tr>
+              <tr data-fx="in@5 bad@5"><td><code>4</code></td><td><code>R</code></td><td>нет</td><td><code>break</code>: выход из цикла</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@6">4 R</pre>
+      </div>
+      <aside class="note warn"><p>Для <code>"ACGT"</code> программа напечатает <code>3 T</code>, как будто нашла недопустимую букву: без <code>break</code> переменная <code>i</code> просто осталась на последнем индексе. Для пустой строки цикл не выполнится ни разу, <code>i</code> не будет создана, и последняя строка даст <code>NameError</code>. Выход по <code>break</code> и обычное окончание цикла нужно различать.</p></aside>
+      <p>Оператор <code>continue</code> не прерывает цикл. Он пропускает остаток тела только для текущего элемента. Две программы ниже отличаются одним словом. С <code>break</code> цикл заканчивается на первой N: напечатаны четыре буквы, вторая половина строки не просмотрена. С <code>continue</code> на N пропускается только <code>print</code>, а цикл идет дальше и печатает остальные семь букв. По выводу легко запомнить: <code>break</code> обрезает, <code>continue</code> вычеркивает.</p>
+      <div class="runner" data-file="break_vs_continue.py"><textarea>
+for c in "ACGTNACG":
+    if c == "N":
+        break
+    print(c, end="")
+print()
+
+for c in "ACGTNACG":
+    if c == "N":
+        continue
+    print(c, end="")
+print()
+</textarea></div>
+      <div class="more">
+        <p>Тот же результат, что с <code>continue</code>, дает <code>if c != "N": print(c, end="")</code>. Оператор <code>continue</code> удобен, когда без него пришлось бы добавить еще один уровень отступа для длинного тела.</p>
+        <p>В <code>while</code> оператор <code>continue</code> тоже возвращает к проверке условия. Поэтому строка, которая меняет переменную условия, должна стоять до <code>continue</code>, иначе цикл станет бесконечным.</p>
+        <p>Оператора goto в Python нет. Метки для выхода сразу из нескольких циклов предлагались в PEP 3136 и были отклонены.</p>
+      </div>
+      <h3>Два выхода из цикла</h3>
+      <p>У цикла поиска два выхода: элементы кончились или сработал <code>break</code>. Python позволяет повесить на первый выход отдельный блок.</p>
+      <p class="def"><span class="term">Ветвь <code>else</code> цикла</span>&nbsp;— блок, записанный после цикла на уровне <code>for</code> или <code>while</code>, который выполняется, только если цикл закончился сам, без <code>break</code>.</p>
+      <p>У <code>for</code> это значит, что элементы кончились, у <code>while</code>, что условие стало ложным. Обратите внимание на отступ: <code>else</code> написан на одном уровне с <code>for</code> и относится к циклу, а не к <code>if</code>. Внутри цикла много раз проверяется <code>if</code>, и если он ни разу не сработал, выполняется <code>else</code> снаружи.</p>
+      <p>Тот же поиск пишут и без <code>else</code> у цикла. До цикла заводят <span class="term">флаг</span>, логическую переменную <code>found = False</code>, которая помнит, случилась ли находка. Перед <code>break</code> ей присваивают <code>True</code>, а после цикла проверяют обычным <code>if not found:</code>. Код длиннее на две строки, зато его можно прочитать без особого правила про <code>else</code>. В примере обе программы проверяют одну и ту же строку. Запустите, затем замените <code>"ACGTTGCA"</code> на <code>"ACGN"</code>: обе напечатают <code>недопустимая: N</code>.</p>
+      <div class="runner" data-file="alphabet.py"><textarea>
+seq = "ACGTTGCA"
+
+# проверка через else цикла
+for base in seq:
+    if base not in "ACGT":
+        print("недопустимая:", base)
+        break
+else:
+    print("все буквы допустимы")
+
+# та же проверка с флагом
+found = False
+for base in seq:
+    if base not in "ACGT":
+        print("недопустимая:", base)
+        found = True       # флаг помнит находку
+        break
+if not found:
+    print("все буквы допустимы")
+</textarea></div>
+      <p>Пример из документации Python проверяет, простое ли число. Цикл перебирает возможные делители, а <code>n % x == 0</code> значит «делится нацело». Если ни один делитель не подошел, <code>break</code> не случился, и <code>else</code> сообщает, что число простое. Замените 7 на 9 и запустите снова.</p>
+      <div class="runner" data-file="prime.py"><textarea>
+n = 7
+for x in range(2, n):
+    if n % x == 0:
+        print(n, "делится на", x)
+        break
+else:
+    print(n, "простое")
+</textarea></div>
+      <div class="more">
+        <p>У <code>else</code> цикла есть сторонники и противники. Документация Python и книга Д. Бизли показывают его как естественный способ сказать «ничего не нашли». Б. Слаткин в книге Effective Python советует его избегать: читатель видит слово <code>else</code> и думает, что ветвь выполнится, если цикл прервался, а на деле все наоборот. Выбор за вами, но читать чужой код с <code>else</code> у цикла нужно уметь.</p>
+        <p>Перебирать делители до самого <code>n</code> долго: достаточно дойти до квадратного корня из <code>n</code>. В документации этот же код стоит внутри еще одного цикла и печатает все простые числа до 10.</p>
+      </div>
+      <div class="quiz" data-id="loop-else-empty" data-slide="S30">
+        <p class="quiz-q">Что напечатает программа, если <code>seq = ""</code>, а дальше идет проверка алфавита: <code>for base in seq:</code> с <code>break</code> на недопустимой букве и <code>else: print("все буквы допустимы")</code>?</p>
+        <ul>
+          <li>ничего</li>
+          <li><code>IndexError</code></li>
+          <li><code>NameError</code></li>
+          <li data-correct><code>все буквы допустимы</code></li>
+        </ul>
+        <p class="quiz-why">Итераций не было, значит, не было и <code>break</code>: цикл закончился сам, и ветвь <code>else</code> выполняется. Сообщение появляется, хотя проверять было нечего, поэтому пустую строку проверяют отдельно, до цикла: <code>if not seq:</code>. <code>IndexError</code> дало бы обращение <code>seq[0]</code>, но индексов здесь нет. Переменная <code>base</code> действительно не создана, но к ней никто не обращается, поэтому и <code>NameError</code> не будет.</p>
+      </div>
+      <div class="walk" data-slide="S71">
+        <p class="task"><b>Задача 5.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">for n in range(1, 10):
+    if n % 4 == 0:
+        break
+    print(n, end=" ")</pre>
+        <div class="anim" data-id="break-mod-four" data-title="Разбор задачи 5">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>n</code></th><th><code>n % 4 == 0</code></th><th>действие</th><th>напечатано</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>1</code></td><td>нет</td><td>печать</td><td><code>1</code></td></tr>
+              <tr data-fx="in@2"><td><code>2</code></td><td>нет</td><td>печать</td><td><code>1 2</code></td></tr>
+              <tr data-fx="in@3"><td><code>3</code></td><td>нет</td><td>печать</td><td><code>1 2 3</code></td></tr>
+              <tr data-fx="in@4"><td><code>4</code></td><td>да</td><td><code>break</code></td><td><code>1 2 3</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@5">1 2 3</pre>
+          <p data-fx="in@5">Ответ <code>1 2 3</code>: на <code>n = 4</code> срабатывает <code>break</code>, и до чисел 5–9 цикл не доходит.</p>
+          <p data-fx="in@5">Ответ <code>1 2 3 4</code> неверен: печать стоит после <code>break</code>, и на четверке до нее дело не доходит. Ответ <code>1 2 3 5 6 7 9</code> дает <code>continue</code>, а не <code>break</code>.</p>
+        </div>
+        <p>Замените <code>break</code> на <code>continue</code> и сравните вывод.</p>
+        <div class="runner" data-file="task_5.py"><textarea>
+for n in range(1, 10):
+    if n % 4 == 0:
+        break
+    print(n, end=" ")
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S72">
+        <p class="task"><b>Задача 6.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">total = 0
+for x in range(1, 8):
+    if x % 3 == 0:
+        continue
+    total = total + x
+print(total)</pre>
+        <div class="anim" data-id="continue-sum" data-title="Разбор задачи 6">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>x</code></th><th><code>x % 3 == 0</code></th><th>действие</th><th><code>total</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>1</code></td><td>нет</td><td>прибавить</td><td><code>1</code></td></tr>
+              <tr data-fx="in@2"><td><code>2</code></td><td>нет</td><td>прибавить</td><td><code>3</code></td></tr>
+              <tr data-fx="in@3"><td><code>3</code></td><td>да</td><td><code>continue</code></td><td><code>3</code></td></tr>
+              <tr data-fx="in@4"><td><code>4</code></td><td>нет</td><td>прибавить</td><td><code>7</code></td></tr>
+              <tr data-fx="in@5"><td><code>5</code></td><td>нет</td><td>прибавить</td><td><code>12</code></td></tr>
+              <tr data-fx="in@6"><td><code>6</code></td><td>да</td><td><code>continue</code></td><td><code>12</code></td></tr>
+              <tr data-fx="in@7"><td><code>7</code></td><td>нет</td><td>прибавить</td><td><code>19</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@8">19</pre>
+          <p data-fx="in@8">Ответ <code>19</code>: 1 + 2 + 4 + 5 + 7; числа 3 и 6 пропущены через <code>continue</code>.</p>
+          <p data-fx="in@8">Ответ <code>28</code> дают те, кто забыл про <code>continue</code> и сложил все числа от 1 до 7. Ответ <code>3</code> дают те, кто решил, что <code>continue</code> прерывает цикл, как <code>break</code>.</p>
+        </div>
+        <p>Замените <code>continue</code> на <code>break</code>, предскажите вывод и проверьте запуском.</p>
+        <div class="runner" data-file="task_6.py"><textarea>
+total = 0
+for x in range(1, 8):
+    if x % 3 == 0:
+        continue
+    total = total + x
+print(total)
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S73">
+        <p class="task"><b>Задача 7.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">n = 10
+while n &gt; 1:
+    n = n - 3
+    if n == 5:
+        break
+else:
+    print("нет пятерки")
+print(n)</pre>
+        <div class="anim" data-id="while-else-five" data-title="Разбор задачи 7">
+          <div class="table-wrap"><table>
+            <thead><tr><th>проверка <code>n &gt; 1</code></th><th><code>n = n - 3</code></th><th><code>n == 5</code></th><th>действие</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>10 &gt; 1</code>: да</td><td><code>n = 7</code></td><td>нет</td><td>дальше</td></tr>
+              <tr data-fx="in@2"><td><code>7 &gt; 1</code>: да</td><td><code>n = 4</code></td><td>нет</td><td>дальше</td></tr>
+              <tr data-fx="in@3"><td><code>4 &gt; 1</code>: да</td><td><code>n = 1</code></td><td>нет</td><td>дальше</td></tr>
+              <tr data-fx="in@4"><td><code>1 &gt; 1</code>: нет</td><td></td><td></td><td>конец без <code>break</code>: <code>else</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@5">нет пятерки
+1</pre>
+          <p data-fx="in@5">Ответ: две строки, <code>нет пятерки</code> и <code>1</code>. Значения 7, 4, 1 проскочили пятерку, <code>break</code> не сработал, и выполнилась ветвь <code>else</code>.</p>
+          <p data-fx="in@5">Ответ «только <code>1</code>» дают те, кто думает, что ветвь <code>else</code> бывает только у <code>for</code> или выполняется после <code>break</code>. У <code>while</code> она выполняется, когда условие стало ложным.</p>
+        </div>
+        <p>Замените <code>n = 10</code> на <code>n = 11</code>: получатся 8 и 5, <code>break</code> сработает, <code>else</code> не выполнится, и программа напечатает только 5.</p>
+        <div class="runner" data-file="task_7.py"><textarea>
+n = 10
+while n &gt; 1:
+    n = n - 3
+    if n == 5:
+        break
+else:
+    print("нет пятерки")
+print(n)
+</textarea></div>
+      </div>
+    </section>
+
+    <section id="accumulators">
+      <h2>Счетчики, накопители, максимум</h2>
+      <div class="ask" data-slide="S34">
+        <p class="ask-q">Как посчитать буквы G, если бы метода <code>.count()</code> не было?</p>
+        <p class="ask-hint">Подсказка: Что вы делаете, когда считаете буквы на бумаге?.</p>
+        <div class="ask-a"><p>На бумаге идут по строке пальцем и при каждой G ставят черточку: черточки помнят, сколько уже насчитано. В программе эту память дает переменная, которая создана до цикла и живет дольше одной итерации.</p></div>
+      </div>
+      <p>Поиск отвечает на вопрос «есть или нет». Чаще нужен ответ «сколько», «какая доля», «какой больше всех». Когда буквы G считают на бумаге, идут по строке пальцем и при каждой G ставят черточку: черточки помнят, сколько уже насчитано. В программе эту память дает переменная, которая живет дольше одной итерации.</p>
+      <p class="def"><span class="term">Накопитель</span>&nbsp;— переменная, которая собирает результат цикла: ее инициализируют до цикла, обновляют в теле и читают после цикла.</p>
+      <p>Накопитель, который растет на единицу, когда случилось событие, называют <span class="term">счетчиком</span>. Накопитель суммы прибавляет само значение. Пока цикл идет, в переменной лежит результат для уже просмотренной части данных, а после цикла это готовый ответ. Метод <code>.count()</code> из лекции 2 считает буквы и без цикла, но шаблон пригодится там, где готового метода нет.</p>
+      <pre class="code">
+count = 0                   # инициализация до цикла
+for base in seq:
+    if base == "G":
+        count = count + 1   # обновление в теле
+print(count)                # результат после цикла
+</pre>
+      <p>Если переменную не создать заранее, первое же обновление завершится ошибкой: Python сначала вычисляет правую часть <code>count + 1</code>, а <code>count</code> еще не существует.</p>
+      <div class="runner" data-file="no_init.py" data-error><textarea>
+seq = "GGCA"
+for base in seq:
+    if base == "G":
+        count = count + 1   # count еще не создан
+print(count)
+</textarea></div>
+      <div class="more">
+        <p>Короткая запись <code>count += 1</code> означает то же, что <code>count = count + 1</code>. В лекции используется длинная форма, чтобы обновление было видно.</p>
+      </div>
+      <h3>Четыре счетчика за один проход</h3>
+      <p>Задача Rosalind DNA просит вывести через пробел числа букв A, C, G и T. Ее решают четырьмя счетчиками и одной цепочкой <code>if</code>/<code>elif</code> из лекции 3. Запись <code>a = c = g = t = 0</code> дает всем четырем переменным значение ноль. Каждая буква увеличивает ровно один счетчик, а буквы вне ACGT цепочка без <code>else</code> пропустит.</p>
+      <div class="runner" data-file="rosalind_dna.py"><textarea>
+seq = "AGCTTTTCATTC"
+a = c = g = t = 0
+for base in seq:
+    if base == "A":
+        a = a + 1
+    elif base == "C":
+        c = c + 1
+    elif base == "G":
+        g = g + 1
+    elif base == "T":
+        t = t + 1
+print(a, c, g, t)
+</textarea></div>
+      <div class="more">
+        <p>Строка взята из начала примера задачи Rosalind DNA. Для полного примера из 70 букв Rosalind ожидает ответ <code>20 12 17 21</code>, и программа его дает. Если заменить <code>elif</code> отдельными <code>if</code>, результат не изменится, но каждая буква будет проверяться четыре раза.</p>
+        <p>Встроенные функции <code>len()</code>, <code>sum()</code>, <code>max()</code>, <code>min()</code> и метод <code>.count()</code> считают длину, сумму, экстремум и число вхождений без ручного цикла.</p>
+      </div>
+      <h3>GC-состав без N</h3>
+      <p>GC-состав из лекции 2 Rosalind определяет как процент букв G и C среди всех нуклеотидов. Но N означает, что основание неизвестно, и считать его «не G и не C» было бы неверно. Поэтому N пропускают через <code>continue</code>: счетчики на этой итерации не меняются. Счетчик <code>known</code> считает известные буквы, <code>gc</code> только G и C.</p>
+      <div class="runner" data-file="gc_no_n.py"><textarea>
+seq = "GGCNNATGC"
+gc = 0
+known = 0
+for base in seq:
+    if base == "N":
+        continue
+    known = known + 1
+    if base in "GC":
+        gc = gc + 1
+pct = gc / known * 100
+print(round(pct, 1))
+</textarea></div>
+      <p>Из девяти букв известны семь, из них пять G или C: 5 / 7 × 100 = 71,43…, и <code>round(pct, 1)</code> печатает <code>71.4</code>. Без <code>continue</code> обе N попали бы в <code>known</code>, и процент стал бы 5 / 9 × 100 = 55,6.</p>
+      <div class="anim" data-slide="S90" data-title="GC-состав без N по шагам">
+          <p>На G, C, A и T растет <code>known</code>, затем вторая проверка решает, расти ли <code>gc</code>. На двух N срабатывает <code>continue</code>, и строки <code>known = known + 1</code> и <code>if base in "GC"</code> не выполняются вовсе.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>base</code></th><th>это N?</th><th><code>known</code></th><th>G или C?</th><th><code>gc</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>G</code></td><td>нет</td><td><code>1</code></td><td>да</td><td><code>1</code></td></tr>
+              <tr data-fx="in@2"><td><code>G</code></td><td>нет</td><td><code>2</code></td><td>да</td><td><code>2</code></td></tr>
+              <tr data-fx="in@3"><td><code>C</code></td><td>нет</td><td><code>3</code></td><td>да</td><td><code>3</code></td></tr>
+              <tr data-fx="in@4 mark@4"><td><code>N</code></td><td>да: <code>continue</code></td><td><code>3</code></td><td>пропуск</td><td><code>3</code></td></tr>
+              <tr data-fx="in@5 mark@5"><td><code>N</code></td><td>да: <code>continue</code></td><td><code>3</code></td><td>пропуск</td><td><code>3</code></td></tr>
+              <tr data-fx="in@6"><td><code>A</code></td><td>нет</td><td><code>4</code></td><td>нет</td><td><code>3</code></td></tr>
+              <tr data-fx="in@7"><td><code>T</code></td><td>нет</td><td><code>5</code></td><td>нет</td><td><code>3</code></td></tr>
+              <tr data-fx="in@8"><td><code>G</code></td><td>нет</td><td><code>6</code></td><td>да</td><td><code>4</code></td></tr>
+              <tr data-fx="in@9"><td><code>C</code></td><td>нет</td><td><code>7</code></td><td>да</td><td><code>5</code></td></tr>
+            </tbody>
+          </table></div>
+          <p data-fx="in@10">Итог: <code>gc</code> равно 5, <code>known</code> равно 7, <code>pct</code> = 5 / 7 · 100 = 71,43…, и <code>round(pct, 1)</code> печатает <code>71.4</code>.</p>
+      </div>
+      <div class="more">
+        <p>Исключать N из знаменателя здесь учебное решение: в задачах Rosalind N не встречается. Если строка состоит из одних N, <code>known</code> останется нулем, и деление даст <code>ZeroDivisionError</code>.</p>
+      </div>
+      <h3>Счетчик внутри цикла</h3>
+      <p>Программа ниже должна посчитать G и C в <code>"GGCAT"</code>, то есть напечатать 3. Запустите ее, затем перенесите строку <code>gc = 0</code> на уровень выше, до <code>for</code>, и запустите снова.</p>
+      <div class="runner" data-file="reset_trap.py"><textarea>
+seq = "GGCAT"
+for base in seq:
+    gc = 0              # ошибка: обнуление на каждой итерации
+    if base in "GC":
+        gc = gc + 1
+print(gc)
+</textarea></div>
+      <aside class="note warn"><p>Строка <code>gc = 0</code> с отступом стоит внутри цикла и обнуляет счетчик на каждой итерации. После цикла в нем результат только для последней буквы: здесь это T, поэтому напечатан 0. Для строки, которая кончается на G, программа напечатала бы 1 и выглядела бы почти правильной. Все, что должно пережить итерации, создается до цикла.</p></aside>
+      <h3>Наибольшее значение</h3>
+      <p>Задача Rosalind GC: среди нескольких записей FASTA найти ту, у которой GC-состав больше. Максимум ищут шаблоном «лучшее на данный момент»: переменная <code>mx</code> хранит наибольшее значение из уже просмотренных. Вначале не просмотрено ничего, и это честно записывают как <code>None</code>. Первое значение сразу становится лучшим, потому что <code>mx is None</code> истинно, а дальше <code>mx</code> меняется, только если встретилось значение больше.</p>
+      <div class="runner" data-file="max_gc.py"><textarea>
+fa = "&gt;1 GGAT &gt;2 GCGA &gt;3 ATCA"
+mx = None
+for w in fa.split():
+    if w.startswith("&gt;"):
+        continue            # строку-заголовок пропускаем
+    gc = w.count("G")
+    gc = gc + w.count("C")
+    gc = gc / len(w) * 100
+    if mx is None or gc &gt; mx:
+        mx = gc
+        mx_seq = w
+print(mx_seq, mx)
+</textarea></div>
+      <p>Записи FASTA для краткости даны в одну строку через пробел: <code>.split()</code> из лекции 2 разрезает ее на шесть слов, а <code>continue</code> пропускает заголовки. <code>GGAT</code> дает 50 %, и <code>mx</code> пока <code>None</code>: она становится лучшей. <code>GCGA</code> дает 75 %, это больше 50, и лучшая меняется. <code>ATCA</code> дает 25 %, ничего не меняется.</p>
+      <p>Порядок частей в <code>mx is None or gc &gt; mx</code> важен. Сравнение числа с <code>None</code> дало бы <code>TypeError</code>, но при <code>mx = None</code> левая часть <code>or</code> уже истинна, и правая не вычисляется. Начинать максимум с нуля можно для длин и счетчиков, потому что они не бывают отрицательными. Для произвольных чисел начинают с <code>None</code> или с первого элемента.</p>
+      <div class="anim" data-slide="S91" data-title="Наибольший GC-состав по шагам">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>w</code></th><th>GC, %</th><th>обновить?</th><th><code>mx</code></th><th><code>mx_seq</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td>&gt;1</td><td>пропуск</td><td></td><td><code>None</code></td><td></td></tr>
+              <tr data-fx="in@2"><td>GGAT</td><td>50.0</td><td>да, первая</td><td>50.0</td><td>GGAT</td></tr>
+              <tr data-fx="in@3"><td>&gt;2</td><td>пропуск</td><td></td><td>50.0</td><td>GGAT</td></tr>
+              <tr data-fx="in@4"><td>GCGA</td><td>75.0</td><td>да: 75 &gt; 50</td><td>75.0</td><td>GCGA</td></tr>
+              <tr data-fx="in@5"><td>&gt;3</td><td>пропуск</td><td></td><td>75.0</td><td>GCGA</td></tr>
+              <tr data-fx="in@6"><td>ATCA</td><td>25.0</td><td>нет: 25 &lt; 75</td><td>75.0</td><td>GCGA</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@7">GCGA 75.0</pre>
+          <p data-fx="in@7">Напечатано <code>GCGA 75.0</code>: первой взяли <code>GGAT</code>, потому что <code>mx is None</code>; лучшая сменилась один раз, когда 75 &gt; 50.</p>
+      </div>
+      <div class="more">
+        <p>В настоящем FASTA записи идут на отдельных строках, а Rosalind просит вывести идентификатор записи: его можно запомнить из строки с <code>&gt;</code>. Встроенная <code>max()</code> находит максимум без цикла, но для пустых данных без аргумента <code>default</code> дает <code>ValueError</code>.</p>
+      </div>
+      <div class="quiz" data-id="max-start-zero" data-slide="S40">
+        <p class="quiz-q">Что напечатает программа <code>largest = 0</code>, затем <code>for x in range(-5, -1):</code> с <code>if x &gt; largest: largest = x</code> и <code>print(largest)</code>?</p>
+        <ul>
+          <li><code>-5</code></li>
+          <li><code>-2</code></li>
+          <li data-correct><code>0</code></li>
+          <li><code>None</code></li>
+        </ul>
+        <p class="quiz-why"><code>range(-5, -1)</code> дает числа −5, −4, −3, −2, и ни одно из них не больше 0, поэтому начальное значение сохранилось. Программа вернула число, которого в данных нет. Вариант <code>-2</code> отвечает, каким максимум должен быть, а не что напечатает программа: его дал бы старт с <code>None</code> или с первого элемента. <code>None</code> получился бы только при старте с <code>None</code> на пустых данных.</p>
+      </div>
+      <div class="walk" data-slide="S74">
+        <p class="task"><b>Задача 8.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">seq = "ATGCGCAT"
+best = 0
+run = 0
+for b in seq:
+    if b in "GC":
+        run = run + 1
+        if run &gt; best:
+            best = run
+    else:
+        run = 0
+print(best)</pre>
+        <div class="anim" data-id="gc-run" data-title="Разбор задачи 8">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>b</code></th><th>G или C?</th><th><code>run</code></th><th><code>best</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>A</code></td><td>нет</td><td><code>0</code></td><td><code>0</code></td></tr>
+              <tr data-fx="in@2"><td><code>T</code></td><td>нет</td><td><code>0</code></td><td><code>0</code></td></tr>
+              <tr data-fx="in@3"><td><code>G</code></td><td>да</td><td><code>1</code></td><td><code>1</code></td></tr>
+              <tr data-fx="in@4"><td><code>C</code></td><td>да</td><td><code>2</code></td><td><code>2</code></td></tr>
+              <tr data-fx="in@5"><td><code>G</code></td><td>да</td><td><code>3</code></td><td><code>3</code></td></tr>
+              <tr data-fx="in@6"><td><code>C</code></td><td>да</td><td><code>4</code></td><td><code>4</code></td></tr>
+              <tr data-fx="in@7"><td><code>A</code></td><td>нет</td><td><code>0</code></td><td><code>4</code></td></tr>
+              <tr data-fx="in@8"><td><code>T</code></td><td>нет</td><td><code>0</code></td><td><code>4</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@9">4</pre>
+          <p data-fx="in@9">Ответ <code>4</code>: самый длинный участок из G и C подряд, <code>GCGC</code>, имеет длину 4.</p>
+          <p data-fx="in@9">Ответ <code>2</code> дают те, кто путает участок подряд с одной парой букв. Ответ 4 здесь совпадает и с общим числом G и C в строке, поэтому проверьте программу на другой строке.</p>
+        </div>
+        <p>Замените строку на <code>"GCATGC"</code>: ответ 2, хотя всего G и C там 4.</p>
+        <div class="runner" data-file="task_8.py"><textarea>
+seq = "ATGCGCAT"
+best = 0
+run = 0
+for b in seq:
+    if b in "GC":
+        run = run + 1
+        if run &gt; best:
+            best = run
+    else:
+        run = 0
+print(best)
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S92">
+        <p class="task"><b>Задача 8, другое решение.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">seq = "ATGCGCAT"
+s = seq.replace("A", " ")
+s = s.replace("T", " ")
+parts = s.split()
+print(parts)
+best = 0
+for p in parts:
+    if len(p) &gt; best:
+        best = len(p)
+print(best)</pre>
+        <div class="anim" data-id="gc-run-split" data-title="Разбор задачи 8">
+          <p data-fx="in@1"><code>seq.replace("A", " ")</code> дает <code>"&nbsp;TGCGC&nbsp;T"</code>.</p>
+          <p data-fx="in@2"><code>.replace("T", " ")</code> дает <code>"&nbsp;&nbsp;GCGC&nbsp;&nbsp;"</code>.</p>
+          <p data-fx="in@3"><code>.split()</code> режет по пробелам и выбрасывает пустые куски: <code>['GCGC']</code>.</p>
+          <p data-fx="in@4">Цикл по участкам: длина <code>GCGC</code> равна 4, это больше 0, и <code>best</code> становится 4.</p>
+          <pre class="out" data-fx="in@5">['GCGC']
+4</pre>
+          <p data-fx="in@5">Ответ <code>4</code>: тот же, что у первого решения.</p>
+          <p data-fx="in@5">Второе решение заменяет только A и T. Для строки <code>"GCNGC"</code> оно вернет 5, а первое решение вернет 2: в первом любая буква, кроме G и C, обнуляет счетчик.</p>
+        </div>
+        <p>Замените строку на <code>"GCNGC"</code> и сравните ответ с первым решением.</p>
+        <div class="runner" data-file="task_8b.py"><textarea>
+seq = "ATGCGCAT"
+s = seq.replace("A", " ")
+s = s.replace("T", " ")
+parts = s.split()
+print(parts)
+best = 0
+for p in parts:
+    if len(p) &gt; best:
+        best = len(p)
+print(best)
+</textarea></div>
+      </div>
+    </section>
+
+    <section id="invariant">
+      <h2>Инвариант цикла</h2>
+      <div class="ask" data-slide="S44">
+        <p class="ask-q">Как убедиться, что счетчик GC верен для любой строки, а не только для примера?</p>
+        <p class="ask-hint">Подсказка: Строк бесконечно много, проверить можно лишь несколько.</p>
+        <div class="ask-a"><p>Проверка на примерах показывает только, что цикл верен на этих примерах. Строк бесконечно много: пустые, из одних N, длиной в хромосому. Нужен довод, который работает для любой строки сразу. Такой довод дает инвариант цикла.</p></div>
+      </div>
+      <p>Каждый цикл выше проверен на одном примере. Но строк бесконечно много: пустые, из одних N, длиной в хромосому. Тесты проверяют конкретные входы, а нужен довод, который работает для любой строки сразу.</p>
+      <p>Так считают голоса на выборах: бюллетени вскрывают по одному, и табло после каждого показывает итог по уже вскрытым. Табло не знает результат заранее, но в любой момент верно для того, что уже посчитано. Счетчик GC устроен так же: перед каждой буквой в <code>gc</code> лежит число G и C среди уже просмотренных букв. До первой буквы ничего не просмотрено, и <code>gc</code> равно 0. После каждой буквы утверждение снова верно. Когда буквы кончились, просмотрены все, и <code>gc</code> дает ответ.</p>
+      <p class="def"><span class="term">Инвариант цикла</span>&nbsp;— утверждение о переменных цикла, которое верно перед каждой итерацией.</p>
+      <p>Возьмем поиск наибольшего числа в последовательности чисел <code>a</code>. Здесь <code>a</code>&nbsp;— список; подробно списки будут в следующей лекции, а пока достаточно знать, что к числу в нем обращаются по индексу, как к букве строки. Поиск начинается с первого элемента, <code>max_val = a[0]</code>, и идет по остальным с индекса 1. Инвариант: <code>max_val</code> равно наибольшему из уже просмотренных элементов, от <code>a[0]</code> до <code>a[i - 1]</code>. Слово «уже» важно: про элементы правее <code>i</code> цикл пока ничего не знает.</p>
+      <div class="runner" data-file="invariant_max.py"><textarea>
+a = [3, 8, 5, 1]
+n = len(a)
+max_val = a[0]
+i = 1
+while i &lt; n:
+    print("перед i =", i, "max_val =", max_val)
+    if a[i] &gt; max_val:
+        max_val = a[i]
+    i = i + 1
+print("после цикла i =", i, "max_val =", max_val)
+</textarea></div>
+      <p>Инвариант проверяют в трех местах.</p>
+      <div class="anim" data-slide="S93" data-title="Три проверки инварианта">
+          <ol>
+            <li data-fx="in@1">Инициализация, перед циклом: просмотрен только <code>a[0]</code>, и <code>max_val</code> равно <code>a[0]</code>.</li>
+            <li data-fx="in@2">Сохранение, на каждой итерации: больший <code>a[i]</code> становится <code>max_val</code>, затем <code>i</code> растет, и утверждение снова верно.</li>
+            <li data-fx="in@3">Завершение, после цикла: <code>i == n</code>, просмотрен весь список, и <code>max_val</code> равно наибольшему элементу, для <code>[3, 8, 5, 1]</code> это 8.</li>
+          </ol>
+      </div>
+      <div class="more">
+        <p>Названия трех проверок взяты из учебника Т. Кормена и соавторов «Алгоритмы: построение и анализ», где инвариант вводится на сортировке вставкой. Инициализация и сохранение вместе похожи на математическую индукцию: база и шаг. Отличие в том, что шаг останавливается вместе с циклом, и в этот момент инвариант превращается в ответ. Начало с <code>a[0]</code> требует непустого списка.</p>
+      </div>
+      <h3>Три проверки на счетчике GC</h3>
+      <p>Инвариант счетчика GC: перед каждой итерацией <code>gc</code> равно числу G и C в <code>seq[:i]</code>, то есть в уже просмотренной части. Пример печатает перед каждой итерацией просмотренную часть, значение <code>gc</code> и результат сравнения с числом, посчитанным заново. Замените строку и убедитесь, что в каждой строке вывода стоит <code>True</code>.</p>
+      <div class="runner" data-file="gc_invariant.py"><textarea>
+seq = "GACG"
+gc = 0
+for i in range(len(seq)):
+    seen = seq[:i]
+    real = seen.count("G") + seen.count("C")
+    print(f"перед i = {i}: просмотрено '{seen}', gc = {gc}, верно: {gc == real}")
+    if seq[i] in "GC":
+        gc = gc + 1
+print(f"после цикла: просмотрено '{seq}', gc = {gc}")
+</textarea></div>
+      <div class="anim" data-slide="S46" data-title="Три проверки на трассировке GC">
+          <p>Инвариант: перед каждой итерацией <code>gc</code> равно числу G и C в просмотренной части <code>seq</code>.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th>момент</th><th>просмотрено</th><th><code>gc</code></th><th>инвариант</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1 mark@6 plain@7"><td>перед i = 0</td><td><code>""</code></td><td><code>0</code></td><td>верен: 0 = 0</td></tr>
+              <tr data-fx="in@2 mark@7 plain@8"><td>перед i = 1</td><td><code>"G"</code></td><td><code>1</code></td><td>верен: 1 = 1</td></tr>
+              <tr data-fx="in@3 mark@7 plain@8"><td>перед i = 2</td><td><code>"GA"</code></td><td><code>1</code></td><td>верен: 1 = 1</td></tr>
+              <tr data-fx="in@4 mark@7 plain@8"><td>перед i = 3</td><td><code>"GAC"</code></td><td><code>2</code></td><td>верен: 2 = 2</td></tr>
+              <tr data-fx="in@5 ok@8"><td>после цикла</td><td><code>"GACG"</code></td><td><code>3</code></td><td>верен: 3 = 3, ответ</td></tr>
+            </tbody>
+          </table></div>
+          <p data-fx="in@6">Инициализация: до первой итерации просмотрена пустая строка, в ней ноль букв G и C, и <code>gc</code> равно нулю.</p>
+          <p data-fx="in@7">Сохранение: итерация берет следующую букву; если это G или C, счетчик растет на единицу, иначе не меняется.</p>
+          <p data-fx="in@8">Завершение: просмотрена вся строка, и <code>gc</code> равно числу G и C в ней.</p>
+      </div>
+      <p>Таблица лишь иллюстрирует довод, а сам довод работает для строки любой длины, в том числе пустой.</p>
+      <div class="more">
+        <p>Цикл <code>for</code> не присваивает <code>i = 4</code>: после цикла <code>i</code> остается равным 3. Поэтому последняя строка таблицы называется «после цикла», а не «перед <code>i = 4</code>». Тем же рассуждением можно проверить счетчик <code>known</code> из примера с GC-составом без N.</p>
+      </div>
+      <h3>Инвариант поиска максимума</h3>
+      <p>Шаблон из задачи о наибольшем GC-составе работает и на цифрах строки. Цифры одной длины сравниваются как строки так же, как числа: <code>"8" &gt; "5"</code>. Условие <code>best is None</code> нужно для первой цифры: сравнение <code>"3" &gt; None</code> дало бы <code>TypeError</code>.</p>
+      <div class="runner" data-file="max_digit.py"><textarea>
+best = None
+for c in "3851":
+    if best is None or c &gt; best:
+        best = c
+print(best)
+</textarea></div>
+      <div class="anim" data-slide="S76" data-title="Инвариант поиска максимума">
+          <div class="table-wrap"><table>
+            <thead><tr><th>момент</th><th>просмотрено</th><th><code>best</code></th><th>наибольшая просмотренная</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td>перед <code>"3"</code></td><td>ничего</td><td><code>None</code></td><td>нет (ничего не видели)</td></tr>
+              <tr data-fx="in@2"><td>перед <code>"8"</code></td><td><code>"3"</code></td><td><code>"3"</code></td><td><code>"3"</code></td></tr>
+              <tr data-fx="in@3"><td>перед <code>"5"</code></td><td><code>"38"</code></td><td><code>"8"</code></td><td><code>"8"</code></td></tr>
+              <tr data-fx="in@4"><td>перед <code>"1"</code></td><td><code>"385"</code></td><td><code>"8"</code></td><td><code>"8"</code></td></tr>
+              <tr data-fx="in@5 ok@5"><td>после цикла</td><td><code>"3851"</code></td><td><code>"8"</code></td><td><code>"8"</code>: ответ</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@6">8</pre>
+      </div>
+      <p>В каждой строке таблицы два последних столбца совпадают: это и есть инвариант. Перед каждой итерацией <code>best</code> равно наибольшей из просмотренных цифр, а пока цифр не было, <code>best</code> равно <code>None</code>. Последняя строка превращает инвариант в ответ.</p>
+      <div class="more">
+        <p>Для цифр одной длины порядок строк совпадает с порядком чисел, а для <code>"10"</code> и <code>"9"</code> уже нет: <code>"10" &lt; "9"</code>. Поэтому как строки сравнивают только одиночные цифры. С <code>None</code> сравнивают через <code>is</code>, а не <code>==</code>, потому что <code>None</code> существует в одном экземпляре (так советует PEP 8).</p>
+      </div>
+      <div class="quiz" data-id="invariant-max-none" data-slide="S48">
+        <p class="quiz-q">Что служит инвариантом цикла <code>mx = None</code>, <code>for x in nums:</code>, <code>if mx is None or x &gt; mx: mx = x</code>?</p>
+        <ul>
+          <li><code>x &gt; mx</code></li>
+          <li data-correct><code>mx</code> равно наибольшему из уже просмотренных чисел</li>
+          <li><code>mx</code> равно наибольшему числу во всей <code>nums</code></li>
+          <li><code>mx</code> не меньше 0</li>
+        </ul>
+        <p class="quiz-why">Инвариант верен перед каждой итерацией. До первой итерации чисел нет, и <code>mx</code> равно <code>None</code>; дальше <code>mx</code> равно наибольшему из просмотренных. Условие <code>x &gt; mx</code> то истинно, то ложно, это проверка в теле. Утверждение о всей <code>nums</code> верно только после цикла: в него инвариант превращается при завершении. «Не меньше 0» ложно для отрицательных чисел.</p>
+      </div>
+      <div class="walk" data-slide="S77">
+        <p class="task"><b>Задача 9.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">s = 0
+for i in range(1, 5):
+    s = s + i
+print(s)</pre>
+        <div class="anim" data-id="invariant-sum" data-title="Разбор задачи 9">
+          <div class="table-wrap"><table>
+            <thead><tr><th>момент</th><th><code>s</code></th><th>сумма от 1 до <code>i - 1</code></th><th>инвариант</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td>перед <code>i = 1</code></td><td><code>0</code></td><td>0 (чисел нет)</td><td>верен</td></tr>
+              <tr data-fx="in@2"><td>перед <code>i = 2</code></td><td><code>1</code></td><td>1</td><td>верен</td></tr>
+              <tr data-fx="in@3"><td>перед <code>i = 3</code></td><td><code>3</code></td><td>1 + 2 = 3</td><td>верен</td></tr>
+              <tr data-fx="in@4"><td>перед <code>i = 4</code></td><td><code>6</code></td><td>1 + 2 + 3 = 6</td><td>верен</td></tr>
+              <tr data-fx="in@5"><td>после цикла</td><td><code>10</code></td><td>1 + 2 + 3 + 4 = 10</td><td>ответ</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@6">10</pre>
+          <p data-fx="in@6">Ответ <code>10</code>. Инвариант: перед итерацией с <code>i</code> в <code>s</code> лежит сумма чисел от 1 до <code>i - 1</code>; после последней итерации это сумма от 1 до 4.</p>
+          <p data-fx="in@6">Частая неточность в формулировке инварианта: «в <code>s</code> сумма до <code>i</code>». Перед итерацией число <code>i</code> еще не прибавлено, поэтому верно «сумма от 1 до <code>i - 1</code>».</p>
+        </div>
+        <p>Замените <code>range(1, 5)</code> на <code>range(1, 11)</code>: инвариант тот же, а ответ 55.</p>
+        <div class="runner" data-file="task_9.py"><textarea>
+s = 0
+for i in range(1, 5):
+    s = s + i
+print(s)
+</textarea></div>
+      </div>
+    </section>
+
+    <section id="nested">
+      <h2>Вложенные циклы</h2>
+      <div class="ask" data-slide="S52">
+        <p class="ask-q">Где в последовательности <code>GATATATGCATATACTT</code> встречается мотив <code>ATAT</code>?</p>
+        <p class="ask-hint">Подсказка: Вхождения могут перекрываться.</p>
+        <div class="ask-a"><p>Вхождения начинаются с позиций 2, 4 и 10, если считать с единицы, как принято в биологии. Позицию 4 часто пропускают: вхождения на 2 и 4 перекрываются (<code>ATATAT</code>). Метод <code>.find()</code> из лекции 2 находит только первое вхождение, поэтому нужен перебор всех позиций.</p></div>
+      </div>
+      <p>Второй вопрос, который задают любому циклу после «верен ли он», звучит так: сколько шагов он делает. Особенно когда один цикл стоит внутри другого. Задача Rosalind SUBS: найти все позиции, с которых в <code>GATATATGCATATACTT</code> начинается мотив <code>ATAT</code>. Вхождения могут перекрываться, а метод <code>.find()</code> находит только первое, поэтому нужно проверить каждую позицию начала.</p>
+      <p class="def"><span class="term">Вложенный цикл</span>&nbsp;— цикл, который стоит в теле другого цикла и на каждой итерации внешнего выполняется целиком.</p>
+      <p>Отступ показывает, что строка <code>for j</code> принадлежит телу внешнего цикла. Внешний цикл берет <code>i = 0</code>, и внутренний печатает две пары. Потом внешний берет <code>i = 1</code>, и внутренний начинается заново с <code>j = 0</code>. Так идут часы: минутная стрелка проходит полный круг, и только тогда часовая сдвигается на одно деление. Скажите заранее, сколько строк напечатает программа и какая будет последней, затем запустите.</p>
+      <div class="runner" data-file="pairs.py"><textarea>
+for i in range(3):
+    for j in range(2):
+        print(i, j)
+</textarea></div>
+      <div class="anim" data-slide="S79" data-title="Как идут i и j">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>i</code></th><th><code>j</code></th><th>печать</th><th>что происходит</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>0</code></td><td><code>0</code></td><td><code>0 0</code></td><td>начало внутреннего цикла</td></tr>
+              <tr data-fx="in@2"><td><code>0</code></td><td><code>1</code></td><td><code>0 1</code></td><td>конец внутреннего цикла</td></tr>
+              <tr data-fx="in@3"><td><code>1</code></td><td><code>0</code></td><td><code>1 0</code></td><td>начало внутреннего цикла</td></tr>
+              <tr data-fx="in@4"><td><code>1</code></td><td><code>1</code></td><td><code>1 1</code></td><td>конец внутреннего цикла</td></tr>
+              <tr data-fx="in@5"><td><code>2</code></td><td><code>0</code></td><td><code>2 0</code></td><td>начало внутреннего цикла</td></tr>
+              <tr data-fx="in@6"><td><code>2</code></td><td><code>1</code></td><td><code>2 1</code></td><td>конец внутреннего цикла</td></tr>
+            </tbody>
+          </table></div>
+          <p data-fx="in@7">Внутренний цикл прошел целиком три раза: 3 · 2 = 6 печатей. <code>j</code> начинается с 0 на каждом новом <code>i</code>.</p>
+      </div>
+      <p>Внутренний цикл прошел целиком три раза: 3 × 2 = 6 печатей. В таблице умножения внутренний цикл печатает одну строку, а <code>print()</code> с отступом внешнего цикла заканчивает ее. Сдвиньте <code>print()</code> на уровень внутреннего цикла и посмотрите, что изменится.</p>
+      <div class="runner" data-file="table.py"><textarea>
+for i in range(1, 4):
+    for j in range(1, 4):
+        print(i * j, end=" ")
+    print()          # конец строки таблицы
+</textarea></div>
+      <p>Число шагов внутреннего цикла может зависеть от внешнего. Если в первом примере написать <code>for j in range(i + 1, 3):</code>, внутренний цикл будет начинаться с <code>i + 1</code>. Тогда перебираются только пары с <code>i &lt; j</code>, и каждая пара встречается один раз: <code>0 1</code>, <code>0 2</code>, <code>1 2</code>. При <code>i = 2</code> диапазон <code>range(3, 3)</code> пуст. Попробуйте в редакторе с парами.</p>
+      <p>Программа ниже хочет напечатать шесть пар, как с двумя <code>for</code>, но печатает только две. Запустите ее, затем перенесите <code>j = 0</code> в тело внешнего цикла, перед внутренним <code>while</code>.</p>
+      <div class="runner" data-file="while_trap.py"><textarea>
+i = 0
+j = 0               # ошибка: обнуляется один раз до циклов
+while i &lt; 3:
+    while j &lt; 2:
+        print(i, j)
+        j = j + 1
+    i = i + 1
+</textarea></div>
+      <aside class="note warn"><p><code>while</code> сам не начинает счет заново. После первого прохода внутреннего цикла <code>j</code> равно 2, условие <code>j &lt; 2</code> сразу ложно, и при <code>i = 1</code> и <code>i = 2</code> внутренний цикл не выполняется. Счетчик обнуляют перед каждым запуском того цикла, результат которого он собирает. С <code>for j in range(2)</code> такой ошибки нет: <code>for</code> начинает перебор заново сам.</p></aside>
+      <h3>Поиск мотива</h3>
+      <p>Внешний цикл пробует каждую позицию <code>i</code>, с которой мотив еще помещается в строку; число таких позиций хранится в <code>k</code>. Внутренний цикл сравнивает букву мотива <code>t[j]</code> с буквой строки <code>s[i + j]</code> и прерывается на первом несовпадении. Если все буквы совпали, <code>break</code> не случился, и ветвь <code>else</code> внутреннего цикла печатает позицию. Rosalind нумерует позиции с 1, поэтому печатается <code>i + 1</code>.</p>
+      <div class="runner" data-file="motif.py"><textarea>
+s = "GATATATGCATATACTT"
+t = "ATAT"
+k = len(s) - len(t) + 1
+for i in range(k):
+    for j in range(len(t)):
+        if s[i + j] != t[j]:
+            break
+    else:
+        print(i + 1, end=" ")
+</textarea></div>
+      <p>Внутренний <code>break</code> прерывает только сравнение, а внешний цикл идет к следующей позиции. Вхождения на позициях 2 и 4 перекрываются (<code>ATATAT</code>), и вложенные циклы находят оба.</p>
+      <div class="anim" data-slide="S94" data-title="Поиск мотива по шагам">
+          <p>Окно записано как <code>s[i:i+4]</code> для наглядности, сама программа срезов не делает, а сравнивает по одной букве.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>i</code></th><th>окно</th><th><code>break</code> при</th><th>печать</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td>0</td><td>GATA</td><td>j = 0: G ≠ A</td><td></td></tr>
+              <tr data-fx="in@2 ok@2"><td>1</td><td>ATAT</td><td>нет: сработал else</td><td>2</td></tr>
+              <tr data-fx="in@3"><td>2</td><td>TATA</td><td>j = 0: T ≠ A</td><td></td></tr>
+              <tr data-fx="in@4 ok@4"><td>3</td><td>ATAT</td><td>нет: сработал else</td><td>4</td></tr>
+              <tr data-fx="in@5"><td>4</td><td>TATG</td><td>j = 0: T ≠ A</td><td></td></tr>
+              <tr data-fx="in@6"><td>5</td><td>ATGC</td><td>j = 2: G ≠ A</td><td></td></tr>
+              <tr data-fx="in@7"><td>6</td><td>TGCA</td><td>j = 0: T ≠ A</td><td></td></tr>
+              <tr data-fx="in@8"><td>7</td><td>GCAT</td><td>j = 0: G ≠ A</td><td></td></tr>
+              <tr data-fx="in@9"><td>8</td><td>CATA</td><td>j = 0: C ≠ A</td><td></td></tr>
+              <tr data-fx="in@10 ok@10"><td>9</td><td>ATAT</td><td>нет: сработал else</td><td>10</td></tr>
+              <tr data-fx="in@11"><td>10</td><td>TATA</td><td>j = 0: T ≠ A</td><td></td></tr>
+              <tr data-fx="in@12"><td>11</td><td>ATAC</td><td>j = 3: C ≠ T</td><td></td></tr>
+              <tr data-fx="in@13"><td>12</td><td>TACT</td><td>j = 0: T ≠ A</td><td></td></tr>
+              <tr data-fx="in@14"><td>13</td><td>ACTT</td><td>j = 1: C ≠ T</td><td></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@15">2 4 10 </pre>
+          <p data-fx="in@15">Итог: печать <code>2 4 10</code>. Из 14 позиций 8 отсеялись на первой же букве, и только на 3 внутренний цикл дошел до конца.</p>
+      </div>
+      <div class="more">
+        <p>Короче сравнение пишут срезом: <code>s[i:i + len(t)] == t</code>. Но внутри среза и сравнения все равно спрятан перебор букв.</p>
+      </div>
+      <h3>Почему <code>range(len(s) - len(t) + 1)</code></h3>
+      <p>Мотив из четырех букв помещается в строку <code>"GATATAT"</code> из семи букв целиком только с позиций 0, 1, 2 и 3: с позиции 3 он занимает индексы 3–6, а дальше строка кончается. Таких позиций 7 &minus; 4 + 1 = 4, это и есть <code>k</code>. Если написать <code>range(len(s))</code>, программа найдет вхождения 2 и 4, а при <code>i = 5</code> начнет сравнивать окно, которое выходит за конец строки. Запустите пример: буквы A и T совпадут, а на третьей букве Python обратится к <code>s[7]</code> и остановит программу с <code>IndexError</code>.</p>
+      <div class="runner" data-file="motif_index_error.py" data-error><textarea>
+s = "GATATAT"
+t = "ATAT"
+for i in range(len(s)):     # ошибка: нужно range(len(s) - len(t) + 1)
+    for j in range(len(t)):
+        if s[i + j] != t[j]:
+            break
+    else:
+        print(i + 1, end=" ")
+</textarea></div>
+      <aside class="note warn"><p>На строке <code>GATATATGCATATACTT</code> программа с <code>range(len(s))</code> случайно не падает: последние буквы не совпадают с началом мотива, и <code>break</code> срабатывает раньше выхода за границу. Поэтому ошибка коварная: на одних данных программа работает, на других завершается <code>IndexError</code>. Внешний цикл ограничивают так, чтобы мотив помещался: <code>range(len(s) - len(t) + 1)</code>.</p></aside>
+      <h3>Сколько шагов</h3>
+      <p>Чтобы оценить цикл, считают, сколько раз выполняется самая частая строка, здесь сравнение букв. Пусть n означает длину строки, а m длину мотива. Внешний цикл делает n &minus; m + 1 шагов, внутренний на каждом из них до m сравнений. Всего получается до (n &minus; m + 1) × m сравнений: шаги вложенных циклов <span class="term">перемножаются</span>, а не складываются. Строка из 1000 букв и мотив из 10 дают до 9910 сравнений.</p>
+      <p><code>break</code> сокращает работу на неудачных позициях, но в худшем случае, когда мотив почти совпадает везде, внутренний цикл дойдет до конца.</p>
+      <div class="more">
+        <p>На строке из задачи SUBS 8 позиций из 14 отсеялись на первой же букве, и только на трех внутренний цикл дошел до конца. Всего программа сделала 29 сравнений при верхней оценке 14 × 4 = 56. Проверить можно счетчиком: добавьте в программу поиска мотива <code>steps = 0</code> до циклов и <code>steps = steps + 1</code> первой строкой внутреннего цикла. Если число шагов внутреннего цикла растет вместе с внешним, как в сортировке вставкой у Т. Кормена, сумма получается порядка n², и время растет как квадрат длины.</p>
+      </div>
+      <h3>Перебор быстро дорожает</h3>
+      <p>До сих пор мотив был известен. В задаче поиска регуляторных мотивов известна лишь длина l: похожий короткий участок встречается во многих последовательностях. Самый прямолинейный способ перебирает все строки длины l из A, C, G, T и ищет каждую в данных. На каждое место можно поставить любую из 4 букв, поэтому кандидатов 4 × 4 × … × 4 = 4<sup>l</sup>. Перебор кандидатов устроен как l вложенных циклов по четырем буквам, и каждый новый уровень умножает число шагов на 4.</p>
+      <div class="runner" data-file="kmers.py"><textarea>
+count = 0
+for a in "ACGT":
+    for b in "ACGT":
+        print(a + b, end=" ")
+        count = count + 1
+    print()
+print("строк длины 2:", count)
+for l in range(1, 11):
+    print(l, 4 ** l)
+</textarea></div>
+      <div class="more">
+        <p>Н. Джонс и П. Певзнер отмечают, что типичный мотив имеет длину 8–15 нуклеотидов: уже при l = 10 кандидатов больше миллиона, а при l = 15 больше миллиарда. Перебор всех слов длины l у них называется BruteForceMedianSearch; дальше в их книге перебор сокращают методом ветвей и границ.</p>
+      </div>
+      <div class="quiz" data-id="nested-print-count" data-slide="S56">
+        <p class="quiz-q">Сколько раз выполнится <code>print(i, j)</code> в программе <code>for i in range(3):</code>, внутри <code>for j in range(4):</code>?</p>
+        <ul>
+          <li>3</li>
+          <li>4</li>
+          <li>7</li>
+          <li data-correct>12</li>
+        </ul>
+        <p class="quiz-why">Внутренний цикл выполняется целиком на каждой из 3 итераций внешнего, и каждый раз делает 4 шага: 3 × 4 = 12. Ответ 7 получится, если сложить шаги двух циклов, а 3 и 4 учитывают только один из циклов.</p>
+      </div>
+      <div class="walk" data-slide="S82">
+        <p class="task"><b>Задача 10.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">for i in range(1, 4):
+    for j in range(i):
+        print("*", end="")
+    print()</pre>
+        <div class="anim" data-id="star-triangle" data-title="Разбор задачи 10">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>i</code></th><th><code>range(i)</code></th><th>шагов внутреннего цикла</th><th>строка вывода</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>1</code></td><td><code>0</code></td><td>1</td><td><code>*</code></td></tr>
+              <tr data-fx="in@2"><td><code>2</code></td><td><code>0 1</code></td><td>2</td><td><code>**</code></td></tr>
+              <tr data-fx="in@3"><td><code>3</code></td><td><code>0 1 2</code></td><td>3</td><td><code>***</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@4">*
+**
+***</pre>
+          <p data-fx="in@4">Ответ: три строки <code>*</code>, <code>**</code>, <code>***</code>. Внутренний цикл делает <code>i</code> шагов, <code>print()</code> после него переводит строку.</p>
+          <p data-fx="in@4">Ответ «три строки по три звездочки» дают те, кто не заметил <code>range(i)</code>. Всего печатается 1 + 2 + 3 = 6 звездочек: шаги внутреннего цикла здесь складываются по строкам, а не перемножаются.</p>
+        </div>
+        <p>Замените <code>range(i)</code> на <code>range(3)</code> и сравните вывод.</p>
+        <div class="runner" data-file="task_10.py"><textarea>
+for i in range(1, 4):
+    for j in range(i):
+        print("*", end="")
+    print()
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S83">
+        <p class="task"><b>Задача 11.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">k = 0
+for i in range(4):
+    for j in range(i + 1, 4):
+        k = k + 1
+print(k)</pre>
+        <div class="anim" data-id="pairs-count" data-title="Разбор задачи 11">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>i</code></th><th>значения <code>j</code></th><th>прибавлено к <code>k</code></th><th><code>k</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>0</code></td><td><code>1 2 3</code></td><td>3</td><td><code>3</code></td></tr>
+              <tr data-fx="in@2"><td><code>1</code></td><td><code>2 3</code></td><td>2</td><td><code>5</code></td></tr>
+              <tr data-fx="in@3"><td><code>2</code></td><td><code>3</code></td><td>1</td><td><code>6</code></td></tr>
+              <tr data-fx="in@4"><td><code>3</code></td><td>нет</td><td>0</td><td><code>6</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@5">6</pre>
+          <p data-fx="in@5">Ответ <code>6</code>: столько пар можно составить из 4 чисел, если порядок в паре не важен (3 + 2 + 1).</p>
+          <p data-fx="in@5">Ответ <code>16</code> (4 × 4) дают те, кто не заметил <code>i + 1</code>. Ответ <code>12</code> дают те, кто исключил только пары с равными <code>i</code> и <code>j</code>.</p>
+        </div>
+        <p>Замените <code>range(i + 1, 4)</code> на <code>range(4)</code>: ответ станет 16.</p>
+        <div class="runner" data-file="task_11.py"><textarea>
+k = 0
+for i in range(4):
+    for j in range(i + 1, 4):
+        k = k + 1
+print(k)
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S84">
+        <p class="task"><b>Задача 12.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">for i in range(3):
+    for j in range(3):
+        if j == i:
+            break
+        print(i, j)</pre>
+        <div class="anim" data-id="nested-break" data-title="Разбор задачи 12">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>i</code></th><th>перебор <code>j</code></th><th>напечатано</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>0</code></td><td><code>j = 0</code>: равно <code>i</code>, <code>break</code></td><td>ничего</td></tr>
+              <tr data-fx="in@2"><td><code>1</code></td><td><code>j = 0</code>: печать; <code>j = 1</code>: <code>break</code></td><td><code>1 0</code></td></tr>
+              <tr data-fx="in@3"><td><code>2</code></td><td><code>j = 0</code>, <code>j = 1</code>: печать; <code>j = 2</code>: <code>break</code></td><td><code>2 0</code>, <code>2 1</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@4">1 0
+2 0
+2 1</pre>
+          <p data-fx="in@4">Ответ: три строки <code>1 0</code>, <code>2 0</code>, <code>2 1</code>. Внутренний цикл печатает пары с <code>j &lt; i</code>, а <code>break</code> при <code>j == i</code> не останавливает внешний цикл.</p>
+          <p data-fx="in@4">Ответ «ничего» дают те, кто считает, что <code>break</code> выходит из всех циклов сразу. Он прерывает только самый внутренний цикл.</p>
+        </div>
+        <p>Замените <code>break</code> на <code>continue</code>: напечатаются все пары, кроме тех, где <code>j</code> равно <code>i</code>.</p>
+        <div class="runner" data-file="task_12.py"><textarea>
+for i in range(3):
+    for j in range(3):
+        if j == i:
+            break
+        print(i, j)
+</textarea></div>
+      </div>
+    </section>
+
+    <section id="summary">
+      <h2>Итоги и типичные ошибки</h2>
+      <ul>
+        <li><code>for</code> перебирает элементы, <code>while</code> повторяет до события; оба цикла должны останавливаться.</li>
+        <li>Конец <code>range()</code> не входит: числа 1–5 дает <code>range(1, 6)</code>, счет вниз дает отрицательный шаг.</li>
+        <li><code>while</code> проверяет условие перед каждой итерацией, а не непрерывно.</li>
+        <li><code>break</code> и <code>continue</code> действуют только на ближайший цикл; <code>else</code> цикла выполняется без <code>break</code>, в том числе для пустой строки.</li>
+        <li>Результат собирают так: инициализация до цикла, обновление в теле, ответ после.</li>
+        <li>Максимум начинают с <code>None</code>: <code>mx is None or x &gt; mx</code>.</li>
+        <li>Инвариант проверяют трижды: до первой итерации, на каждой итерации и при выходе, где он дает ответ.</li>
+        <li>Шаги вложенных циклов перемножаются, и каждый новый уровень вложенности умножает их число.</li>
+      </ul>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Так не работает</th><th>Так правильно</th></tr></thead>
+        <tbody>
+          <tr><td><code>print("готово")</code> с отступом в теле цикла</td><td>без отступа, после цикла</td></tr>
+          <tr><td><code>range(1, 5)</code> для чисел 1–5</td><td><code>range(1, 6)</code></td></tr>
+          <tr><td><code>while</code>, в теле которого не меняется переменная условия</td><td><code>i = i + 1</code> в теле</td></tr>
+          <tr><td><code>while i &lt;= len(seq)</code></td><td><code>while i &lt; len(seq)</code></td></tr>
+          <tr><td>ждать, что <code>while</code> оборвет тело, как только условие стало ложным</td><td>условие проверяется только перед итерацией</td></tr>
+          <tr><td>ждать, что <code>else</code> цикла выполнится после <code>break</code></td><td><code>else</code> выполняется, только если <code>break</code> не было</td></tr>
+          <tr><td><code>gc = 0</code> внутри цикла</td><td><code>gc = 0</code> до цикла</td></tr>
+          <tr><td><code>largest = 0</code> для произвольных чисел</td><td><code>mx = None</code> и <code>mx is None or x &gt; mx</code></td></tr>
+          <tr><td>ждать, что <code>break</code> выйдет из всех циклов</td><td><code>break</code> завершает только ближайший цикл</td></tr>
+          <tr><td><code>j = 0</code> один раз до внешнего цикла</td><td><code>j = 0</code> в теле внешнего, перед внутренним <code>while</code></td></tr>
+          <tr><td><code>for i in range(len(s))</code> при поиске мотива</td><td><code>for i in range(len(s) - len(t) + 1)</code></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="self-check">
+      <h2>Задачи для самопроверки</h2>
+      <p>Пять задач по всей лекции. Как и раньше, сначала ответьте сами, затем откройте разбор по шагам.</p>
+      <div class="walk" data-slide="S85">
+        <p class="task"><b>Задача 13.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">a = "GAGCCTACT"
+b = "CATCGTAAT"
+d = 0
+for i in range(len(a)):
+    if a[i] != b[i]:
+        d = d + 1
+print(d)</pre>
+        <div class="anim" data-id="hamming" data-title="Разбор задачи 13">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>i</code></th><th><code>a[i]</code> / <code>b[i]</code></th><th>различаются?</th><th><code>d</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>0</code></td><td><code>G</code> / <code>C</code></td><td>да</td><td><code>1</code></td></tr>
+              <tr data-fx="in@2"><td><code>1</code></td><td><code>A</code> / <code>A</code></td><td>нет</td><td><code>1</code></td></tr>
+              <tr data-fx="in@3"><td><code>2</code></td><td><code>G</code> / <code>T</code></td><td>да</td><td><code>2</code></td></tr>
+              <tr data-fx="in@4"><td><code>3</code></td><td><code>C</code> / <code>C</code></td><td>нет</td><td><code>2</code></td></tr>
+              <tr data-fx="in@5"><td><code>4</code></td><td><code>C</code> / <code>G</code></td><td>да</td><td><code>3</code></td></tr>
+              <tr data-fx="in@6"><td><code>5</code></td><td><code>T</code> / <code>T</code></td><td>нет</td><td><code>3</code></td></tr>
+              <tr data-fx="in@7"><td><code>6</code></td><td><code>A</code> / <code>A</code></td><td>нет</td><td><code>3</code></td></tr>
+              <tr data-fx="in@8"><td><code>7</code></td><td><code>C</code> / <code>A</code></td><td>да</td><td><code>4</code></td></tr>
+              <tr data-fx="in@9"><td><code>8</code></td><td><code>T</code> / <code>T</code></td><td>нет</td><td><code>4</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@10">4</pre>
+          <p data-fx="in@10">Ответ <code>4</code>: в стольких позициях буквы двух последовательностей различаются (расстояние Хэмминга).</p>
+          <p data-fx="in@10">Частая ошибка: считать совпадения, а не различия. Совпадений здесь 5, а различий 4.</p>
+        </div>
+        <p>Замените <code>!=</code> на <code>==</code>: программа посчитает совпадения.</p>
+        <div class="runner" data-file="task_13.py"><textarea>
+a = "GAGCCTACT"
+b = "CATCGTAAT"
+d = 0
+for i in range(len(a)):
+    if a[i] != b[i]:
+        d = d + 1
+print(d)
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S86">
+        <p class="task"><b>Задача 14.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">seq = "ACGTAC"
+for i in range(len(seq)):
+    if seq[i] in seq[:i]:
+        print(i, seq[i])
+        break</pre>
+        <div class="anim" data-id="first-repeat" data-title="Разбор задачи 14">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>i</code></th><th><code>seq[i]</code></th><th><code>seq[:i]</code></th><th>уже было?</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>0</code></td><td><code>A</code></td><td><code>""</code></td><td>нет</td></tr>
+              <tr data-fx="in@2"><td><code>1</code></td><td><code>C</code></td><td><code>"A"</code></td><td>нет</td></tr>
+              <tr data-fx="in@3"><td><code>2</code></td><td><code>G</code></td><td><code>"AC"</code></td><td>нет</td></tr>
+              <tr data-fx="in@4"><td><code>3</code></td><td><code>T</code></td><td><code>"ACG"</code></td><td>нет</td></tr>
+              <tr data-fx="in@5"><td><code>4</code></td><td><code>A</code></td><td><code>"ACGT"</code></td><td>да: печать и <code>break</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@6">4 A</pre>
+          <p data-fx="in@6">Ответ <code>4 A</code>: первая буква, которая повторяется, стоит на индексе 4; до нее все буквы разные.</p>
+          <p data-fx="in@6">Ответ <code>0 A</code> дают те, кто считает, что <code>seq[:0]</code> содержит первую букву. Срез <code>seq[:0]</code> пустой.</p>
+        </div>
+        <p>Замените строку на <code>"GATTACA"</code> и предскажите, какая буква повторится первой.</p>
+        <div class="runner" data-file="task_14.py"><textarea>
+seq = "ACGTAC"
+for i in range(len(seq)):
+    if seq[i] in seq[:i]:
+        print(i, seq[i])
+        break
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S87">
+        <p class="task"><b>Задача 15.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">s = "ACGT"
+r = ""
+for c in s:
+    r = c + r
+print(r)</pre>
+        <div class="anim" data-id="reverse-string" data-title="Разбор задачи 15">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>c</code></th><th><code>r = c + r</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>A</code></td><td><code>"A"</code></td></tr>
+              <tr data-fx="in@2"><td><code>C</code></td><td><code>"CA"</code></td></tr>
+              <tr data-fx="in@3"><td><code>G</code></td><td><code>"GCA"</code></td></tr>
+              <tr data-fx="in@4"><td><code>T</code></td><td><code>"TGCA"</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@5">TGCA</pre>
+          <p data-fx="in@5">Ответ <code>TGCA</code>: каждая новая буква встает перед уже собранными, поэтому строка переворачивается.</p>
+          <p data-fx="in@5">Ответ <code>ACGT</code> получился бы при <code>r = r + c</code>: тогда новая буква встает в конец, и порядок сохраняется.</p>
+        </div>
+        <p>Замените <code>c + r</code> на <code>r + c</code> и сравните вывод.</p>
+        <div class="runner" data-file="task_15.py"><textarea>
+s = "ACGT"
+r = ""
+for c in s:
+    r = c + r
+print(r)
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S88">
+        <p class="task"><b>Задача 16.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">for i in range(3):
+    for j in range(3):
+        if i == j:
+            continue
+        print(i, j)</pre>
+        <div class="anim" data-id="nested-continue" data-title="Разбор задачи 16">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>i</code></th><th>пропущено</th><th>напечатано</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>0</code></td><td><code>0 0</code></td><td><code>0 1</code>, <code>0 2</code></td></tr>
+              <tr data-fx="in@2"><td><code>1</code></td><td><code>1 1</code></td><td><code>1 0</code>, <code>1 2</code></td></tr>
+              <tr data-fx="in@3"><td><code>2</code></td><td><code>2 2</code></td><td><code>2 0</code>, <code>2 1</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@4">0 1
+0 2
+1 0
+1 2
+2 0
+2 1</pre>
+          <p data-fx="in@4">Ответ: шесть строк, все пары из 0, 1, 2, кроме <code>0 0</code>, <code>1 1</code>, <code>2 2</code>.</p>
+          <p data-fx="in@4">Ответ «три строки, как в задаче 12» дают те, кто путает <code>continue</code> с <code>break</code>. Здесь пропускается только печать пары с равными <code>i</code> и <code>j</code>, а внутренний цикл продолжается.</p>
+        </div>
+        <p>Замените <code>continue</code> на <code>break</code>: получится задача 12.</p>
+        <div class="runner" data-file="task_16.py"><textarea>
+for i in range(3):
+    for j in range(3):
+        if i == j:
+            continue
+        print(i, j)
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S89">
+        <p class="task"><b>Задача 17.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">seq = "ACG"
+i = 0
+while i &lt;= len(seq):
+    print(seq[i])
+    i = i + 1</pre>
+        <div class="anim" data-id="off-by-one" data-title="Разбор задачи 17">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>i</code></th><th><code>i &lt;= 3</code></th><th><code>seq[i]</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>0</code></td><td>да</td><td><code>A</code></td></tr>
+              <tr data-fx="in@2"><td><code>1</code></td><td>да</td><td><code>C</code></td></tr>
+              <tr data-fx="in@3"><td><code>2</code></td><td>да</td><td><code>G</code></td></tr>
+              <tr data-fx="in@4"><td><code>3</code></td><td>да</td><td><code>IndexError</code>: индекса 3 нет</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@5">A
+C
+G
+IndexError: string index out of range</pre>
+          <p data-fx="in@5">Ответ: <code>A</code>, <code>C</code>, <code>G</code>, затем <code>IndexError: string index out of range</code>. Последний допустимый индекс 2, а условие пропустило 3.</p>
+          <p data-fx="in@5">Частый ответ: «<code>A</code>, <code>C</code>, <code>G</code>» без ошибки. Условие <code>i &lt;= len(seq)</code> пропускает индекс 3, а последний индекс строки длины 3 равен 2. Это ошибка на единицу, как с невключаемым концом <code>range()</code>. Правильное условие: <code>i &lt; len(seq)</code>.</p>
+        </div>
+        <p>Исправьте условие на <code>i &lt; len(seq)</code> и запустите.</p>
+        <div class="runner" data-file="task_17.py" data-error><textarea>
+seq = "ACG"
+i = 0
+while i &lt;= len(seq):
+    print(seq[i])
+    i = i + 1
+</textarea></div>
+      </div>
+    </section>
+
+    <section id="test">
+      <h2>Итоговый тест</h2>
+      <p>Десять вопросов по всей лекции, в каждом нужно предсказать результат программы. Ответьте на все и нажмите «Проверить»: тест засчитывается от восьми верных ответов. Пройти его можно сколько угодно раз, в прогресс идет лучший результат.</p>
+      <div class="final-test" data-id="final">
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа <code>s = "ACGTACGT"</code>, <code>for i in range(0, len(s), 3): print(s[i], end="")</code>?</p>
+          <ul>
+            <li><code>CAT</code></li>
+            <li data-correct><code>ATG</code></li>
+            <li><code>ATGC</code></li>
+            <li><code>ATG</code>, затем <code>IndexError</code></li>
+          </ul>
+          <p class="quiz-why"><code>range(0, 8, 3)</code> дает индексы 0, 3, 6, и печатаются буквы A, T, G. <code>CAT</code> получится, если начать с индекса 1. Следующее число 9 уже не меньше 8, поэтому четвертой буквы и обращения за конец строки нет.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа <code>n = 2</code>, <code>while n &lt; 40: n = n * 2</code>, затем <code>print(n)</code> без отступа?</p>
+          <ul>
+            <li><code>32</code></li>
+            <li><code>40</code></li>
+            <li data-correct><code>64</code></li>
+            <li><code>128</code></li>
+          </ul>
+          <p class="quiz-why">Значения <code>n</code>: 2, 4, 8, 16, 32, 64. На 32 условие еще истинно, тело дает 64, и только следующая проверка ложна. Ответ <code>32</code> дают те, кто считает, что цикл остановится перед превышением; 40 программа не печатает ни на каком шаге; до 128 цикл не доходит.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа <code>total = 0</code>, <code>while True:</code>, в теле <code>total = total + 6</code> и <code>if total &gt; 20: break</code>, после цикла <code>print(total)</code>?</p>
+          <ul>
+            <li><code>18</code></li>
+            <li><code>20</code></li>
+            <li data-correct><code>24</code></li>
+            <li>цикл бесконечный</li>
+          </ul>
+          <p class="quiz-why">Проверка стоит после сложения: 6, 12, 18 не больше 20, а 24 больше, и <code>break</code> выводит из цикла. Ответ <code>18</code> дают те, кто думает, что цикл остановится перед превышением. Цикл не бесконечный: из <code>while True</code> выходят через <code>break</code>.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа <code>seq = "GT"</code>, <code>i = 0</code>, <code>while i &lt;= len(seq):</code>, в теле <code>print(seq[i])</code> и <code>i = i + 1</code>?</p>
+          <ul>
+            <li><code>G</code> и <code>T</code></li>
+            <li data-correct><code>G</code>, <code>T</code>, затем <code>IndexError</code></li>
+            <li>только <code>G</code></li>
+            <li>ничего, сразу <code>IndexError</code></li>
+          </ul>
+          <p class="quiz-why">Условие <code>i &lt;= 2</code> пропускает <code>i = 2</code>, а последний индекс строки длины 2 равен 1. Две буквы печатаются, затем <code>seq[2]</code> останавливает программу ошибкой. Ответ «<code>G</code> и <code>T</code>» не учитывает лишнюю итерацию. Правильное условие: <code>i &lt; len(seq)</code>.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа <code>total = 0</code>, <code>for x in range(1, 7):</code>, в теле <code>if x % 2 == 0: continue</code> и <code>total = total + x</code>, после цикла <code>print(total)</code>?</p>
+          <ul>
+            <li><code>21</code></li>
+            <li><code>1</code></li>
+            <li><code>12</code></li>
+            <li data-correct><code>9</code></li>
+          </ul>
+          <p class="quiz-why"><code>continue</code> пропускает сложение для четных чисел, и в сумму попадают 1, 3 и 5: получается 9. Ответ <code>21</code> дает сумма всех чисел от 1 до 6, <code>1</code> получится, если принять <code>continue</code> за <code>break</code>, а <code>12</code> дает сумма четных.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа <code>n = 9</code>, <code>while n &gt; 0:</code>, в теле <code>n = n - 4</code> и <code>if n == 1: break</code>, затем <code>else: print("нет единицы")</code> и <code>print(n)</code>?</p>
+          <ul>
+            <li><code>нет единицы</code>, затем <code>1</code></li>
+            <li data-correct><code>1</code></li>
+            <li><code>нет единицы</code>, затем <code>-3</code></li>
+            <li><code>-3</code></li>
+          </ul>
+          <p class="quiz-why">Значения <code>n</code>: 5, затем 1. На единице срабатывает <code>break</code>, поэтому ветвь <code>else</code> не выполняется, и печатается только 1. Ветвь <code>else</code> выполнилась бы, если бы условие стало ложным без <code>break</code>; до −3 цикл не доходит.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Программа ищет самый длинный участок из G и C подряд: <code>seq = "GCATGGCA"</code>, <code>best = 0</code>, <code>run = 0</code>, в цикле <code>for b in seq:</code> на G или C <code>run = run + 1</code> и <code>if run &gt; best: best = run</code>, иначе <code>run = 0</code>; после цикла <code>print(best)</code>. Что она выведет?</p>
+          <ul>
+            <li><code>2</code></li>
+            <li data-correct><code>3</code></li>
+            <li><code>5</code></li>
+            <li><code>8</code></li>
+          </ul>
+          <p class="quiz-why">Участки из G и C: <code>GC</code> длины 2 и <code>GGC</code> длины 3. Счетчик <code>run</code> обнуляется на A и T, а <code>best</code> запоминает наибольшее значение. Ответ <code>5</code> дает общее число G и C, <code>2</code> только первый участок.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Чему равна <code>s</code> перед итерацией с <code>i = 5</code> в программе <code>s = 0</code>, <code>for i in range(2, 7): s = s + i</code>?</p>
+          <ul>
+            <li data-correct><code>9</code></li>
+            <li><code>14</code></li>
+            <li><code>5</code></li>
+            <li><code>20</code></li>
+          </ul>
+          <p class="quiz-why">Инвариант: перед итерацией с <code>i</code> в <code>s</code> сумма чисел от 2 до <code>i - 1</code>, то есть 2 + 3 + 4 = 9. Ответ <code>14</code> уже включает 5, которое прибавится только на этой итерации; <code>20</code> дает сумма после всего цикла.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа <code>k = 0</code>, <code>for i in range(5):</code>, внутри <code>for j in range(i + 1, 5): k = k + 1</code>, после циклов <code>print(k)</code>?</p>
+          <ul>
+            <li><code>25</code></li>
+            <li><code>20</code></li>
+            <li data-correct><code>10</code></li>
+            <li><code>15</code></li>
+          </ul>
+          <p class="quiz-why">Внутренний цикл делает 4, 3, 2, 1 и 0 шагов: всего 10, столько пар без повторов можно составить из пяти чисел. <code>25</code> дает 5 × 5 без учета <code>i + 1</code>, <code>20</code> получится, если исключить только пары с равными <code>i</code> и <code>j</code>.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Сколько строк напечатает программа <code>for i in range(1, 4):</code>, внутри <code>for j in range(1, 4):</code>, в теле <code>if j &gt; i: break</code> и <code>print(i, j)</code>?</p>
+          <ul>
+            <li><code>1</code></li>
+            <li><code>3</code></li>
+            <li data-correct><code>6</code></li>
+            <li><code>9</code></li>
+          </ul>
+          <p class="quiz-why"><code>break</code> прерывает только внутренний цикл. При <code>i = 1</code> печатается одна строка, при <code>i = 2</code> две, при <code>i = 3</code> три: всего 6. Ответ <code>1</code> дают те, кто считает, что <code>break</code> выходит из обоих циклов; <code>9</code> получится без <code>break</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="finish" data-slot="finish"></div>
+  </main>
+
+  <nav class="toc" data-slot="toc" aria-label="Разделы лекции"></nav>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="claude:viewport-fit-sides" content="cover">
+  <title>Списки и кортежи</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Unbounded:wght@500;600&display=swap">
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/course.js"></script>
+  <script src="assets/app.js"></script>
+</head>
+<body data-lecture="05">
+<div class="read-progress" aria-hidden="true"><i></i></div>
+<header class="topbar">
+  <button class="icon-btn menu-btn" type="button" aria-label="Содержание курса"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+  <a class="brand" href="index.html" data-logo><span class="brand-name">PYTHON</span></a>
+  <nav class="crumbs" aria-label="Путь"></nav>
+  <div class="tools">
+    <button class="icon-btn theme-btn" type="button" aria-label="Сменить тему"></button>
+  </div>
+</header>
+<div class="scrim"></div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Лекции курса"></aside>
+
+  <main class="lecture">
+    <header class="lecture-head rise">
+      <p class="eyebrow" data-slot="eyebrow"></p>
+      <h1>Списки и кортежи</h1>
+      <p class="lead">Как хранить много значений сразу и не испортить их: списки и кортежи, ссылки и копии, распаковка, enumerate и zip, сортировка, включения и консенсус последовательностей.</p>
+      <div class="meta" data-slot="meta"></div>
+    </header>
+
+    <div class="goals rise" style="--i:1">
+      <p>После лекции вы сможете</p>
+      <ul>
+        <li>создавать списки и кортежи, менять список на месте и отличать второе имя списка от его копии;</li>
+        <li>разбирать записи распаковкой, перебирать позиции и пары через <code>enumerate()</code> и <code>zip()</code>, сортировать по ключу и строить списки включениями;</li>
+        <li>хранить набор последовательностей списком и строить по нему профиль и консенсус.</li>
+      </ul>
+    </div>
+
+    <div class="slides" data-src="slides/lecture-05.html" data-title="Презентация лекции 5"></div>
+
+    <section id="list-tuple">
+      <h2>Список и кортеж</h2>
+      <p>В лекции 4 цикл <code>for</code> перебирал буквы одной последовательности. В задаче Rosalind о консенсусе последовательностей семь, а в настоящем файле FASTA их тысячи. Семь переменных <code>s1</code>, <code>s2</code>, …, <code>s7</code> циклом не перебрать: цикл обходит элементы одной последовательности, а не разные имена. Нужна одна переменная, которая хранит много значений по порядку.</p>
+      <div class="ask" data-slide="S4">
+        <p class="ask-q">Как хранить в программе семь последовательностей, а не одну?</p>
+        <p class="ask-hint">Подсказка: <code>s1</code>, <code>s2</code>, …, <code>s7</code>: как перебрать их циклом?</p>
+        <div class="ask-a"><p>Перебрать циклом можно элементы одной последовательности, а не разные имена. Нужна одна переменная, которая хранит все семь значений по порядку. Это список. Кто предложит склеить последовательности в строку через пробел и вызвать <code>split()</code>, почти прав: <code>split()</code> из лекции 2 как раз возвращает список.</p></div>
+      </div>
+      <p class="def"><span class="term">Список</span>&nbsp;— последовательность значений, записанных через запятую в квадратных скобках: <code>[10, 20, 30]</code>. Значения списка называют элементами; они бывают любого типа, даже списками.</p>
+      <p>Пустой список записывают как <code>[]</code>. Со списком работает все, что вы делали со строкой как с последовательностью: индекс, <code>len()</code>, <code>in</code> и цикл <code>for</code>. Список можно записать на нескольких строках кода: пока скобка не закрыта, Python считает это одной инструкцией. В примере собраны семь последовательностей из задачи Rosalind. Запустите его, затем допишите <code>print(seqs[0][0])</code> и запустите снова.</p>
+      <div class="runner" data-file="seqs.py"><textarea>
+seqs = [
+    "ATCCAGCT", "GGGCAACT",
+    "ATGGATCT", "AAGCAACC",
+    "TTGGAACT", "ATGCCATT",
+    "ATGGCACT"]
+print(seqs[0])
+print(seqs[-1])
+print(len(seqs))
+print("AAGCAACC" in seqs)
+for s in seqs:
+    print(s.count("G"), end=" ")
+</textarea></div>
+      <p>Отличия от строки видны в выводе. <code>seqs[0]</code> дает целую последовательность, а не букву, а <code>len(seqs)</code> считает элементы, а не буквы. Оператор <code>in</code> сравнивает элементы целиком: <code>"CAAC" in seqs</code> дает <code>False</code>, хотя такой кусок есть в <code>"GGGCAACT"</code>.</p>
+      <p>Список удобно представлять рядом ячеек. Над ячейкой стоит индекс от начала, с нуля: он показывает, на сколько шагов элемент отстоит от начала. Под ячейкой стоит индекс от конца: последний элемент имеет номер -1. Индексы списка устроены так же, как индексы строки в лекции 2.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th></th><th><code>"ATCC"</code></th><th><code>"GGGC"</code></th><th><code>"ATGG"</code></th><th><code>"AAGC"</code></th></tr></thead>
+            <tbody>
+              <tr><td>от начала</td><td>0</td><td>1</td><td>2</td><td>3</td></tr>
+              <tr><td>от конца</td><td>-4</td><td>-3</td><td>-2</td><td>-1</td></tr>
+            </tbody>
+          </table></div>
+      <p>Для списка <code>seqs = ["ATCC", "GGGC", "ATGG", "AAGC"]</code> выражение <code>seqs[0]</code> дает <code>"ATCC"</code>, а <code>seqs[-1]</code> дает <code>"AAGC"</code>. Элемент списка можно заменить: после <code>seqs[1] = "TTTT"</code> список равен <code>['ATCC', 'TTTT', 'ATGG', 'AAGC']</code>, остальные элементы остаются на местах.</p>
+      <p>Цикл <code>for</code> обходит список по шагам. На каждом шаге имя <code>s</code> получает очередной элемент, начиная с индекса 0, и выполняется тело цикла. Индексы в коде не пишутся: цикл сам идет по списку слева направо. Нажимайте «Дальше».</p>
+      <div class="anim" data-slide="S101" data-title="Как for перебирает список">
+          <pre class="code">seqs = ["ATCC", "GGGC", "AAGC"]
+for s in seqs:
+    print(s, s.count("G"))</pre>
+          <div class="table-wrap"><table>
+            <thead><tr><th>шаг</th><th>индекс</th><th><code>s</code></th><th>напечатано</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td>1</td><td>0</td><td><code>"ATCC"</code></td><td><code>ATCC 0</code></td></tr>
+              <tr data-fx="in@2"><td>2</td><td>1</td><td><code>"GGGC"</code></td><td><code>GGGC 3</code></td></tr>
+              <tr data-fx="in@3"><td>3</td><td>2</td><td><code>"AAGC"</code></td><td><code>AAGC 1</code></td></tr>
+            </tbody>
+          </table></div>
+          <p data-fx="in@3">Элементы кончились, и цикл закончился. Имя <code>s</code> после цикла остается и ссылается на последний элемент.</p>
+      </div>
+      <div class="more">
+        <p>Индексы можно ставить подряд: <code>seqs[0][0]</code> берет первую последовательность, а из нее первую букву <code>"A"</code>. Список внутри списка называют вложенным; вложенные списки понадобятся для профиля в конце лекции.</p>
+      </div>
+      <h3>Список можно изменить</h3>
+      <p>Элементу списка можно присвоить новое значение, и список изменится на месте. Метод <code>append(x)</code> дописывает <code>x</code> в конец того же списка, новый список не создается. Строку так изменить нельзя. Поэтому список называют <span class="term">изменяемым</span> типом, а строку неизменяемым.</p>
+      <div class="runner" data-file="mutable.py" data-error><textarea>
+s = "ATCCAGCT"
+seqs = ["ATCC", "GGGC"]
+seqs[0] = "TTCC"
+seqs.append("AAGC")
+print(seqs)
+s[0] = "T"   # строку изменить нельзя
+</textarea></div>
+      <p>Пример печатает измененный список, а последняя строка останавливает программу: <code>TypeError: 'str' object does not support item assignment</code>. Методы строк из лекции 2 никогда не меняли строку, а возвращали новую: для строки иначе нельзя.</p>
+      <h3>Кортеж</h3>
+      <p class="def"><span class="term">Кортеж</span> (tuple)&nbsp;— неизменяемая последовательность значений, записанных через запятую. Кортеж создает запятая, а скобки нужны только для ясности.</p>
+      <p>Кортеж удобен для записи из нескольких полей: имя последовательности, длина и GC-состав в процентах. При печати Python показывает кортеж в круглых скобках. Индексы и <code>len()</code> работают как у списка, а изменить элемент нельзя: снова <code>TypeError</code>, теперь <code>'tuple' object does not support item assignment</code>.</p>
+      <div class="runner" data-file="tuple.py" data-error><textarea>
+rec = "Rosalind_1", 8, 50.0
+print(rec)
+print(rec[0], len(rec))
+one = ("ATG",)
+print(len(one))
+not_tuple = ("ATG")
+print(len(not_tuple))
+rec[1] = 9   # кортеж изменить нельзя
+</textarea></div>
+      <aside class="note warn"><p><code>("ATG")</code> не кортеж, а обычная строка в скобках: скобки только группируют выражение, и <code>len()</code> считает буквы. Кортеж из одного элемента пишут с запятой: <code>("ATG",)</code>.</p></aside>
+      <p>Кортеж тоже удобно рисовать ячейками, только в круглых скобках. Индексы считаются так же, как у списка, а подписи под ячейками показывают главное отличие: поля записи разного смысла и типа.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th></th><th><code>"Rosalind_1"</code></th><th><code>8</code></th><th><code>50.0</code></th></tr></thead>
+            <tbody>
+              <tr><td>индекс</td><td>0</td><td>1</td><td>2</td></tr>
+              <tr><td>от конца</td><td>-3</td><td>-2</td><td>-1</td></tr>
+              <tr><td>поле</td><td>имя</td><td>длина</td><td>GC-состав, %</td></tr>
+              <tr><td>тип</td><td><code>str</code></td><td><code>int</code></td><td><code>float</code></td></tr>
+            </tbody>
+          </table></div>
+      <p>Заменить поле нельзя: <code>rec[1] = 9</code> дает <code>TypeError</code>. Список на схеме выше такую замену разрешал.</p>
+      <p>Зачем Python два похожих типа, разработчики объясняют в официальном FAQ. Список похож на массив: элементы одного рода, их число может меняться, а обрабатывают их по одному. Кортеж похож на запись: несколько связанных значений, часто разных типов, которые обрабатывают вместе.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>Список</th><th>Кортеж</th></tr></thead>
+        <tbody>
+          <tr><td>запись</td><td><code>[...]</code></td><td>через запятую, обычно в <code>(...)</code></td></tr>
+          <tr><td>изменить элемент</td><td>можно</td><td>нельзя: <code>TypeError</code></td></tr>
+          <tr><td>что хранит</td><td>однородные элементы</td><td>разнородные поля одной записи</td></tr>
+          <tr><td>как обрабатывают</td><td>по одному, в цикле</td><td>целиком или по полям</td></tr>
+          <tr><td>пример</td><td>семь последовательностей <code>seqs</code></td><td><code>("Rosalind_1", 8, 50.0)</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="more">
+        <p>Правило не жесткое: в кортеж можно положить однородные числа, а в список разнородные значения. Речь о том, как типы задуманы. Кортеж может быть ключом словаря, а список не может; словари будут в следующей лекции.</p>
+        <p>Кортеж неизменяем, но список внутри кортежа меняется. После <code>rec = ("R1", [1, 2])</code> вызов <code>rec[1].append(3)</code> выполняется, и <code>print(rec)</code> выводит <code>('R1', [1, 2, 3])</code>. Кортеж по-прежнему ссылается на тот же список, изменился сам список.</p>
+      </div>
+      <h3>Два имени, один список</h3>
+      <p>Раз список можно менять, возникает вопрос, которого со строками не было. Сделаем <code>b = a</code> и допишем элемент в <code>b</code>:</p>
+      <pre class="code">
+a = ["ATCC", "GGGC"]  # создали список
+b = a                 # второе имя
+b.append("AAGC")      # дописали в b
+</pre>
+      <div class="ask" data-slide="S10">
+        <p class="ask-q">Изменится ли список <code>a</code>, если дописать элемент в <code>b</code>?</p>
+        <p class="ask-hint">Подсказка: после <code>y = x</code> и <code>x = x + 1</code> переменная <code>y</code> у чисел не меняется. Так ли со списком?</p>
+        <div class="ask-a"><p>Изменится: <code>print(a)</code> выведет <code>['ATCC', 'GGGC', 'AAGC']</code>. Аналогия с числами подводит: <code>b = a</code> не копирует список, а дает ему второе имя. Почему так, объясняет схема ниже.</p></div>
+      </div>
+      <p>Список <code>a</code> изменился. Переменная в Python не коробка, в которую кладут список, а ярлык на объекте. Первая строка создает список и вешает на него ярлык <code>a</code>. Вторая строка не копирует список, а вешает на тот же объект второй ярлык <code>b</code>. Элемент дописан через <code>b</code>, и через <code>a</code> виден тот же, уже измененный список.</p>
+      <div class="anim" data-slide="S11" data-title="Два имени, один список">
+          <pre class="code" data-lines="1:mark@1 1:plain@2 2:mark@2 2:plain@3 3:mark@3 3:plain@4 4:mark@4">a = ["ATCC", "GGGC"]
+b = a
+b.append("AAGC")
+print(a)</pre>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ярлык</th><th></th><th>объект в памяти</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>a</code></td><td>→</td><td>список <code>['ATCC', 'GGGC']</code></td></tr>
+              <tr data-fx="in@2"><td><code>b</code></td><td>→</td><td>тот же список</td></tr>
+              <tr data-fx="in@3"><td><code>a</code>, <code>b</code></td><td>→</td><td>тот же список, теперь <code>['ATCC', 'GGGC', 'AAGC']</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@4">['ATCC', 'GGGC', 'AAGC']</pre>
+      </div>
+      <div class="more">
+        <p>Образ ярлыка перестает быть точным в одном месте: настоящий ярлык висит снаружи предмета, а в Python ссылки есть и внутри объектов. Элемент списка тоже ссылка на объект; это понадобится для вложенных списков в конце лекции.</p>
+      </div>
+      <p class="def"><span class="term">Ссылка</span>&nbsp;— связь имени с объектом. Если у одного объекта два имени, говорят, что у него есть псевдоним (alias).</p>
+      <p>Независимый список копируют явно. Метод <code>copy()</code> и срез <code>a[:]</code> без обоих индексов строят новый список с теми же элементами. Оператор <code>is</code> проверяет, тот ли это самый объект, а <code>==</code> проверяет, равны ли значения.</p>
+      <div class="runner" data-file="copy.py"><textarea>
+a = ["ATCC", "GGGC"]
+b = a
+c = a.copy()
+d = a[:]
+print(b is a, c is a)
+print(c == a, d == a)
+c.append("AAGC")
+print(a)
+print(c)
+</textarea></div>
+      <p><code>b</code> и <code>a</code> оказались одним объектом, а <code>c</code> и <code>a</code> двумя разными объектами с равными значениями. Поэтому <code>append()</code> к копии <code>c</code> оригинал не трогает.</p>
+      <div class="anim" data-slide="S13" data-title="Присваивание копирует список?">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+            <aside class="note warn"><p><b>Кажется:</b> <code>b = a</code> кладет в <code>b</code> копию списка.</p></aside>
+            <aside class="note" data-fx="in@1"><p><b>На самом деле:</b> присваивание никогда не копирует данные. <code>b = a</code> дает тому же списку второе имя. Копию делают явно: <code>a.copy()</code> или <code>a[:]</code>.</p></aside>
+          </div>
+      </div>
+      <div class="more">
+        <p>Для чисел и строк общий объект ничем не опасен: их нельзя изменить. После <code>y = x</code> и <code>x = x + 1</code> переменная <code>y</code> прежняя, потому что <code>x + 1</code> создает новый объект и перевешивает на него ярлык <code>x</code>. Правило присваивания одно для всех типов, разница только в том, можно ли изменить сам объект.</p>
+        <p>Третий способ копирования дает функция <code>list(a)</code>. Все три способа строят поверхностную копию: новый внешний список с теми же элементами. Если элементы сами списки, они остаются общими; к этому мы вернемся в разделе о консенсусе.</p>
+      </div>
+      <div class="quiz" data-id="alias-rebind" data-slide="S14">
+        <p class="quiz-q">Что напечатает программа?</p>
+        <pre class="code">
+a = ["A", "C"]
+b = a
+b.append("G")
+b = ["T"]
+print(a)
+</pre>
+        <ul>
+          <li><code>['A', 'C']</code></li>
+          <li data-correct><code>['A', 'C', 'G']</code></li>
+          <li><code>['T']</code></li>
+          <li><code>['A', 'C', 'G', 'T']</code></li>
+        </ul>
+        <p class="quiz-why">Третья строка изменила сам список, на котором висят оба ярлыка. Четвертая строка в нем ничего не меняет: она создает новый список <code>['T']</code> и перевешивает на него ярлык <code>b</code>, а <code>a</code> остается на старом. Вариант <code>['A', 'C']</code> получился бы, если бы <code>b = a</code> делал копию, <code>['T']</code>&nbsp;— если бы присваивание <code>b</code> меняло и <code>a</code>. Последний вариант путает присваивание с <code>append()</code>.</p>
+      </div>
+      <div class="walk" data-slide="S15">
+        <p class="task"><b>Задача 1.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">x = [1, 2]
+y = x
+z = x[:]
+y.append(3)
+z.append(4)
+print(x, y, z)</pre>
+        <div class="anim" data-id="task-alias-copy" data-title="Разбор задачи 1">
+          <div class="table-wrap"><table>
+            <thead><tr><th>строка</th><th>список под <code>x</code> и <code>y</code></th><th>список под <code>z</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td>1–2</td><td><code>[1, 2]</code></td><td>нет</td></tr>
+              <tr data-fx="in@2"><td>3</td><td><code>[1, 2]</code></td><td>копия <code>[1, 2]</code></td></tr>
+              <tr data-fx="in@3"><td>4</td><td><code>[1, 2, 3]</code></td><td><code>[1, 2]</code></td></tr>
+              <tr data-fx="in@4"><td>5</td><td><code>[1, 2, 3]</code></td><td><code>[1, 2, 4]</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@5">[1, 2, 3] [1, 2, 3] [1, 2, 4]</pre>
+          <p data-fx="in@5">Ответ <code>[1, 2, 3] [1, 2, 3] [1, 2, 4]</code>: <code>x</code> и <code>y</code> висят на одном списке, а <code>z</code> на его копии.</p>
+          <p data-fx="in@5">Ответ <code>[1, 2] [1, 2, 3] [1, 2, 4]</code> дают те, кто считает <code>y = x</code> копией. Три одинаковых списка <code>[1, 2, 3, 4]</code> получаются, если считать копию <code>z</code> тем же списком.</p>
+        </div>
+        <p>Замените <code>z = x[:]</code> на <code>z = x</code> и предскажите вывод.</p>
+        <div class="runner" data-file="task_1.py"><textarea>
+x = [1, 2]
+y = x
+z = x[:]
+y.append(3)
+z.append(4)
+print(x, y, z)
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S92">
+        <p class="task"><b>Задача 2.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">a = ("ATG")
+b = ("ATG",)
+c = "ATG",
+print(len(a), len(b), len(c))
+print(a[0], b[0])</pre>
+        <div class="anim" data-id="task-one-tuple" data-title="Разбор задачи 2">
+          <div class="table-wrap"><table>
+            <thead><tr><th>имя</th><th>что создано</th><th><code>len()</code></th><th>элемент <code>[0]</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>a</code></td><td>строка <code>"ATG"</code>: скобки ничего не меняют</td><td><code>3</code></td><td><code>'A'</code></td></tr>
+              <tr data-fx="in@2"><td><code>b</code></td><td>кортеж из одного элемента <code>('ATG',)</code></td><td><code>1</code></td><td><code>'ATG'</code></td></tr>
+              <tr data-fx="in@3"><td><code>c</code></td><td>тоже кортеж <code>('ATG',)</code>: его создала запятая</td><td><code>1</code></td><td>не печатается</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@4">3 1 1
+A ATG</pre>
+          <p data-fx="in@4">Ответ <code>3 1 1</code> и <code>A ATG</code>: кортеж создает запятая, а не скобки.</p>
+          <p data-fx="in@4">Ответ <code>1 1 1</code> и <code>ATG ATG</code> дают те, кто считает, что кортеж создают скобки. Ответ <code>3 1 3</code> получается, если не заметить запятую в строке с <code>c</code>. Поэтому кортеж из одного элемента лучше всегда писать в скобках, как <code>b</code>.</p>
+        </div>
+        <p>Уберите запятую в строке с <code>c</code> и запустите снова.</p>
+        <div class="runner" data-file="task_2.py"><textarea>
+a = ("ATG")
+b = ("ATG",)
+c = "ATG",
+print(len(a), len(b), len(c))
+print(a[0], b[0])
+</textarea></div>
+      </div>
+    </section>
+
+    <section id="slices-methods">
+      <h2>Индексы, срезы, методы</h2>
+      <div class="ask" data-slide="S18">
+        <p class="ask-q">Как взять первые три последовательности, а последнюю убрать?</p>
+        <p class="ask-hint">Подсказка: вспомните срез строки из лекции 2: <code>seq[:3]</code>.</p>
+        <div class="ask-a"><p>Первые три дает срез <code>seqs[:3]</code>: срезы списка устроены так же, как срезы строки. Чтобы убрать последнюю, нужен способ изменить сам список, а у строки такого не было. Для этого есть методы списка <code>pop()</code>, <code>remove()</code> и инструкция <code>del</code>; они собраны в таблице ниже.</p></div>
+      </div>
+      <p>Из семи последовательностей часто нужны только первые три, а последнюю, ошибочную, надо убрать. Срезы списка устроены так же, как срезы строки из лекции 2: <code>[начало:конец:шаг]</code>, начало входит в срез, конец не входит. Разница одна: срез списка строит новый список. Поэтому изменение <code>top</code> в примере не трогает <code>seqs</code>, и по той же причине срез <code>[:]</code> дает копию.</p>
+      <div class="runner" data-file="list_slices.py"><textarea>
+seqs = ["ATCC", "GGGC",
+        "ATGG", "AAGC",
+        "TTGG"]
+print(seqs[:3])    # первые три
+print(seqs[-2:])   # две последние
+print(seqs[::2])   # каждая вторая
+top = seqs[:3]
+top[0] = "NNNN"
+print(seqs[0])     # оригинал не изменился
+</textarea></div>
+      <p>Срез за концом списка ошибки не дает, а индекс за концом дает. Индекс просит один элемент, а срез берет столько, сколько найдется в диапазоне. У трех элементов индексы 0, 1 и 2, поэтому <code>seqs[3]</code> останавливает программу с <code>IndexError</code>.</p>
+      <pre class="code">
+seqs = ["ATCC", "GGGC", "ATGG"]
+print(seqs[1:20])   # ['GGGC', 'ATGG']
+print(seqs[3])      # IndexError: list index out of range
+</pre>
+      <div class="more">
+        <p>Самая частая причина <code>IndexError</code> в том, что индексы начинаются с нуля, и последний индекс на единицу меньше длины. При такой ошибке напечатайте список или его длину. Последний элемент надежнее брать как <code>seqs[-1]</code>: это работает для любой длины, кроме пустого списка.</p>
+      </div>
+      <h3>Методы списка</h3>
+      <p>Методы, которые меняют список, работают на месте и возвращают <code>None</code>. Исключение составляет <code>pop()</code>: он удаляет элемент и отдает его, чтобы удаленное можно было использовать. Инструкция <code>del</code> не метод: она удаляет элемент по индексу или целый срез.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Вызов</th><th>Что делает</th><th>Что возвращает</th></tr></thead>
+        <tbody>
+          <tr><td><code>a.append(x)</code></td><td>добавляет <code>x</code> в конец</td><td><code>None</code></td></tr>
+          <tr><td><code>a.extend(b)</code></td><td>дописывает все элементы <code>b</code></td><td><code>None</code></td></tr>
+          <tr><td><code>a.insert(i, x)</code></td><td>вставляет <code>x</code> перед индексом <code>i</code></td><td><code>None</code></td></tr>
+          <tr><td><code>a.pop()</code>, <code>a.pop(i)</code></td><td>удаляет последний или <code>i</code>-й элемент</td><td>удаленный элемент</td></tr>
+          <tr><td><code>a.remove(x)</code></td><td>удаляет первое вхождение <code>x</code></td><td><code>None</code></td></tr>
+          <tr><td><code>a.index(x)</code>, <code>a.count(x)</code></td><td>ищет индекс <code>x</code>, считает <code>x</code></td><td>число</td></tr>
+          <tr><td><code>a.reverse()</code></td><td>разворачивает список</td><td><code>None</code></td></tr>
+          <tr><td><code>del a[i]</code></td><td>удаляет элемент по индексу или срез</td><td>инструкция, не метод</td></tr>
+        </tbody>
+      </table></div>
+      <p>Последнюю последовательность убирают вызовом <code>seqs.pop()</code> или инструкцией <code>del seqs[-1]</code>. Запустите пример и сравните каждую строку вывода с таблицей.</p>
+      <div class="runner" data-file="methods.py"><textarea>
+seqs = ["ATCC", "GGGC", "ATGG", "AAGC", "TTGG"]
+last = seqs.pop()        # удален и возвращен последний
+print(last, seqs)
+seqs.insert(1, "CCCC")   # вставка перед индексом 1
+print(seqs)
+seqs.remove("CCCC")      # удаление по значению
+print(seqs.index("ATGG"), seqs.count("ATCC"))
+del seqs[0]              # удаление по индексу
+print(seqs)
+seqs.reverse()
+print(seqs)
+</textarea></div>
+      <div class="more">
+        <p><code>remove()</code> и <code>index()</code> дают <code>ValueError</code>, если значения в списке нет, а <code>pop()</code> на пустом списке дает <code>IndexError</code>. В таблицу не попали <code>clear()</code>, который очищает список, <code>copy()</code> из прошлого раздела и <code>sort()</code> из раздела о сортировке.</p>
+      </div>
+      <h3><code>append</code>, <code>extend</code>, <code>+</code> и <code>+=</code></h3>
+      <p>Добавить в список несколько элементов можно разными способами, и результат у них разный. <code>append</code> кладет аргумент целиком одним элементом: в <code>a</code> оказался список внутри списка, длина 2. <code>extend</code> дописывает элементы по одному, длина 3. Оператор <code>+</code> склеивает списки, как строки, но строит новый список: <code>c is b</code> дает <code>False</code>.</p>
+      <p>Запись <code>x += y</code> означает «прибавить <code>y</code> к <code>x</code>». Для чисел это короткая форма <code>x = x + y</code>: <code>n += 1</code> увеличивает счетчик на единицу. Для списка <code>+=</code> дописывает элементы в тот же самый список, как <code>extend</code>.</p>
+      <div class="runner" data-file="append_extend.py"><textarea>
+a = ["ATCC"]
+a.append(["GGGC", "TTGG"])
+print(a, len(a))
+b = ["ATCC"]
+b.extend(["GGGC", "TTGG"])
+print(b, len(b))
+c = b + ["AAAA"]
+print(c is b)
+b += ["CCCC"]
+print(b)
+</textarea></div>
+      <p>Разница между <code>+=</code> и <code>a = a + [...]</code> видна, когда у списка два имени. После <code>b = a</code> запись <code>a += [3]</code> меняет общий список, и <code>b</code> это видит. Запись <code>a = a + [4]</code> сначала строит новый список, а потом перевешивает на него только ярлык <code>a</code>; ярлык <code>b</code> остается на старом списке.</p>
+      <aside class="note warn"><p>Привычка из лекции 2 подводит: методы строк возвращали новую строку, и мы писали <code>s = s.upper()</code>. Метод списка <code>append()</code> уже изменил список и вернул <code>None</code>, а присваивание повесило ярлык <code>seqs</code> на <code>None</code>. Метод, который меняет список, вызывают отдельной строкой, без присваивания.</p></aside>
+      <pre class="code">
+seqs = ["ATCC", "GGGC"]
+seqs = seqs.append("TTGG")   # так нельзя
+print(seqs)        # None
+print(len(seqs))   # TypeError: object of type 'NoneType' has no len()
+</pre>
+      <p>Список с тремя элементами где-то есть, но имени у него больше нет: <code>seqs</code> теперь означает <code>None</code>, а у <code>None</code> нет длины.</p>
+      <h3>Откуда берутся списки</h3>
+      <p>Метод <code>split()</code> из лекции 2 всегда возвращал список, просто мы его так не называли. А <code>print(range(5))</code> не показывает числа: диапазон их не хранит, он помнит начало, конец и шаг и выдает числа по одному, когда их просят. Настоящий список из любой последовательности собирает функция <code>list()</code>, строку она превращает в список букв. Функции <code>sum()</code> и <code>max()</code> из лекции 4 работают и со списком.</p>
+      <div class="runner" data-file="sources.py"><textarea>
+text = "ATCC GGGC TTGG"
+parts = text.split()
+print(parts)
+print(range(5))
+print(list(range(5)))
+print(list("ACGT"))
+nums = list(range(1, 6))
+print(sum(nums), max(nums))
+</textarea></div>
+      <h3>Удаление во время обхода</h3>
+      <p>Удалим из списка все последовательности с неизвестной буквой N. Первая версия выглядит правильно, но <code>"NNAT"</code> уцелел. Вторая версия отличается одним символом. Запустите пример и сравните результаты.</p>
+      <div class="runner" data-file="remove_loop.py"><textarea>
+seqs = ["NNNN", "NNAT", "ATCC"]
+for s in seqs:
+    if "N" in s:
+        seqs.remove(s)
+print(seqs)   # NNAT уцелел
+
+seqs = ["NNNN", "NNAT", "ATCC"]
+for s in seqs[:]:   # обходим копию
+    if "N" in s:
+        seqs.remove(s)
+print(seqs)
+</textarea></div>
+      <aside class="note warn"><p>Цикл <code>for</code> идет по позициям того же списка, а удаление сдвигает элементы влево. После удаления <code>"NNNN"</code> на позицию 0 встал <code>"NNAT"</code>, а цикл перешел к позиции 1, где уже <code>"ATCC"</code>. Python об ошибке не сообщает. Если в цикле удаляются элементы, обходят копию <code>seqs[:]</code>, а удаляют из оригинала.</p></aside>
+      <div class="more">
+        <p>Второй способ избежать ошибки: собрать новый список из подходящих элементов. Короче всего это записать включением <code>[s for s in seqs if "N" not in s]</code>, о включениях пойдет речь ниже.</p>
+      </div>
+      <div class="quiz" data-id="reverse-none" data-slide="S26">
+        <p class="quiz-q">Что напечатает программа?</p>
+        <pre class="code">
+a = ["G", "A", "T", "C"]
+b = a.reverse()
+print(a, b)
+</pre>
+        <ul>
+          <li><code>['G', 'A', 'T', 'C'] None</code></li>
+          <li><code>['G', 'A', 'T', 'C'] ['C', 'T', 'A', 'G']</code></li>
+          <li><code>['C', 'T', 'A', 'G'] ['C', 'T', 'A', 'G']</code></li>
+          <li data-correct><code>['C', 'T', 'A', 'G'] None</code></li>
+        </ul>
+        <p class="quiz-why"><code>reverse()</code> развернул сам список <code>a</code> и вернул <code>None</code>, это <code>None</code> и попало в <code>b</code>. Второй вариант рассуждает по аналогии со строками: будто метод возвращает новый объект, а старый не трогает. Третий считает, что метод и меняет список, и возвращает его. Развернутую копию дает срез <code>a[::-1]</code>.</p>
+      </div>
+      <div class="walk" data-slide="S27">
+        <p class="task"><b>Задача 3.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">seqs = ["AT", "GC", "AT", "TA"]
+x = seqs.pop()
+seqs.remove("AT")
+print(x, seqs)</pre>
+        <div class="anim" data-id="task-pop-remove" data-title="Разбор задачи 3">
+          <div class="table-wrap"><table>
+            <thead><tr><th>строка</th><th><code>seqs</code></th><th><code>x</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td>1</td><td><code>['AT', 'GC', 'AT', 'TA']</code></td><td>нет</td></tr>
+              <tr data-fx="in@2"><td>2</td><td><code>['AT', 'GC', 'AT']</code></td><td><code>'TA'</code></td></tr>
+              <tr data-fx="in@3"><td>3</td><td><code>['GC', 'AT']</code></td><td><code>'TA'</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@4">TA ['GC', 'AT']</pre>
+          <p data-fx="in@4">Ответ <code>TA ['GC', 'AT']</code>: <code>pop()</code> удалил последний элемент списка и вернул его, а <code>remove("AT")</code> удалил только первое <code>"AT"</code>.</p>
+          <p data-fx="in@4">Ответ <code>TA ['GC']</code> дают те, кто считает, что <code>remove()</code> удаляет все вхождения. Ответ <code>None ['GC', 'AT']</code> переносит на <code>pop()</code> правило «метод, который меняет список, возвращает <code>None</code>»; <code>pop()</code> из него исключение.</p>
+        </div>
+        <p>Замените <code>seqs.pop()</code> на <code>seqs.pop(0)</code> и предскажите вывод.</p>
+        <div class="runner" data-file="task_3.py"><textarea>
+seqs = ["AT", "GC", "AT", "TA"]
+x = seqs.pop()
+seqs.remove("AT")
+print(x, seqs)
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S28">
+        <p class="task"><b>Задача 4.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">a = [1, 2]
+b = a
+a += [3]
+a = a + [4]
+print(a, b)</pre>
+        <div class="anim" data-id="task-plus-eq" data-title="Разбор задачи 4">
+          <div class="table-wrap"><table>
+            <thead><tr><th>строка</th><th><code>a</code></th><th><code>b</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td>1–2</td><td><code>[1, 2]</code></td><td>тот же список</td></tr>
+              <tr data-fx="in@2"><td>3</td><td><code>[1, 2, 3]</code>: дописано на месте</td><td>тот же список <code>[1, 2, 3]</code></td></tr>
+              <tr data-fx="in@3"><td>4</td><td>новый список <code>[1, 2, 3, 4]</code></td><td>остался <code>[1, 2, 3]</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@4">[1, 2, 3, 4] [1, 2, 3]</pre>
+          <p data-fx="in@4">Ответ <code>[1, 2, 3, 4] [1, 2, 3]</code>: <code>+=</code> изменил общий список, а <code>a + [4]</code> построил новый и перевесил на него только ярлык <code>a</code>.</p>
+          <p data-fx="in@4">Ответ <code>[1, 2, 3, 4] [1, 2, 3, 4]</code> дают те, кто считает <code>a</code> и <code>b</code> связанными навсегда. Ответ <code>[1, 2, 3, 4] [1, 2]</code> считает, что <code>+=</code> тоже строит новый список.</p>
+        </div>
+        <p>Поменяйте местами строки 3 и 4 и предскажите вывод.</p>
+        <div class="runner" data-file="task_4.py"><textarea>
+a = [1, 2]
+b = a
+a += [3]
+a = a + [4]
+print(a, b)
+</textarea></div>
+      </div>
+    </section>
+
+    <section id="unpacking">
+      <h2>Распаковка</h2>
+      <p>Запись о последовательности хранится кортежем <code>rec = ("Rosalind_1", 8, 50.0)</code>. Индексами поля достают тремя строками: <code>name = rec[0]</code>, <code>length = rec[1]</code> и так далее. В каждой строке легко ошибиться номером: что лежит в <code>rec[2]</code>, длина или GC-состав?</p>
+      <div class="ask" data-slide="S31">
+        <p class="ask-q">Как разложить запись по трем переменным одной строкой?</p>
+        <p class="ask-hint">Подсказка: <code>rec = ("Rosalind_1", 8, 50.0)</code>; пока умеем только <code>name = rec[0]</code>, <code>length = rec[1]</code>, ….</p>
+        <div class="ask-a"><p>Имена перечисляют через запятую слева от знака <code>=</code>: <code>name, length, gc = rec</code>. Такое присваивание называют распаковкой; как оно работает, показывают две схемы ниже.</p></div>
+      </div>
+      <p class="def"><span class="term">Распаковка</span>&nbsp;— присваивание, при котором элементы последовательности справа раскладываются по именам слева по порядку: <code>name, length, gc = rec</code>.</p>
+      <p>Справа может стоять любая последовательность: кортеж, список, даже строка. Число имен слева должно совпадать с числом элементов справа, иначе <code>ValueError</code>.</p>
+      <div class="anim" data-slide="S103" data-title="Распаковка: что это">
+          <pre class="code">name, length, gc = rec</pre>
+          <div class="table-wrap"><table>
+            <thead><tr><th>элемент</th><th>значение</th><th>имя</th><th>то же через индекс</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>rec[0]</code></td><td><code>"Rosalind_1"</code></td><td><code>name</code></td><td><code>name = rec[0]</code></td></tr>
+              <tr data-fx="in@2"><td><code>rec[1]</code></td><td><code>8</code></td><td><code>length</code></td><td><code>length = rec[1]</code></td></tr>
+              <tr data-fx="in@3"><td><code>rec[2]</code></td><td><code>50.0</code></td><td><code>gc</code></td><td><code>gc = rec[2]</code></td></tr>
+            </tbody>
+          </table></div>
+      </div>
+      <div class="anim" data-slide="S104" data-title="Имен столько же, сколько элементов">
+          <div class="table-wrap"><table>
+            <thead><tr><th>запись</th><th>имен</th><th>элементов</th><th>результат</th></tr></thead>
+            <tbody>
+              <tr><td><code>name, length, gc = rec</code></td><td>3</td><td>3</td><td>каждый элемент получил имя</td></tr>
+              <tr data-fx="in@1 bad@1"><td><code>a, b = rec</code></td><td>2</td><td>3</td><td>третьему элементу имени не досталось: <code>ValueError: too many values to unpack</code></td></tr>
+              <tr data-fx="in@2 bad@2"><td><code>a, b, c, d = rec</code></td><td>4</td><td>3</td><td>имени <code>d</code> не досталось элемента: <code>ValueError: not enough values to unpack</code></td></tr>
+            </tbody>
+          </table></div>
+      </div>
+      <div class="runner" data-file="unpack.py" data-error><textarea>
+rec = ("Rosalind_1", 8, 50.0)
+name, length, gc = rec
+print(name)
+print(length, gc)
+x, y = "AT"
+print(y, x)
+a, b = rec   # имен два, элементов три
+</textarea></div>
+      <p>Последняя строка дает <code>ValueError: too many values to unpack (expected 2)</code>: Python ожидал два значения по числу имен, а получил больше.</p>
+      <div class="more">
+        <p>Распаковку вы уже видели в лекции 2: <code>seq_id, comment = body.split(maxsplit=1)</code> раскладывает список из двух строк по двум именам.</p>
+      </div>
+      <h3>Обмен значений</h3>
+      <p>Значения двух переменных в Python меняют местами одной строкой <code>a, b = b, a</code>, без временной переменной. Справа сначала вычисляется <code>b, a</code>, и получается кортеж из двух значений: это <span class="term">упаковка</span>. Затем кортеж распаковывается в <code>a</code> и <code>b</code>. Все выражения справа вычисляются до любого присваивания, поэтому значение не теряется.</p>
+      <div class="anim" data-slide="S95" data-title="Как работает a, b = b, a">
+          <div class="table-wrap"><table>
+            <thead><tr><th>шаг</th><th>что происходит</th><th><code>a</code></th><th><code>b</code></th></tr></thead>
+            <tbody>
+              <tr><td>до обмена</td><td>имена ссылаются на исходные строки</td><td><code>"GGGC"</code></td><td><code>"ATCC"</code></td></tr>
+              <tr data-fx="in@1"><td>1) правая часть</td><td>вычисляется кортеж без имени <code>("ATCC", "GGGC")</code></td><td><code>"GGGC"</code></td><td><code>"ATCC"</code></td></tr>
+              <tr data-fx="in@2"><td>2) распаковка</td><td>первое поле достается <code>a</code>, второе <code>b</code></td><td><code>"ATCC"</code></td><td><code>"GGGC"</code></td></tr>
+              <tr data-fx="in@3"><td>3) после</td><td>кортеж больше не нужен: временная переменная не понадобилась</td><td><code>"ATCC"</code></td><td><code>"GGGC"</code></td></tr>
+            </tbody>
+          </table></div>
+          <p>Для сравнения: в Java слева от <code>=</code> стоит одна переменная, и обмен пишут через временную переменную:</p>
+          <pre class="code">String temp = a;
+a = b;
+b = temp;</pre>
+      </div>
+      <pre class="code">
+a = "GGGC"
+b = "ATCC"
+a, b = b, a
+print(a, b)   # ATCC GGGC
+t = 1, 2      # упаковка в кортеж
+print(t)      # (1, 2)
+</pre>
+      <div class="more">
+        <p>Без распаковки понадобилась бы временная переменная: <code>temp = a</code>, <code>a = b</code>, <code>b = temp</code>. Если записать обмен двумя строками <code>a = b</code> и <code>b = a</code>, обе переменные получат одно значение: старое <code>a</code> к второй строке уже потеряно.</p>
+      </div>
+      <h3>Звездочка: остаток в список</h3>
+      <p>Если элементов больше, чем имен, одно имя можно пометить звездочкой: оно соберет все, что не досталось остальным. Звездочка стоит в начале, в середине или в конце. Имя со звездочкой всегда получает список, даже если справа строка. Если на его долю ничего не осталось, список пустой, но ошибки нет.</p>
+      <div class="runner" data-file="star.py"><textarea>
+seq = "ATGCGTAA"
+first, *rest = seq
+print(first, rest)
+*body, last = [1, 2, 3]
+print(body, last)
+head, *mid, tail = "AT"
+print(mid)
+</textarea></div>
+      <div class="more">
+        <p>Звездочка в распаковке может быть только одна: <code>*a, *b = seq</code> дает <code>SyntaxError: multiple starred expressions in assignment</code>. Остаток строки со звездочкой получается списком букв, а не строкой, как у среза <code>seq[1:]</code>.</p>
+      </div>
+      <h3>Распаковка в цикле</h3>
+      <p>Список кортежей встречается постоянно: каждая строка таблицы представляет собой запись. Цикл <code>for</code> берет записи по одной, и распаковку пишут прямо в его заголовке. В теле вместо <code>rec[0]</code> и <code>rec[1]</code> стоят понятные имена. Пример печатает последовательности с GC-составом больше 45&nbsp;%.</p>
+      <div class="runner" data-file="loop_unpack.py"><textarea>
+records = [
+    ("Rosalind_1", 50.0),
+    ("Rosalind_2", 62.5),
+    ("Rosalind_3", 37.5)]
+for name, gc in records:
+    if gc > 45:
+        print(name, gc)
+</textarea></div>
+      <aside class="note warn"><p>Распаковка в заголовке цикла подходит, только если каждый элемент состоит ровно из стольких частей, сколько имен. В списке строк элементы не пары: строку из восьми букв Python пытается разложить на два имени и останавливается с <code>ValueError</code>.</p></aside>
+      <pre class="code">
+seqs = ["ATCCAGCT", "GGGCAACT"]
+for name, seq in seqs:   # элементы не пары
+    print(name)
+# ValueError: too many values to unpack (expected 2)
+</pre>
+      <div class="more">
+        <p>Если бы все строки были длиной 2, например <code>["AT", "GC"]</code>, ошибки не было бы: <code>name</code> получил бы первую букву, <code>seq</code> вторую. Программа работала бы, но делала не то. Записи хранят парами, <code>[("R1", "ATCCAGCT"), ...]</code>; такой список мы получим из текста FASTA в конце лекции.</p>
+        <p>Для записей разной длины в заголовке цикла пишут звездочку: <code>for name, *nums in recs:</code>. <code>name</code> получает первое поле записи, а <code>nums</code> список остальных, возможно пустой.</p>
+      </div>
+      <div class="quiz" data-id="star-empty" data-slide="S37">
+        <p class="quiz-q">Что напечатает программа?</p>
+        <pre class="code">
+first, *rest = "ACG"
+x, *y = "A"
+print(rest, y)
+</pre>
+        <ul>
+          <li data-correct><code>['C', 'G'] []</code></li>
+          <li><code>CG ''</code></li>
+          <li><code>['C', 'G'] ['']</code></li>
+          <li><code>ValueError</code></li>
+        </ul>
+        <p class="quiz-why">Имя со звездочкой всегда получает список, даже из строки. Во второй строке остатка нет, и <code>y</code> получает пустой список. Вариант <code>CG ''</code> переносит на звездочку поведение среза <code>"ACG"[1:]</code>, а <code>['']</code> считает пустой остаток пустой строкой. Ошибки нет: звездочке разрешено получить ноль элементов.</p>
+      </div>
+      <div class="walk" data-slide="S38">
+        <p class="task"><b>Задача 5.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">a, b = 0, 1
+for i in range(5):
+    a, b = b, a + b
+print(a, b)</pre>
+        <div class="anim" data-id="task-fibonacci" data-title="Разбор задачи 5">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>i</code></th><th>правая часть <code>b, a + b</code></th><th><code>a</code>, <code>b</code> после</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>0</code></td><td><code>1, 0 + 1</code></td><td><code>1, 1</code></td></tr>
+              <tr data-fx="in@2"><td><code>1</code></td><td><code>1, 1 + 1</code></td><td><code>1, 2</code></td></tr>
+              <tr data-fx="in@3"><td><code>2</code></td><td><code>2, 1 + 2</code></td><td><code>2, 3</code></td></tr>
+              <tr data-fx="in@4"><td><code>3</code></td><td><code>3, 2 + 3</code></td><td><code>3, 5</code></td></tr>
+              <tr data-fx="in@5"><td><code>4</code></td><td><code>5, 3 + 5</code></td><td><code>5, 8</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@6">5 8</pre>
+          <p data-fx="in@6">Ответ <code>5 8</code>: на каждом шаге правая часть берет старые <code>a</code> и <code>b</code>, а затем обе переменные получают новые значения. Получаются соседние числа Фибоначчи.</p>
+          <p data-fx="in@6">Другие числа получаются, если пересчитывать <code>a + b</code> уже с новым <code>a</code>, как в двух строках <code>a = b</code> и <code>b = a + b</code>: такая программа напечатает <code>16 32</code>. Ответ <code>3 5</code> дают те, кто насчитал на шаг меньше.</p>
+        </div>
+        <p>Замените строку обмена двумя строками <code>a = b</code> и <code>b = a + b</code> и сравните вывод.</p>
+        <div class="runner" data-file="task_5.py"><textarea>
+a, b = 0, 1
+for i in range(5):
+    a, b = b, a + b
+print(a, b)
+</textarea></div>
+      </div>
+    </section>
+
+    <section id="enumerate-zip">
+      <h2><code>enumerate()</code> и <code>zip()</code></h2>
+      <div class="ask" data-slide="S41">
+        <p class="ask-q">Нужна и буква, и ее номер. Как обойтись без <code>range(len(s))</code>?</p>
+        <p class="ask-hint">Подсказка: в лекции 4 писали <code>for i in range(len(s)):</code> и внутри цикла брали букву <code>s[i]</code>.</p>
+        <div class="ask-a"><p>Номер и букву удобно получать парой, то есть кортежем, и сразу распаковывать в заголовке цикла. Такие пары выдает функция <code>enumerate()</code>, а пары букв двух последовательностей выдает <code>zip()</code>.</p></div>
+      </div>
+      <p>В лекции 4 позицию буквы узнавали циклом по индексам <code>for i in range(len(s)):</code>, а букву доставали как <code>s[i]</code>. Это работает, но читается тяжело, и индекс легко сделать на единицу больше нужного. Две встроенные функции выдают кортежи, которые удобно распаковывать в заголовке цикла.</p>
+      <p>Функция <code>enumerate(seq)</code> выдает пары (номер, элемент), номера идут с нуля. В заголовке цикла пару сразу распаковывают в <code>i</code> и <code>b</code>, и в теле есть и позиция, и буква. Параметр <code>start=1</code> начинает нумерацию с единицы, как в задачах Rosalind. Как и <code>range</code>, <code>enumerate</code> не печатает пары сразу: чтобы увидеть все, их собирают в список функцией <code>list()</code>.</p>
+      <p>Работу <code>enumerate()</code> удобно представлять как счетчик 0, 1, 2, …, который идет рядом с последовательностью. На каждом шаге функция берет очередной элемент и текущее значение счетчика и складывает их в кортеж: сначала номер, потом элемент.</p>
+      <div class="anim" data-slide="S105" data-title="enumerate(): номер к каждому элементу">
+          <div class="table-wrap"><table>
+            <thead><tr><th>шаг</th><th>счетчик</th><th>буква <code>"GATA"</code></th><th>кортеж</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td>1</td><td>0</td><td>G</td><td><code>(0, 'G')</code></td></tr>
+              <tr data-fx="in@2"><td>2</td><td>1</td><td>A</td><td><code>(1, 'A')</code></td></tr>
+              <tr data-fx="in@3"><td>3</td><td>2</td><td>T</td><td><code>(2, 'T')</code></td></tr>
+              <tr data-fx="in@4"><td>4</td><td>3</td><td>A</td><td><code>(3, 'A')</code></td></tr>
+            </tbody>
+          </table></div>
+      </div>
+      <div class="runner" data-file="enumerate.py"><textarea>
+seq = "GATATATGC"
+for i, b in enumerate(seq):
+    if b == "T":
+        print(i, end=" ")
+print()
+e = enumerate("AC", start=1)
+print(list(e))
+</textarea></div>
+      <div class="more">
+        <p><code>print(enumerate("AC"))</code> покажет только что-то вроде <code>&lt;enumerate object at 0x...&gt;</code>, как <code>range</code> в лекции 4. Пары появляются по одной, когда их просит цикл или <code>list()</code>.</p>
+      </div>
+      <h3><code>zip()</code> как застежка</h3>
+      <p>Функция <code>zip(s, t)</code> выдает кортежи из элементов с одинаковым номером: первый с первым, второй со вторым. Название означает застежку-молнию, которая тоже соединяет зубцы двух сторон по одному. Получаются пары букв, стоящих друг под другом:</p>
+      <pre class="code">
+zip("GAGCC", "CATCG")
+# ('G', 'C') ('A', 'A') ('G', 'T') ('C', 'C') ('C', 'G')
+</pre>
+      <div class="anim" data-slide="S43" data-title="zip() как застежка">
+          <div class="table-wrap"><table>
+            <thead><tr><th>позиция</th><th><code>s</code></th><th><code>t</code></th><th>пара</th><th>буквы совпадают</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1 bad@1"><td>0</td><td>G</td><td>C</td><td><code>('G', 'C')</code></td><td>нет</td></tr>
+              <tr data-fx="in@2 ok@2"><td>1</td><td>A</td><td>A</td><td><code>('A', 'A')</code></td><td>да</td></tr>
+              <tr data-fx="in@3 bad@3"><td>2</td><td>G</td><td>T</td><td><code>('G', 'T')</code></td><td>нет</td></tr>
+              <tr data-fx="in@4 ok@4"><td>3</td><td>C</td><td>C</td><td><code>('C', 'C')</code></td><td>да</td></tr>
+              <tr data-fx="in@5 bad@5"><td>4</td><td>C</td><td>G</td><td><code>('C', 'G')</code></td><td>нет</td></tr>
+            </tbody>
+          </table></div>
+      </div>
+      <p class="def"><span class="term">Расстояние Хэмминга</span>&nbsp;— число позиций, в которых буквы двух последовательностей одной длины различаются.</p>
+      <p>Его можно посчитать циклом по индексам <code>range(len(s))</code>. С <code>zip</code> индексов нет вовсе: пары букв распаковываются в <code>a</code> и <code>b</code>, а счетчик <code>d += 1</code> растет на каждом несовпадении. Пример взят из задачи Rosalind HAMM, ответ 7 совпадает с ответом задачи.</p>
+      <div class="runner" data-file="hamming.py"><textarea>
+s = "GAGCCTACTAACGGGAT"
+t = "CATCGTAATGACGGCCT"
+d = 0
+for a, b in zip(s, t):
+    if a != b:
+        d += 1
+print(d)
+print(list(zip("AC", "GT")))
+</textarea></div>
+      <div class="more">
+        <p><code>zip</code> принимает и три, и больше последовательностей: кортежи тогда будут длиннее, по одному элементу из каждой.</p>
+      </div>
+      <aside class="note warn"><p>Если последовательности разной длины, <code>zip</code> не жалуется: он останавливается, когда кончилась самая короткая. Для расстояния Хэмминга это неверный ответ без всякой ошибки. С параметром <code>strict=True</code> функция проверяет длины и останавливает программу с <code>ValueError</code>, как только одна последовательность кончилась раньше другой.</p></aside>
+      <div class="runner" data-file="zip_strict.py" data-error><textarea>
+s = "ACGTAC"
+t = "ACG"
+print(list(zip(s, t)))   # TAC молча отброшен
+for a, b in zip(s, t, strict=True):
+    print(a, b)
+</textarea></div>
+      <p>У <code>s</code> шесть букв, у <code>t</code> три, и <code>TAC</code> в пары не попал. Во втором цикле пары <code>A A</code>, <code>C C</code>, <code>G G</code> успевают напечататься, затем программа останавливается: <code>ValueError: zip() argument 2 is shorter than argument 1</code>.</p>
+      <div class="more">
+        <p>Параметр <code>strict</code> появился в Python 3.10 (PEP 618). Авторы PEP пишут, что молчаливое обрезание часто скрывает ошибки в данных. Если длины могут различаться, передавайте <code>strict=True</code>.</p>
+      </div>
+      <div class="quiz" data-id="zip-shorter" data-slide="S47">
+        <p class="quiz-q">Что напечатает программа?</p>
+        <pre class="code">
+s = "ACGTA"
+t = "TCCT"
+d = 0
+for a, b in zip(s, t):
+    if a != b:
+        d += 1
+print(d)
+</pre>
+        <ul>
+          <li><code>1</code></li>
+          <li data-correct><code>2</code></li>
+          <li><code>3</code></li>
+          <li><code>ValueError</code></li>
+        </ul>
+        <p class="quiz-why"><code>zip</code> выдал четыре пары, а не пять: пятая буква <code>s</code> пары не нашла. Буквы различаются в двух парах, <code>A</code>/<code>T</code> и <code>G</code>/<code>C</code>. Ответ <code>3</code> считает лишнюю <code>A</code> несовпадением, <code>1</code> останавливает счет на первом различии. <code>ValueError</code> был бы только со <code>strict=True</code>.</p>
+      </div>
+      <h3>Столбцы: <code>zip(*seqs)</code></h3>
+      <p>Если последовательности хранятся в списке, перечислять их в <code>zip</code> вручную неудобно. Звездочка перед именем списка в вызове функции раскладывает список на отдельные аргументы: <code>zip(*seqs)</code> означает <code>zip(seqs[0], seqs[1], seqs[2])</code>. Тогда <code>zip</code> берет первую букву каждой строки, потом вторую, и получаются столбцы. Операцию, при которой строки становятся столбцами, называют транспонированием.</p>
+      <div class="runner" data-file="columns.py"><textarea>
+seqs = ["ATCC",
+        "GGGC",
+        "ATGG"]
+cols = list(zip(*seqs))
+print(cols[0])   # буквы позиции 0
+print(cols[3])
+print(len(cols))
+</textarea></div>
+      <div class="anim" data-slide="S46" data-title="Столбцы zip(*seqs)">
+          <div class="table-wrap"><table>
+            <thead><tr><th></th><th data-fx="mark@3">0</th><th data-fx="mark@3">1</th><th data-fx="mark@3">2</th><th data-fx="mark@3">3</th></tr></thead>
+            <tbody>
+              <tr><td><code>seqs[0]</code></td><td data-fx="mark@1 plain@2">A</td><td>T</td><td>C</td><td data-fx="mark@2 plain@3">C</td></tr>
+              <tr><td><code>seqs[1]</code></td><td data-fx="mark@1 plain@2">G</td><td>G</td><td>G</td><td data-fx="mark@2 plain@3">C</td></tr>
+              <tr><td><code>seqs[2]</code></td><td data-fx="mark@1 plain@2">A</td><td>T</td><td>G</td><td data-fx="mark@2 plain@3">G</td></tr>
+            </tbody>
+          </table></div>
+          <p data-fx="in@1"><code>cols[0]</code> равен <code>('A', 'G', 'A')</code>: буквы позиции 0 во всех строках.</p>
+          <p data-fx="in@2"><code>cols[3]</code> равен <code>('C', 'C', 'G')</code>.</p>
+          <p data-fx="in@3">Столбцов четыре, по длине строк: <code>len(cols)</code> равен 4.</p>
+      </div>
+      <div class="more">
+        <p>В вызове функции звездочка раскладывает последовательность на аргументы, а в присваивании собирает остаток. Места разные, но идея одна: много элементов вместо одного. Этот прием понадобится для профиля в конце лекции: профиль считают по столбцам.</p>
+      </div>
+    </section>
+
+    <section id="sorting">
+      <h2>Сортировка</h2>
+      <div class="ask" data-slide="S51">
+        <p class="ask-q">Как упорядочить последовательности по длине, а не по алфавиту?</p>
+        <p class="ask-hint">Подсказка: <code>"AT" &lt; "GATTACA"</code>, ведь <code>"A" &lt; "G"</code>: длина не важна.</p>
+        <div class="ask-a"><p>Обычная сортировка строк идет по алфавиту. Идея «сделать список длин и отсортировать его» близка к ответу, но так теряются сами строки. Нужно сказать Python, по какому признаку сравнивать элементы, а в результат класть сами строки.</p></div>
+      </div>
+      <p>Строки Python сравнивает посимвольно, как слова в словаре, и длина при этом не важна: <code>"AT" &lt; "GATTACA"</code>, потому что <code>"A" &lt; "G"</code>. Поэтому сортировка списка строк упорядочит их по алфавиту. Чтобы упорядочить последовательности по длине, Python нужно сказать, что сравнивать.</p>
+      <p>Сначала о двух способах сортировать. Метод <code>sort()</code> переставляет элементы в самом списке и, как другие методы, которые меняют список на месте, возвращает <code>None</code>. Функция <code>sorted()</code> исходные данные не трогает, а строит новый отсортированный список; ей можно дать и строку, и кортеж.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th><code>a.sort()</code></th><th><code>sorted(a)</code></th></tr></thead>
+        <tbody>
+          <tr><td>что это</td><td>метод списка</td><td>встроенная функция</td></tr>
+          <tr><td>что делает</td><td>сортирует сам список</td><td>строит новый список</td></tr>
+          <tr><td>что возвращает</td><td><code>None</code></td><td>отсортированный список</td></tr>
+          <tr><td>исходные данные</td><td>изменены</td><td>прежние</td></tr>
+          <tr><td>что принимает</td><td>только список</td><td>любую последовательность</td></tr>
+        </tbody>
+      </table></div>
+      <div class="runner" data-file="sort_sorted.py"><textarea>
+seqs = ["TTGG", "ATCC", "GGGC"]
+new = sorted(seqs)
+print(new)
+print(seqs)             # исходный порядок
+seqs.sort()
+print(seqs)             # отсортирован сам список
+print(sorted("GATC"))   # список букв, а не строка
+</textarea></div>
+      <p>Слева <code>sort()</code>: в <code>r = a.sort()</code> попал бы <code>None</code>, а сам <code>a</code> отсортирован. Справа <code>sorted()</code>: в <code>r = sorted(b)</code> лежит новый список, а <code>b</code> прежний. Отсюда правило: от <code>sort()</code> результат не сохраняют, от <code>sorted()</code> сохраняют обязательно.</p>
+      <div class="ask" data-slide="S99">
+        <p class="ask-q">Обе сортируют по алфавиту. Как сортировать по длине?</p>
+        <p class="ask-hint">Подсказка: у <code>sort()</code> и <code>sorted()</code> есть параметр <code>key=</code>: что в него передать?</p>
+        <div class="ask-a"><p>В <code>key=</code> передают функцию, которая по элементу вычисляет то, по чему сравнивать. Для длины это <code>len</code>: <code>sorted(seqs, key=len)</code>.</p></div>
+      </div>
+      <h3>Ключ сортировки</h3>
+      <p class="def"><span class="term">Ключ сортировки</span>&nbsp;— значение, которое функция из параметра <code>key</code> вычисляет для каждого элемента. Сравниваются ключи, а в результат попадают сами элементы.</p>
+      <p>Параметр <code>key=</code> получает функцию одного аргумента, например <code>len</code>. Python вызывает ее один раз для каждого элемента и упорядочивает элементы по ключам. Функцию передают без скобок: <code>key=len</code>, а не <code>key=len()</code>. Со скобками вы бы вызвали ее сами, а вызывать ее должен Python.</p>
+      <p>Ключом служит и метод, записанный через имя типа: <code>key=str.lower</code> означает «у каждой строки вызвать <code>lower()</code>». <code>str.lower</code> это тот же метод <code>lower()</code>, взятый у типа <code>str</code>: <code>str.lower("Gc")</code> дает <code>"gc"</code>, как <code>"Gc".lower()</code>. Поэтому его можно передать как функцию одного аргумента. Параметр <code>reverse=True</code> дает порядок по убыванию. Оба параметра есть и у <code>sort()</code>, и у <code>sorted()</code>.</p>
+      <div class="runner" data-file="keys.py"><textarea>
+seqs = ["GATTACA", "AT",
+        "gc", "TTA"]
+print(sorted(seqs))
+print(sorted(seqs, key=len))
+print(sorted(seqs,
+             key=str.lower))
+print(sorted(seqs, key=len,
+             reverse=True))
+</textarea></div>
+      <p>Без ключа строки идут по кодам символов, и все прописные буквы стоят раньше строчных: <code>"gc"</code> оказался последним. С ключом <code>str.lower</code> строки сравниваются в нижнем регистре, а печатаются как были. Строки <code>"AT"</code> и <code>"gc"</code> одной длины, и с <code>key=len</code> они стоят в исходном порядке, даже при <code>reverse=True</code>.</p>
+      <p>Сортировка в Python <span class="term">устойчивая</span>: при равных ключах элементы сохраняют тот порядок, в котором были.</p>
+      <div class="more">
+        <p>Ключом может быть и метод конкретного объекта: <code>seq.count</code> для буквы возвращает, сколько раз она встречается в <code>seq</code>. Так в конце лекции найдем самую частую букву столбца. Свои функции появятся в лекции о функциях, а до тех пор ключ берем из встроенных функций и методов.</p>
+        <p>Метод <code>sort()</code> возвращает <code>None</code> нарочно: копировать список ради сортировки расточительно, а <code>None</code> напоминает, что исходный порядок потерян.</p>
+      </div>
+      <h3>Сортировка кортежей</h3>
+      <p>Кортежи сравниваются поле за полем: сначала первые поля, а если они равны, то вторые, и так далее. Такой порядок называют лексикографическим. Список записей <code>(gc, name)</code> поэтому сортируется по GC-составу, а записи с равным GC упорядочиваются по имени. Поле, по которому нужно сортировать, ставят в кортеже первым.</p>
+      <div class="runner" data-file="sort_tuples.py"><textarea>
+recs = [(50.0, "Rosalind_7"),
+        (62.5, "Rosalind_2"),
+        (50.0, "Rosalind_1")]
+recs.sort()
+print(recs[0])
+print(recs[-1])
+print((1, "b") &lt; (2, "a"))   # 1 &lt; 2, вторые поля не важны
+</textarea></div>
+      <p>С <code>reverse=True</code> порядок переворачивается целиком: при равном GC имена тоже идут по убыванию.</p>
+      <div class="more">
+        <p>Если на одной позиции кортежей смешаны числа и строки, сравнение дает <code>TypeError</code>: число со строкой Python не сравнивает.</p>
+      </div>
+      <h3><code>max()</code> и <code>min()</code> с ключом</h3>
+      <p>Параметр <code>key</code> есть и у <code>max()</code> и <code>min()</code> из лекции 4. <code>max(seqs, key=len)</code> отвечает на вопрос «какая последовательность самая длинная», и в ответе сама строка, а не ее длина. При равных ключах возвращается первый из элементов: короче всех <code>"AT"</code> и <code>"GC"</code>, и <code>min</code> вернул <code>"AT"</code>. Без ключа <code>max</code> сравнивает строки по алфавиту, и максимальной оказалась самая короткая <code>"GC"</code>.</p>
+      <pre class="code">
+seqs = ["ATCCAGCT", "AT", "GATTACA", "GC"]
+print(max(seqs, key=len))   # ATCCAGCT
+print(min(seqs, key=len))   # AT
+print(max(seqs))            # GC: по алфавиту
+</pre>
+      <div class="more">
+        <p>В лекции 4 максимум искали шаблоном «лучшее на данный момент». <code>max(..., key=...)</code> делает то же одной строкой. Для пустого списка <code>max</code> дает <code>ValueError</code>.</p>
+      </div>
+      <div class="quiz" data-id="sorted-stable" data-slide="S57">
+        <p class="quiz-q">Что напечатает программа?</p>
+        <pre class="code">
+words = ["TTA", "GC", "AAT", "CA"]
+print(sorted(words, key=len))
+</pre>
+        <ul>
+          <li><code>['CA', 'GC', 'AAT', 'TTA']</code></li>
+          <li><code>['TTA', 'AAT', 'GC', 'CA']</code></li>
+          <li data-correct><code>['GC', 'CA', 'TTA', 'AAT']</code></li>
+          <li><code>[2, 2, 3, 3]</code></li>
+        </ul>
+        <p class="quiz-why">Ключи равны 3, 2, 3, 2. Сначала идут слова длины 2, потом 3, а внутри каждой группы сохраняется исходный порядок: <code>"GC"</code> стоял раньше <code>"CA"</code> и остался раньше, хотя по алфавиту <code>"CA"</code> меньше. Первый вариант дополнительно сортирует по алфавиту, второй путает направление, а <code>[2, 2, 3, 3]</code> сортирует сами длины.</p>
+      </div>
+      <div class="walk" data-slide="S58">
+        <p class="task"><b>Задача 6.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">a = [3, 1, 2]
+b = sorted(a)
+c = a.sort()
+print(a, b, c)</pre>
+        <div class="anim" data-id="task-sort-sorted" data-title="Разбор задачи 6">
+          <div class="table-wrap"><table>
+            <thead><tr><th>строка</th><th><code>a</code></th><th><code>b</code></th><th><code>c</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td>1</td><td><code>[3, 1, 2]</code></td><td>нет</td><td>нет</td></tr>
+              <tr data-fx="in@2"><td>2</td><td><code>[3, 1, 2]</code></td><td>новый <code>[1, 2, 3]</code></td><td>нет</td></tr>
+              <tr data-fx="in@3"><td>3</td><td><code>[1, 2, 3]</code></td><td><code>[1, 2, 3]</code></td><td><code>None</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@4">[1, 2, 3] [1, 2, 3] None</pre>
+          <p data-fx="in@4">Ответ <code>[1, 2, 3] [1, 2, 3] None</code>: <code>sorted()</code> построил новый список, а <code>sort()</code> отсортировал <code>a</code> на месте и вернул <code>None</code>.</p>
+          <p data-fx="in@4">Ответ <code>[3, 1, 2] [1, 2, 3] [1, 2, 3]</code> считает, что <code>sort()</code> возвращает список и не меняет <code>a</code>. Три одинаковых списка получаются, если забыть, что <code>sort()</code> возвращает <code>None</code>.</p>
+        </div>
+        <p>Допишите <code>print(b is a)</code> и предскажите результат.</p>
+        <div class="runner" data-file="task_6.py"><textarea>
+a = [3, 1, 2]
+b = sorted(a)
+c = a.sort()
+print(a, b, c)
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S59">
+        <p class="task"><b>Задача 7.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">recs = [(50.0, "R1"),
+        (62.5, "R2"),
+        (50.0, "R3")]
+recs.sort(reverse=True)
+print(recs)</pre>
+        <div class="anim" data-id="task-sort-reverse" data-title="Разбор задачи 7">
+          <div class="table-wrap"><table>
+            <thead><tr><th>сравнение</th><th>по какому полю решено</th><th>результат</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>(62.5, 'R2')</code> и <code>(50.0, …)</code></td><td>первое: <code>62.5 &gt; 50.0</code></td><td><code>R2</code> первым</td></tr>
+              <tr data-fx="in@2"><td><code>(50.0, 'R3')</code> и <code>(50.0, 'R1')</code></td><td>первые равны, второе: <code>'R3' &gt; 'R1'</code></td><td><code>R3</code> раньше <code>R1</code></td></tr>
+              <tr data-fx="in@3"><td>порядок по убыванию</td><td></td><td><code>R2</code>, <code>R3</code>, <code>R1</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@4">[(62.5, 'R2'), (50.0, 'R3'), (50.0, 'R1')]</pre>
+          <p data-fx="in@4">Ответ <code>[(62.5, 'R2'), (50.0, 'R3'), (50.0, 'R1')]</code>: <code>reverse=True</code> переворачивает и порядок по второму полю.</p>
+          <p data-fx="in@4">Частый ответ ставит <code>R1</code> раньше <code>R3</code>: кажется, что <code>reverse</code> действует только на первое поле или что сработала устойчивость. Устойчивость здесь не участвует: кортежи <code>(50.0, 'R1')</code> и <code>(50.0, 'R3')</code> не равны, их различает имя.</p>
+        </div>
+        <p>Уберите <code>reverse=True</code> и предскажите порядок.</p>
+        <div class="runner" data-file="task_7.py"><textarea>
+recs = [(50.0, "R1"),
+        (62.5, "R2"),
+        (50.0, "R3")]
+recs.sort(reverse=True)
+print(recs)
+</textarea></div>
+      </div>
+    </section>
+
+    <section id="comprehensions">
+      <h2>Списковые включения</h2>
+      <div class="ask" data-slide="S62">
+        <p class="ask-q">Пустой список, цикл и <code>.append()</code>: можно ли короче?</p>
+        <p class="ask-hint">Подсказка: <code>lens = []</code>, <code>for s in seqs:</code>, <code>lens.append(len(s))</code>.</p>
+        <div class="ask-a"><p>Можно: списковое включение записывает те же части одной строкой, <code>[len(s) for s in seqs]</code>. Три строки шаблона накопителя ради одной мысли становятся одним выражением.</p></div>
+      </div>
+      <p>Новый список из старого обычно строят шаблоном накопителя из лекции 4: пустой список, цикл и <code>append()</code> в теле. Несколько строк уходит на одну мысль «список длин последовательностей без буквы N». Для этого у Python есть короткая запись.</p>
+      <p class="def"><span class="term">Списковое включение</span>&nbsp;— выражение в квадратных скобках, которое строит новый список: <code>[выражение for x in последовательность if условие]</code>.</p>
+      <p>Части включения те же, что у цикла, только переставлены: сначала то, что кладут в список, потом <code>for</code>, потом условие. Читать включение удобно вслух: «длина <code>s</code> для каждого <code>s</code> из <code>seqs</code>, если в <code>s</code> нет N». Пример строит один и тот же список обоими способами.</p>
+      <div class="runner" data-file="loop_vs_comp.py"><textarea>
+seqs = ["ATCCAGCT", "GGNCAACT", "TTGG"]
+lens = []
+for s in seqs:
+    if "N" not in s:
+        lens.append(len(s))
+print(lens)
+lens = [len(s) for s in seqs if "N" not in s]
+print(lens)
+</textarea></div>
+      <div class="anim" data-slide="S63" data-title="Цикл и включение: одни и те же части">
+          <div class="table-wrap"><table>
+            <thead><tr><th>часть</th><th>цикл с <code>append()</code></th><th>включение</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1 mark@1 plain@2"><td>выражение</td><td><code>lens.append(len(s))</code></td><td><code>len(s)</code> в начале</td></tr>
+              <tr data-fx="in@2 mark@2 plain@3"><td>перебор</td><td><code>for s in seqs:</code></td><td><code>for s in seqs</code> после выражения</td></tr>
+              <tr data-fx="in@3 mark@3 plain@4"><td>условие</td><td><code>if "N" not in s:</code></td><td><code>if "N" not in s</code> в конце</td></tr>
+              <tr data-fx="in@4 mark@4"><td>новый список</td><td><code>lens = []</code></td><td>квадратные скобки <code>[...]</code></td></tr>
+            </tbody>
+          </table></div>
+      </div>
+      <p>Без условия включение делает новый элемент из каждого старого, и новый список получается той же длины, что исходный. Исходный список не меняется. Выражением может быть что угодно: вызов функции, метода, даже кортеж.</p>
+      <pre class="code">
+seqs = ["ATCCAGCT", "GGGCAACT", "TTGG"]
+print([len(s) for s in seqs])        # [8, 8, 4]
+print([s.lower() for s in seqs])     # ['atccagct', 'gggcaact', 'ttgg']
+print([(s, len(s)) for s in seqs][2])   # ('TTGG', 4)
+</pre>
+      <p>С условием включение работает как фильтр: элемент попадает в новый список, только если условие верно. Первое включение в примере отбирает последовательности, где буква G встречается хотя бы дважды. Второе решает задачу Rosalind SUBS из лекции 4 одной инструкцией: перебирает позиции начала окна длины 4 и оставляет те, где окно совпало с мотивом. <code>i + 1</code> переводит индекс Python в позицию Rosalind, и ответ <code>[2, 4, 10]</code> совпадает с ответом задачи.</p>
+      <div class="runner" data-file="comp_filter.py"><textarea>
+seqs = ["ATCCAGCT",
+        "GGGCAACT",
+        "TTGGAACT"]
+rich = [s for s in seqs
+        if s.count("G") >= 2]
+print(rich)
+s = "GATATATGCATATACTT"
+pos = [i + 1
+       for i in range(len(s) - 3)
+       if s[i:i + 4] == "ATAT"]
+print(pos)
+</textarea></div>
+      <div class="more">
+        <p><code>range(len(s) - 3)</code> перебирает только позиции, с которых мотив длины 4 помещается целиком. Включение можно писать на нескольких строках, пока скобка не закрыта.</p>
+      </div>
+      <p>Во включении может быть несколько <code>for</code>. Они идут в том же порядке, что вложенные циклы: первый внешний, второй внутренний. Поэтому сначала идут все пары с <code>A</code>, потом все пары с <code>C</code>. Выражение-кортеж <code>(a, b)</code> обязательно берут в скобки.</p>
+      <pre class="code">
+pairs = [(a, b) for a in "AC"
+         for b in "GT"]
+print(pairs)
+# [('A', 'G'), ('A', 'T'), ('C', 'G'), ('C', 'T')]
+</pre>
+      <p>Переменная цикла <code>for</code> остается после цикла и хранит последнее значение. Переменная включения существует только внутри квадратных скобок: обращение к ней после включения дает <code>NameError</code>.</p>
+      <h3>Когда включение хуже цикла</h3>
+      <p>Включения удобны, пока они короткие. Б.&nbsp;Слаткин в книге «Effective Python» советует оставлять во включении не больше двух управляющих частей: два <code>for</code> или <code>for</code> и <code>if</code>. Если частей больше, пишите обычный цикл: строк больше, но каждую можно прочитать. Оба варианта ниже отбирают из строк матрицы с суммой не меньше 10 числа, кратные 3, и дают <code>[6, 9]</code>.</p>
+      <pre class="code">
+m = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+# плохо: два for и два if в одной строке
+r = [x for row in m if sum(row) >= 10
+     for x in row if x % 3 == 0]
+# хорошо: то же циклами
+r = []
+for row in m:
+    if sum(row) >= 10:
+        for x in row:
+            if x % 3 == 0:
+                r.append(x)
+print(r)   # [6, 9]
+</pre>
+      <div class="quiz" data-id="enumerate-comp" data-slide="S68">
+        <p class="quiz-q">Что напечатает программа?</p>
+        <pre class="code">
+s = "GATTACA"
+r = [i for i, b in enumerate(s)
+     if b == "A"]
+print(r)
+</pre>
+        <ul>
+          <li data-correct><code>[1, 4, 6]</code></li>
+          <li><code>[2, 5, 7]</code></li>
+          <li><code>['A', 'A', 'A']</code></li>
+          <li><code>3</code></li>
+        </ul>
+        <p class="quiz-why">Условие проверяет букву <code>b</code>, но в список кладется то, что стоит в начале включения, т.&nbsp;е. индекс <code>i</code>. Индексы букв A равны 1, 4 и 6, счет идет с нуля. <code>[2, 5, 7]</code> считает позиции с единицы, <code>['A', 'A', 'A']</code> путает выражение с условием. Включение строит список, а не считает элементы, поэтому <code>3</code> неверно.</p>
+      </div>
+      <div class="walk" data-slide="S69">
+        <p class="task"><b>Задача 8.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">s = "GAGCCTA"
+t = "CATCGTA"
+d = [i for i, a in enumerate(s)
+     if a != t[i]]
+print(d, len(d))</pre>
+        <div class="anim" data-id="task-mismatch-pos" data-title="Разбор задачи 8">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>i</code></th><th>буквы</th><th>разные?</th><th><code>d</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>0</code></td><td><code>G</code>, <code>C</code></td><td>да</td><td><code>[0]</code></td></tr>
+              <tr data-fx="in@2"><td><code>1</code></td><td><code>A</code>, <code>A</code></td><td>нет</td><td><code>[0]</code></td></tr>
+              <tr data-fx="in@3"><td><code>2</code></td><td><code>G</code>, <code>T</code></td><td>да</td><td><code>[0, 2]</code></td></tr>
+              <tr data-fx="in@4"><td><code>3</code></td><td><code>C</code>, <code>C</code></td><td>нет</td><td><code>[0, 2]</code></td></tr>
+              <tr data-fx="in@5"><td><code>4</code></td><td><code>C</code>, <code>G</code></td><td>да</td><td><code>[0, 2, 4]</code></td></tr>
+              <tr data-fx="in@6"><td><code>5</code></td><td><code>T</code>, <code>T</code></td><td>нет</td><td><code>[0, 2, 4]</code></td></tr>
+              <tr data-fx="in@7"><td><code>6</code></td><td><code>A</code>, <code>A</code></td><td>нет</td><td><code>[0, 2, 4]</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@8">[0, 2, 4] 3</pre>
+          <p data-fx="in@8">Ответ <code>[0, 2, 4] 3</code>: в списке позиции несовпадений, а их число дает расстояние Хэмминга.</p>
+          <p data-fx="in@8">Ответ <code>[1, 3, 5] 3</code> считает позиции с единицы. Ответ <code>['G', 'G', 'C'] 3</code> путает выражение <code>i</code> с буквой <code>a</code>.</p>
+        </div>
+        <p>Замените <code>i</code> в начале включения на <code>a</code> и предскажите вывод.</p>
+        <div class="runner" data-file="task_8.py"><textarea>
+s = "GAGCCTA"
+t = "CATCGTA"
+d = [i for i, a in enumerate(s)
+     if a != t[i]]
+print(d, len(d))
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S70">
+        <p class="task"><b>Задача 9.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">for x in "ACG":
+    print(x, end="")
+print()
+print(x)
+y = [z for z in "ACG"]
+print(y)
+print(z)</pre>
+        <div class="anim" data-id="task-comp-var" data-title="Разбор задачи 9">
+          <div class="table-wrap"><table>
+            <thead><tr><th>строки</th><th>что происходит</th><th>напечатано</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td>1–3</td><td>цикл печатает буквы подряд, <code>print()</code> заканчивает строку</td><td><code>ACG</code></td></tr>
+              <tr data-fx="in@2"><td>4</td><td><code>x</code> после цикла равно последней букве</td><td><code>G</code></td></tr>
+              <tr data-fx="in@3"><td>5–6</td><td>включение строит список</td><td><code>['A', 'C', 'G']</code></td></tr>
+              <tr data-fx="in@4"><td>7</td><td>имени <code>z</code> вне включения нет</td><td><code>NameError</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@5">ACG
+G
+['A', 'C', 'G']
+NameError: name 'z' is not defined</pre>
+          <p data-fx="in@5">Ответ: <code>ACG</code>, <code>G</code>, <code>['A', 'C', 'G']</code>, затем <code>NameError</code>: переменная включения существует только внутри скобок.</p>
+          <p data-fx="in@5">Частый неверный ответ ставит <code>G</code> на последнюю строку вместо ошибки: поведение цикла переносят на включение. Пользоваться переменной цикла после цикла тоже не стоит: если цикл не сделал ни одного шага, ее не будет.</p>
+        </div>
+        <p>Удалите последнюю строку и запустите код.</p>
+        <div class="runner" data-file="task_9.py" data-error><textarea>
+for x in "ACG":
+    print(x, end="")
+print()
+print(x)
+y = [z for z in "ACG"]
+print(y)
+print(z)
+</textarea></div>
+      </div>
+    </section>
+
+    <section id="consensus">
+      <h2>От FASTA к консенсусу</h2>
+      <div class="ask" data-slide="S73">
+        <p class="ask-q">В FASTA семь последовательностей. Как получить их консенсус?</p>
+        <p class="ask-hint">Подсказка: консенсус: строка из самых частых букв каждой позиции.</p>
+        <div class="ask-a"><p>Последовательности нужно хранить вместе и обрабатывать по позициям: разобрать FASTA в список, разложить по столбцам, посчитать буквы в каждом столбце и взять самую частую. Эти четыре шага описаны ниже.</p></div>
+      </div>
+      <p>Задача Rosalind CONS: дано несколько последовательностей одинаковой длины в формате FASTA. Для каждой позиции нужно найти самую частую букву и сложить из этих букв строку. Задачу решают за четыре шага, и на каждом шаге данные хранятся по-своему:</p>
+      <ol>
+        <li>текст FASTA разбирают в список записей <code>(id, seq)</code>;</li>
+        <li>последовательности раскладывают по столбцам: <code>zip(*seqs)</code>;</li>
+        <li>в каждом столбце считают буквы A, C, G и T, получается профиль;</li>
+        <li>из каждого столбца берут самую частую букву, получается консенсус.</li>
+      </ol>
+      <h3>FASTA в список записей</h3>
+      <p>Файлы читать мы пока не умеем, поэтому текст FASTA задан строкой в тройных кавычках. Метод <code>split()</code> режет ее по пробелам и переводам строк. Здесь каждая запись занимает ровно две строки, имя и последовательность. Поэтому срез с шагом 2 от нулевого места дает все имена, а от первого все последовательности. Включение со срезом <code>x[1:]</code> снимает с имен знак <code>&gt;</code>, а <code>zip</code> склеивает имена и последовательности в пары.</p>
+      <div class="runner" data-file="fasta.py"><textarea>
+text = """>Rosalind_1
+ATCCAGCT
+>Rosalind_2
+GGGCAACT
+>Rosalind_3
+ATGGATCT
+>Rosalind_4
+AAGCAACC
+>Rosalind_5
+TTGGAACT
+>Rosalind_6
+ATGCCATT
+>Rosalind_7
+ATGGCACT"""
+lines = text.split()
+ids = lines[0::2]
+seqs = lines[1::2]
+names = [x[1:] for x in ids]
+recs = list(zip(names, seqs))
+print(recs[0])
+print(len(recs))
+</textarea></div>
+      <div class="more">
+        <p>У приема есть ограничения. <code>split()</code> без аргумента режет и по пробелам, а настоящая строка описания в файлах NCBI содержит пробелы после идентификатора. Кроме того, последовательность в настоящем FASTA часто разбита на несколько строк. Для таких файлов нужен цикл по строкам с проверкой <code>line.startswith("&gt;")</code>, он появится в лекции о файлах. В примере задачи Rosalind CONS каждая последовательность записана одной строкой, и прием работает.</p>
+      </div>
+      <h3>Выравнивание, профиль, консенсус</h3>
+      <p class="def"><span class="term">Профиль</span>&nbsp;— матрица, которая показывает, сколько раз каждая буква стоит в каждом столбце набора последовательностей одной длины.</p>
+      <p class="def"><span class="term">Консенсус</span>&nbsp;— строка из самых частых букв каждого столбца.</p>
+      <p>В таблице семь последовательностей стоят друг под другом; Н.&nbsp;Джонс и П.&nbsp;Певзнер называют такую таблицу матрицей выравнивания. В первом столбце пять букв A, ни одной C, по одной G и T. Профиль получается матрицей из четырех строк, по строке на букву, и восьми столбцов.</p>
+      <div class="anim" data-slide="S75" data-title="Выравнивание, профиль, консенсус">
+      <div class="table-wrap"><table>
+        <thead><tr><th>Позиция</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr></thead>
+        <tbody>
+          <tr data-fx="in@1"><td><code>seqs[0]</code></td><td data-fx="mark@2 plain@3">A</td><td>T</td><td>C</td><td>C</td><td>A</td><td>G</td><td>C</td><td>T</td></tr>
+          <tr data-fx="in@1"><td><code>seqs[1]</code></td><td data-fx="mark@2 plain@3">G</td><td>G</td><td>G</td><td>C</td><td>A</td><td>A</td><td>C</td><td>T</td></tr>
+          <tr data-fx="in@1"><td><code>seqs[2]</code></td><td data-fx="mark@2 plain@3">A</td><td>T</td><td>G</td><td>G</td><td>A</td><td>T</td><td>C</td><td>T</td></tr>
+          <tr data-fx="in@1"><td><code>seqs[3]</code></td><td data-fx="mark@2 plain@3">A</td><td>A</td><td>G</td><td>C</td><td>A</td><td>A</td><td>C</td><td>C</td></tr>
+          <tr data-fx="in@1"><td><code>seqs[4]</code></td><td data-fx="mark@2 plain@3">T</td><td>T</td><td>G</td><td>G</td><td>A</td><td>A</td><td>C</td><td>T</td></tr>
+          <tr data-fx="in@1"><td><code>seqs[5]</code></td><td data-fx="mark@2 plain@3">A</td><td>T</td><td>G</td><td>C</td><td>C</td><td>A</td><td>T</td><td>T</td></tr>
+          <tr data-fx="in@1"><td><code>seqs[6]</code></td><td data-fx="mark@2 plain@3">A</td><td>T</td><td>G</td><td>G</td><td>C</td><td>A</td><td>C</td><td>T</td></tr>
+          <tr><th data-fx="in@2">A</th><td data-fx="in@2">5</td><td data-fx="in@3">1</td><td data-fx="in@3">0</td><td data-fx="in@3">0</td><td data-fx="in@3">5</td><td data-fx="in@3">5</td><td data-fx="in@3">0</td><td data-fx="in@3">0</td></tr>
+          <tr><th data-fx="in@2">C</th><td data-fx="in@2">0</td><td data-fx="in@3">0</td><td data-fx="in@3">1</td><td data-fx="in@3">4</td><td data-fx="in@3">2</td><td data-fx="in@3">0</td><td data-fx="in@3">6</td><td data-fx="in@3">1</td></tr>
+          <tr><th data-fx="in@2">G</th><td data-fx="in@2">1</td><td data-fx="in@3">1</td><td data-fx="in@3">6</td><td data-fx="in@3">3</td><td data-fx="in@3">0</td><td data-fx="in@3">1</td><td data-fx="in@3">0</td><td data-fx="in@3">0</td></tr>
+          <tr><th data-fx="in@2">T</th><td data-fx="in@2">1</td><td data-fx="in@3">5</td><td data-fx="in@3">0</td><td data-fx="in@3">0</td><td data-fx="in@3">0</td><td data-fx="in@3">1</td><td data-fx="in@3">1</td><td data-fx="in@3">6</td></tr>
+          <tr data-fx="in@4 ok@4"><th>Консенсус</th><td>A</td><td>T</td><td>G</td><td>C</td><td>A</td><td>A</td><td>C</td><td>T</td></tr>
+        </tbody>
+      </table></div>
+      </div>
+      <h3>Вложенный список: матрица</h3>
+      <p class="def"><span class="term">Вложенный список</span>&nbsp;— список, элементы которого тоже списки. Если все внутренние списки одной длины, вложенный список называют <span class="term">матрицей</span>.</p>
+      <p>Элемент <code>m[1]</code> сам является списком, поэтому к нему можно приписать второй индекс. Первый индекс выбирает строку, второй выбирает элемент в этой строке, то есть столбец. Запустите пример, затем напечатайте <code>m[0][1]</code>.</p>
+      <div class="runner" data-file="nested.py"><textarea>
+m = [[1, 2, 3],
+     [4, 5, 6]]
+print(m[1])       # строка 1
+print(m[1][2])    # ее элемент 2
+print(len(m))     # число строк
+print(len(m[0]))  # длина строки
+</textarea></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th></th><th>столбец 0</th><th>столбец 1</th><th>столбец 2</th></tr></thead>
+            <tbody>
+              <tr><td>строка 0: <code>m[0]</code></td><td>1</td><td>2</td><td>3</td></tr>
+              <tr><td>строка 1: <code>m[1]</code></td><td>4</td><td>5</td><td><b>6</b> (<code>m[1][2]</code>)</td></tr>
+            </tbody>
+          </table></div>
+      <div class="more">
+        <p>Отдельного типа «матрица» среди встроенных типов Python нет: это обычный список списков. Для вычислений с матрицами служит библиотека NumPy с многомерным массивом <code>ndarray</code>; в курсе ее нет.</p>
+      </div>
+      <h3>Строки матрицы через умножение</h3>
+      <p>Чтобы считать профиль вручную, хочется заранее завести матрицу нулей. Список можно умножить на число: <code>[0] * 3</code> дает три нуля. Но если так же умножить строку матрицы, получится ловушка. Запустите пример.</p>
+      <div class="runner" data-file="matrix_trap.py"><textarea>
+bad = [[0] * 3] * 2
+bad[0][0] = 5
+print(bad)    # изменились обе строки
+good = [[0] * 3 for i in range(2)]
+good[0][0] = 5
+print(good)
+</textarea></div>
+      <aside class="note warn"><p><code>[[0] * 3] * 2</code> не делает две строки, а кладет во внешний список две ссылки на одну и ту же строку. Меняем одну ячейку, и меняются обе строки. Строки матрицы строят включением: оно на каждом шаге создает новую строку.</p></aside>
+      <div class="more">
+        <p>Ссылки живут не только в именах, но и в элементах списка. С числами <code>[0] * 3</code> безопасно: числа неизменяемы. А копия <code>bad[:]</code> не помогла бы: это поверхностная копия, она строит новый внешний список, но строки оставляет общими. После <code>m = [[1, 2], [3, 4]]</code> и <code>c = m[:]</code> вызов <code>c[0].append(9)</code> виден и в <code>m</code>. Копию матрицы делают включением: <code>[row[:] for row in m]</code>.</p>
+      </div>
+      <h3>Профиль и консенсус по столбцам</h3>
+      <p><code>zip(*seqs)</code> дает восемь столбцов. Строку профиля для каждой буквы строит включение: в каждом столбце эту букву считает метод <code>count()</code>, он есть и у кортежа. Каждая строка профиля оказывается новым списком, поэтому строки не связаны. Профиль получается матрицей 4&nbsp;×&nbsp;8.</p>
+      <p>Самую частую букву столбца находит <code>max</code> с ключом. Перебираются буквы <code>"ACGT"</code>, а ключом служит метод <code>count</code> текущего столбца: <code>c.count</code> без скобок для каждой буквы вернет, сколько раз она встречается в столбце <code>c</code>. <code>max</code> возвращает саму букву, а не число. Строка <code>cons</code> растет на букву за шаг: для строк <code>+=</code> означает <code>cons = cons + ...</code>.</p>
+      <p>При ничьей <code>max</code> возвращает первую из букв с наибольшим числом в порядке <code>"ACGT"</code>. Rosalind в этом случае принимает любой консенсус. Запустите пример: профиль и консенсус <code>ATGCAACT</code> совпадают с ответом задачи Rosalind CONS.</p>
+      <div class="runner" data-file="consensus.py"><textarea>
+seqs = [
+    "ATCCAGCT", "GGGCAACT",
+    "ATGGATCT", "AAGCAACC",
+    "TTGGAACT", "ATGCCATT",
+    "ATGGCACT"]
+cols = list(zip(*seqs))
+profile = []
+for b in "ACGT":
+    r = [c.count(b) for c in cols]
+    profile.append(r)
+    print(b, r)
+cons = ""
+for c in cols:
+    cons += max("ACGT", key=c.count)
+print(cons)
+</textarea></div>
+      <div class="more">
+        <p class="def"><span class="term">Вектор признаков</span>&nbsp;— список чисел, которые описывают один объект. Каждое число дает признак объекта: длину, GC-состав, число букв A.</p>
+        <p>Профиль описывал позиции. Часто нужно другое: описать каждую последовательность несколькими числами, чтобы сравнивать последовательности или подать их в программу машинного обучения. Определение взято из глоссария библиотеки scikit-learn. Список векторов образует матрицу признаков <code>X</code>: строка описывает последовательность, столбец описывает признак.</p>
+        <pre class="code">
+seqs = ["ATCCAGCT", "GGGCAACT", "TTGGAACT"]
+X = [[s.count(b) for b in "ACGT"]
+     for s in seqs]
+print(X)       # [[2, 3, 1, 2], [2, 2, 3, 1], [2, 1, 2, 3]]
+col_g = [v[2] for v in X]   # столбец признака G
+print(col_g)   # [1, 3, 2]
+</pre>
+        <p>Внутреннее включение строит один вектор, внешнее повторяет это для каждой последовательности. Сравните с профилем: там строки соответствуют буквам, а столбцы позициям.</p>
+      </div>
+      <div class="quiz" data-id="consensus-column" data-slide="S81">
+        <p class="quiz-q">Что напечатает программа?</p>
+        <pre class="code">
+seqs = ["AG", "CG", "TC"]
+col = list(zip(*seqs))[1]
+print(max("ACGT", key=col.count))
+</pre>
+        <ul>
+          <li><code>A</code></li>
+          <li><code>C</code></li>
+          <li data-correct><code>G</code></li>
+          <li><code>T</code></li>
+        </ul>
+        <p class="quiz-why">Столбец с индексом 1 состоит из вторых букв трех строк: <code>('G', 'G', 'C')</code>. Буква G встречается дважды, и <code>max</code> возвращает ее. Ответ <code>A</code> получится, если взять столбец 0: там A, C и T по одному разу, и при ничьей побеждает первая буква <code>"ACGT"</code>. <code>T</code> выбирают, если забыть о ключе и искать наибольшую букву алфавита.</p>
+      </div>
+      <div class="walk" data-slide="S82">
+        <p class="task"><b>Задача 10.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">X = [[2, 3, 1, 2],
+     [2, 2, 3, 1],
+     [2, 1, 2, 3]]
+gc = [v[1] + v[2] for v in X]
+print(gc)
+print(sum(gc) / len(gc))</pre>
+        <div class="anim" data-id="task-gc-columns" data-title="Разбор задачи 10">
+          <div class="table-wrap"><table>
+            <thead><tr><th><code>v</code></th><th>C + G</th><th><code>gc</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>[2, 3, 1, 2]</code></td><td><code>3 + 1 = 4</code></td><td><code>[4]</code></td></tr>
+              <tr data-fx="in@2"><td><code>[2, 2, 3, 1]</code></td><td><code>2 + 3 = 5</code></td><td><code>[4, 5]</code></td></tr>
+              <tr data-fx="in@3"><td><code>[2, 1, 2, 3]</code></td><td><code>1 + 2 = 3</code></td><td><code>[4, 5, 3]</code></td></tr>
+              <tr data-fx="in@4"><td>среднее</td><td><code>12 / 3</code></td><td><code>4.0</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@5">[4, 5, 3]
+4.0</pre>
+          <p data-fx="in@5">Ответ <code>[4, 5, 3]</code> и <code>4.0</code>: включение сложило столбцы C и G (индексы 1 и 2), деление <code>/</code> всегда дает дробное число.</p>
+          <p data-fx="in@5">Ответ <code>[5, 4, 3]</code> берет столбцы с индексами 0 и 1, забыв, что индексы идут с нуля. Ответ <code>4</code> без <code>.0</code> забывает, что <code>/</code> дает <code>float</code>.</p>
+        </div>
+        <p>Посчитайте среднее число букв A: замените выражение на <code>v[0]</code>.</p>
+        <div class="runner" data-file="task_10.py"><textarea>
+X = [[2, 3, 1, 2],
+     [2, 2, 3, 1],
+     [2, 1, 2, 3]]
+gc = [v[1] + v[2] for v in X]
+print(gc)
+print(sum(gc) / len(gc))
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S83">
+        <p class="task"><b>Задача 11.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">seqs = ["AC", "GC", "GT", "AT"]
+cols = list(zip(*seqs))
+cons = ""
+for c in cols:
+    cons += max("ACGT", key=c.count)
+print(cons)</pre>
+        <div class="anim" data-id="task-consensus-tie" data-title="Разбор задачи 11">
+          <div class="table-wrap"><table>
+            <thead><tr><th>столбец <code>c</code></th><th>счет A, C, G, T</th><th><code>max</code></th><th>строка <code>cons</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>('A', 'G', 'G', 'A')</code></td><td>2, 0, 2, 0</td><td><code>A</code>: первая из равных</td><td><code>A</code></td></tr>
+              <tr data-fx="in@2"><td><code>('C', 'C', 'T', 'T')</code></td><td>0, 2, 0, 2</td><td><code>C</code>: первая из равных</td><td><code>AC</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@3">AC</pre>
+          <p data-fx="in@3">Ответ <code>AC</code>: в обоих столбцах ничья, и <code>max</code> возвращает ту букву, что раньше в <code>"ACGT"</code>.</p>
+          <p data-fx="in@3">Ответ <code>GT</code> считает, что побеждает последняя из равных букв, а <code>GC</code> смешивает оба правила. Правило «при равных ключах первый» было в разделе о <code>max()</code> и <code>min()</code>.</p>
+        </div>
+        <p>Замените <code>"ACGT"</code> на <code>"TGCA"</code> и предскажите консенсус.</p>
+        <div class="runner" data-file="task_11.py"><textarea>
+seqs = ["AC", "GC", "GT", "AT"]
+cols = list(zip(*seqs))
+cons = ""
+for c in cols:
+    cons += max("ACGT", key=c.count)
+print(cons)
+</textarea></div>
+      </div>
+    </section>
+
+    <section id="summary">
+      <h2>Итоги и типичные ошибки</h2>
+      <ul>
+        <li>Список меняют на месте, кортеж хранит запись из нескольких полей; кортеж создает запятая.</li>
+        <li><code>b = a</code> не копирует список: копию делают явно, <code>a.copy()</code> или <code>a[:]</code>.</li>
+        <li>Срез дает новый список, а методы, которые меняют список, работают на месте и возвращают <code>None</code>.</li>
+        <li>Распаковка, <code>enumerate()</code> и <code>zip()</code> убирают из циклов ручную работу с индексами.</li>
+        <li><code>sorted()</code> с ключом и списковые включения строят новые списки.</li>
+        <li>По столбцам набора последовательностей строят профиль и консенсус.</li>
+      </ul>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Так не работает</th><th>Так правильно</th></tr></thead>
+        <tbody>
+          <tr><td><code>b = a</code>, чтобы получить копию</td><td><code>b = a.copy()</code> или <code>b = a[:]</code></td></tr>
+          <tr><td><code>("ATG")</code> как кортеж из одного элемента</td><td><code>("ATG",)</code></td></tr>
+          <tr><td><code>seqs = seqs.append(x)</code></td><td><code>seqs.append(x)</code> отдельной строкой</td></tr>
+          <tr><td><code>seqs.append(["AT", "GC"])</code>, чтобы дописать два элемента</td><td><code>seqs.extend(["AT", "GC"])</code></td></tr>
+          <tr><td>удалять элементы в цикле <code>for s in seqs</code></td><td><code>for s in seqs[:]</code> или включение</td></tr>
+          <tr><td><code>for name, seq in seqs</code> по списку строк</td><td>хранить записи парами <code>(name, seq)</code></td></tr>
+          <tr><td><code>zip(s, t)</code> для строк, длина которых может различаться</td><td><code>zip(s, t, strict=True)</code></td></tr>
+          <tr><td><code>key=len()</code></td><td><code>key=len</code></td></tr>
+          <tr><td><code>[[0] * 3] * 2</code></td><td><code>[[0] * 3 for i in range(2)]</code></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="self-check">
+      <h2>Задачи для самопроверки</h2>
+      <p>Пять задач потруднее, по нарастающей сложности. Каждая проверяет прием из лекции в непривычной ситуации.</p>
+      <div class="walk" data-slide="S86">
+        <p class="task"><b>Задача 12.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">rec = ("R1", [1, 2])
+rec[1].append(3)
+print(rec)</pre>
+        <div class="anim" data-id="task-tuple-list" data-title="Разбор задачи 12">
+          <div class="table-wrap"><table>
+            <thead><tr><th>строка</th><th>что происходит</th><th><code>rec</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td>1</td><td>кортеж из строки и списка</td><td><code>('R1', [1, 2])</code></td></tr>
+              <tr data-fx="in@2"><td>2</td><td><code>rec[1]</code> это список: <code>append()</code> меняет сам список</td><td><code>('R1', [1, 2, 3])</code></td></tr>
+              <tr data-fx="in@3"><td>3</td><td>кортеж печатается</td><td>кортеж ссылается на тот же список</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@4">('R1', [1, 2, 3])</pre>
+          <p data-fx="in@4">Ответ <code>('R1', [1, 2, 3])</code>: кортеж не изменился, он ссылается на тот же список, а длиннее стал сам список.</p>
+          <p data-fx="in@4">Многие ждут <code>TypeError</code>, раз кортеж неизменяем. Неизменяем набор ссылок в кортеже, а объект по ссылке может меняться.</p>
+        </div>
+        <p>Замените вторую строку на <code>rec[1] = [1, 2, 3]</code> и запустите.</p>
+        <div class="runner" data-file="task_12.py"><textarea>
+rec = ("R1", [1, 2])
+rec[1].append(3)
+print(rec)
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S88">
+        <p class="task"><b>Задача 13.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">m = [[1, 2], [3, 4]]
+c = m[:]
+c[0].append(9)
+c[1] = [0]
+print(m)
+print(c)</pre>
+        <div class="anim" data-id="task-shallow-copy" data-title="Разбор задачи 13">
+          <div class="table-wrap"><table>
+            <thead><tr><th>строка</th><th><code>m</code></th><th><code>c</code></th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td>1–2</td><td><code>[[1, 2], [3, 4]]</code></td><td>новый внешний список, строки общие</td></tr>
+              <tr data-fx="in@2"><td>3</td><td><code>[[1, 2, 9], [3, 4]]</code></td><td><code>[[1, 2, 9], [3, 4]]</code>: строка 0 общая</td></tr>
+              <tr data-fx="in@3"><td>4</td><td><code>[[1, 2, 9], [3, 4]]</code></td><td><code>[[1, 2, 9], [0]]</code>: заменена ссылка только в <code>c</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@4">[[1, 2, 9], [3, 4]]
+[[1, 2, 9], [0]]</pre>
+          <p data-fx="in@4">Ответ: <code>m</code> равен <code>[[1, 2, 9], [3, 4]]</code>, <code>c</code> равен <code>[[1, 2, 9], [0]]</code>. Срез <code>m[:]</code> делает поверхностную копию: внешний список новый, строки общие.</p>
+          <p data-fx="in@4">Частый ответ оставляет <code>m</code> прежним, <code>[[1, 2], [3, 4]]</code>, считая <code>m[:]</code> полной копией. Полную копию матрицы чисел дает включение <code>[row[:] for row in m]</code>.</p>
+        </div>
+        <p>Замените <code>m[:]</code> на <code>[row[:] for row in m]</code> и сравните вывод.</p>
+        <div class="runner" data-file="task_13.py"><textarea>
+m = [[1, 2], [3, 4]]
+c = m[:]
+c[0].append(9)
+c[1] = [0]
+print(m)
+print(c)
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S90">
+        <p class="task"><b>Задача 14.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">w = ["b", "A", "a", "B"]
+print(sorted(w))
+print(sorted(w, key=str.lower))</pre>
+        <div class="anim" data-id="task-stable-lower" data-title="Разбор задачи 14">
+          <div class="table-wrap"><table>
+            <thead><tr><th>вызов</th><th>ключи</th><th>результат</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>sorted(w)</code></td><td>коды букв: прописные раньше строчных</td><td><code>['A', 'B', 'a', 'b']</code></td></tr>
+              <tr data-fx="in@2"><td><code>key=str.lower</code></td><td><code>b</code>, <code>a</code>, <code>a</code>, <code>b</code></td><td>группа <code>a</code>: <code>A</code>, <code>a</code> в исходном порядке</td></tr>
+              <tr data-fx="in@3"><td></td><td></td><td>группа <code>b</code>: <code>b</code>, <code>B</code> в исходном порядке</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@4">['A', 'B', 'a', 'b']
+['A', 'a', 'b', 'B']</pre>
+          <p data-fx="in@4">Ответ <code>['A', 'B', 'a', 'b']</code> и <code>['A', 'a', 'b', 'B']</code>: с ключом <code>str.lower</code> равные ключи сохраняют исходный порядок, сортировка устойчива.</p>
+          <p data-fx="in@4">Частый ответ во второй строке <code>['A', 'a', 'B', 'b']</code>: кажется, что прописная буква всегда идет первой. В <code>w</code> буква <code>b</code> стоит раньше <code>B</code>, и так и остается.</p>
+        </div>
+        <p>Поставьте <code>"B"</code> в начало списка <code>w</code> и предскажите вторую строку.</p>
+        <div class="runner" data-file="task_14.py"><textarea>
+w = ["b", "A", "a", "B"]
+print(sorted(w))
+print(sorted(w, key=str.lower))
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S93">
+        <p class="task"><b>Задача 15.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">recs = [("R1", 2, 3),
+        ("R2", 5),
+        ("R3",)]
+for name, *nums in recs:
+    print(name, nums, sum(nums))</pre>
+        <div class="anim" data-id="task-star-loop" data-title="Разбор задачи 15">
+          <div class="table-wrap"><table>
+            <thead><tr><th>запись</th><th><code>name</code></th><th><code>nums</code></th><th>печать</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>("R1", 2, 3)</code></td><td><code>'R1'</code></td><td><code>[2, 3]</code></td><td><code>R1 [2, 3] 5</code></td></tr>
+              <tr data-fx="in@2"><td><code>("R2", 5)</code></td><td><code>'R2'</code></td><td><code>[5]</code></td><td><code>R2 [5] 5</code></td></tr>
+              <tr data-fx="in@3"><td><code>("R3",)</code></td><td><code>'R3'</code></td><td><code>[]</code></td><td><code>R3 [] 0</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@4">R1 [2, 3] 5
+R2 [5] 5
+R3 [] 0</pre>
+          <p data-fx="in@4">Ответ: три строки <code>R1 [2, 3] 5</code>, <code>R2 [5] 5</code>, <code>R3 [] 0</code>. Звездочка снимает требование одинаковой длины записей, а сумма пустого списка равна 0.</p>
+          <p data-fx="in@4">Ответ <code>ValueError</code> на второй записи считает, что все записи должны быть одной длины. Ответ <code>R3 () 0</code> считает остаток кортежа кортежем, а звездочка всегда дает список.</p>
+        </div>
+        <p>Уберите запятую в <code>("R3",)</code> и запустите: что изменилось и почему?</p>
+        <div class="runner" data-file="task_15.py"><textarea>
+recs = [("R1", 2, 3),
+        ("R2", 5),
+        ("R3",)]
+for name, *nums in recs:
+    print(name, nums, sum(nums))
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S87">
+        <p class="task"><b>Задача 16.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">t = ("id", [1, 2])
+print(len(t[1]))
+t[1] += [3]
+print(t)</pre>
+        <div class="anim" data-id="task-tuple-plus-eq" data-title="Разбор задачи 16">
+          <div class="table-wrap"><table>
+            <thead><tr><th>строка</th><th>что происходит</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td>1</td><td>кортеж из строки и списка</td></tr>
+              <tr data-fx="in@2"><td>2</td><td>печатается длина списка: <code>2</code></td></tr>
+              <tr data-fx="in@3"><td>3</td><td><code>+=</code> дописывает <code>3</code> в список (удается), затем пытается записать результат обратно в <code>t[1]</code>: кортеж не позволяет</td></tr>
+              <tr data-fx="in@4"><td>4</td><td>не выполняется: программа остановилась на ошибке</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@5">2
+TypeError: 'tuple' object does not support item assignment</pre>
+          <p data-fx="in@5">Ответ: <code>2</code>, затем <code>TypeError: 'tuple' object does not support item assignment</code>. Строка <code>t[1] += [3]</code> делает два шага: дописывает в список и присваивает элементу кортежа.</p>
+          <p data-fx="in@5">Многие ждут либо только ошибку без изменения списка, либо печать <code>('id', [1, 2, 3])</code> без ошибки. На самом деле список уже изменился, но присваивание элементу кортежа запрещено.</p>
+        </div>
+        <p>Замените третью строку на <code>t[1].append(3)</code> и запустите.</p>
+        <div class="runner" data-file="task_16.py" data-error><textarea>
+t = ("id", [1, 2])
+print(len(t[1]))
+t[1] += [3]
+print(t)
+</textarea></div>
+      </div>
+    </section>
+
+    <section id="test">
+      <h2>Итоговый тест</h2>
+      <p>Десять вопросов по всей лекции. Ответьте на все и нажмите «Проверить»: тест засчитывается от восьми верных ответов. Пройти его можно сколько угодно раз, в прогресс идет лучший результат.</p>
+      <div class="final-test" data-id="final">
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа?</p>
+          <pre class="code">
+x = [1, 2]
+y = x
+z = x[:]
+y.append(3)
+z.append(4)
+print(x, y, z)
+</pre>
+          <ul>
+            <li><code>[1, 2] [1, 2, 3] [1, 2, 4]</code></li>
+            <li><code>[1, 2, 3, 4] [1, 2, 3, 4] [1, 2, 3, 4]</code></li>
+            <li data-correct><code>[1, 2, 3] [1, 2, 3] [1, 2, 4]</code></li>
+            <li><code>[1, 2, 3] [1, 2, 3] [1, 2, 3, 4]</code></li>
+          </ul>
+          <p class="quiz-why"><code>x</code> и <code>y</code> висят на одном списке, а <code>z</code> на его копии: срез <code>[:]</code> строит новый список. Каждый <code>append()</code> меняет тот список, на котором висит его ярлык. Первый вариант считает <code>y = x</code> копией, второй считает копию <code>z</code> тем же списком.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа?</p>
+          <pre class="code">
+a = ("ATG")
+b = ("ATG",)
+c = "ATG",
+print(len(a), len(b), len(c))
+</pre>
+          <ul>
+            <li data-correct><code>3 1 1</code></li>
+            <li><code>1 1 1</code></li>
+            <li><code>3 1 3</code></li>
+            <li><code>3 3 3</code></li>
+          </ul>
+          <p class="quiz-why">Кортеж создает запятая, а не скобки. <code>("ATG")</code> остается строкой из трех букв, а <code>("ATG",)</code> и <code>"ATG",</code> дают кортежи из одного элемента. <code>1 1 1</code> считает, что кортеж создают скобки, а <code>3 1 3</code> не замечает запятую в строке с <code>c</code>.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа?</p>
+          <pre class="code">
+seqs = ["AT", "GC", "AT", "TA"]
+x = seqs.pop()
+seqs.remove("AT")
+print(x, seqs)
+</pre>
+          <ul>
+            <li><code>TA ['GC']</code></li>
+            <li data-correct><code>TA ['GC', 'AT']</code></li>
+            <li><code>None ['GC', 'AT']</code></li>
+            <li><code>AT ['GC', 'TA']</code></li>
+          </ul>
+          <p class="quiz-why"><code>pop()</code> без аргумента удаляет последний элемент и возвращает его, поэтому в <code>x</code> попадает <code>'TA'</code>. <code>remove("AT")</code> удаляет только первое вхождение. <code>TA ['GC']</code> считает, что <code>remove</code> удаляет все вхождения, а <code>None</code> переносит на <code>pop</code> правило других методов-изменителей.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа?</p>
+          <pre class="code">
+a = [1, 2]
+b = a
+a += [3]
+a = a + [4]
+print(a, b)
+</pre>
+          <ul>
+            <li><code>[1, 2, 3, 4] [1, 2, 3, 4]</code></li>
+            <li><code>[1, 2, 3, 4] [1, 2]</code></li>
+            <li><code>[1, 2, 3] [1, 2, 3]</code></li>
+            <li data-correct><code>[1, 2, 3, 4] [1, 2, 3]</code></li>
+          </ul>
+          <p class="quiz-why"><code>a += [3]</code> дописывает элемент в общий список, и <code>b</code> это видит. <code>a + [4]</code> строит новый список, и присваивание перевешивает на него только ярлык <code>a</code>. Первый вариант считает имена связанными навсегда, второй считает, что <code>+=</code> тоже создает новый список.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа?</p>
+          <pre class="code">
+a, b = 0, 1
+for i in range(5):
+    a, b = b, a + b
+print(a, b)
+</pre>
+          <ul>
+            <li><code>3 5</code></li>
+            <li data-correct><code>5 8</code></li>
+            <li><code>16 32</code></li>
+            <li><code>8 13</code></li>
+          </ul>
+          <p class="quiz-why">Правая часть вычисляется целиком до присваивания, поэтому на каждом шаге в ней старые <code>a</code> и <code>b</code>: пары 1 1, 1 2, 2 3, 3 5, 5 8. <code>16 32</code> получилось бы при двух строках <code>a = b</code> и <code>b = a + b</code>, а <code>3 5</code> и <code>8 13</code> насчитывают на шаг меньше или больше.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа?</p>
+          <pre class="code">
+s = "GAGCCTA"
+t = "CATCGTA"
+d = [i for i, a in enumerate(s)
+     if a != t[i]]
+print(d, len(d))
+</pre>
+          <ul>
+            <li><code>[1, 3, 5] 3</code></li>
+            <li><code>['G', 'G', 'C'] 3</code></li>
+            <li data-correct><code>[0, 2, 4] 3</code></li>
+            <li><code>[0, 2, 4] 7</code></li>
+          </ul>
+          <p class="quiz-why"><code>enumerate</code> дает номера с нуля, и в список попадают номера позиций, где буквы различаются: 0, 2 и 4. Длина списка равна расстоянию Хэмминга. <code>[1, 3, 5]</code> считает позиции с единицы, а список букв путает выражение включения с переменной <code>a</code>.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа?</p>
+          <pre class="code">
+a = [3, 1, 2]
+b = sorted(a)
+c = a.sort()
+print(a, b, c)
+</pre>
+          <ul>
+            <li data-correct><code>[1, 2, 3] [1, 2, 3] None</code></li>
+            <li><code>[3, 1, 2] [1, 2, 3] [1, 2, 3]</code></li>
+            <li><code>[1, 2, 3] [1, 2, 3] [1, 2, 3]</code></li>
+            <li><code>[3, 1, 2] [1, 2, 3] None</code></li>
+          </ul>
+          <p class="quiz-why"><code>sorted()</code> строит новый список и не трогает <code>a</code>. <code>a.sort()</code> сортирует сам список и возвращает <code>None</code>, поэтому <code>c</code> равно <code>None</code>, а <code>a</code> к моменту печати уже отсортирован. Остальные варианты считают, что <code>sort()</code> возвращает список или не меняет <code>a</code>.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа?</p>
+          <pre class="code">
+recs = [(50.0, "R1"),
+        (62.5, "R2"),
+        (50.0, "R3")]
+recs.sort(reverse=True)
+print(recs)
+</pre>
+          <ul>
+            <li><code>[(62.5, 'R2'), (50.0, 'R1'), (50.0, 'R3')]</code></li>
+            <li><code>[(50.0, 'R1'), (50.0, 'R3'), (62.5, 'R2')]</code></li>
+            <li><code>[(50.0, 'R3'), (50.0, 'R1'), (62.5, 'R2')]</code></li>
+            <li data-correct><code>[(62.5, 'R2'), (50.0, 'R3'), (50.0, 'R1')]</code></li>
+          </ul>
+          <p class="quiz-why">Кортежи сравниваются по первому полю, при равенстве по второму. По убыванию первой идет запись с GC 62,5, а при равном GC имена тоже идут по убыванию: <code>'R3'</code> раньше <code>'R1'</code>. Первый вариант переворачивает порядок только по первому полю, второй дает обычный порядок по возрастанию, а третий переворачивает только порядок имен.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа?</p>
+          <pre class="code">
+for x in "ACG":
+    print(x, end="")
+print()
+print(x)
+y = [z for z in "ACG"]
+print(z)
+</pre>
+          <ul>
+            <li><code>ACG</code>, <code>G</code>, затем <code>G</code></li>
+            <li data-correct><code>ACG</code>, <code>G</code>, затем <code>NameError</code></li>
+            <li><code>ACG</code>, затем <code>NameError</code></li>
+            <li><code>ACG</code>, <code>A</code>, затем <code>A</code></li>
+          </ul>
+          <p class="quiz-why">Переменная цикла <code>for</code> остается после цикла и хранит последнюю букву <code>G</code>. Переменная включения существует только внутри скобок, поэтому <code>print(z)</code> дает <code>NameError</code>. Первый вариант переносит поведение цикла на включение, третий считает, что и <code>x</code> исчезает после цикла.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа?</p>
+          <pre class="code">
+seqs = ["AC", "GC", "GT", "AT"]
+cols = list(zip(*seqs))
+cons = ""
+for c in cols:
+    cons += max("ACGT", key=c.count)
+print(cons)
+</pre>
+          <ul>
+            <li><code>GT</code></li>
+            <li><code>GC</code></li>
+            <li data-correct><code>AC</code></li>
+            <li><code>[2, 2]</code></li>
+          </ul>
+          <p class="quiz-why">Столбцы равны <code>('A', 'G', 'G', 'A')</code> и <code>('C', 'C', 'T', 'T')</code>, и в обоих ничья. При равных ключах <code>max</code> возвращает первую букву в порядке <code>"ACGT"</code>: A в первом столбце, C во втором. <code>GT</code> считает, что побеждает последняя из равных, а <code>max</code> возвращает букву, а не число.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="finish" data-slot="finish"></div>
+  </main>
+
+  <nav class="toc" data-slot="toc" aria-label="Разделы лекции"></nav>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</body>
+</html>

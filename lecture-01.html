@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="claude:viewport-fit-sides" content="cover">
+  <title>Введение в Python</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Unbounded:wght@500;600&display=swap">
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/course.js"></script>
+  <script src="assets/app.js"></script>
+</head>
+<body data-lecture="01">
+<div class="read-progress" aria-hidden="true"><i></i></div>
+<header class="topbar">
+  <button class="icon-btn menu-btn" type="button" aria-label="Содержание курса"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+  <a class="brand" href="index.html" data-logo><span class="brand-name">PYTHON</span></a>
+  <nav class="crumbs" aria-label="Путь"></nav>
+  <div class="tools">
+    <button class="icon-btn theme-btn" type="button" aria-label="Сменить тему"></button>
+  </div>
+</header>
+<div class="scrim"></div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Лекции курса"></aside>
+
+  <main class="lecture">
+    <header class="lecture-head rise">
+      <p class="eyebrow" data-slot="eyebrow"></p>
+      <h1>Введение в Python</h1>
+      <p class="lead">Как программа превращается в результат на экране, где писать и запускать код, какие данные хранит Python и как с ними считать.</p>
+      <div class="meta" data-slot="meta"></div>
+    </header>
+
+    <div class="goals rise" style="--i:1">
+      <p>После лекции вы сможете</p>
+      <ul>
+        <li>объяснить путь программы от файла <code>.py</code> до результата и по сообщению интерпретатора определить вид ошибки;</li>
+        <li>запустить программу из файла, вывести данные функцией <code>print()</code> и прочитать ввод функцией <code>input()</code>;</li>
+        <li>выбрать тип для значения, преобразовать его явно и не попасть в ловушки ссылок и вещественных чисел.</li>
+      </ul>
+    </div>
+
+    <div class="slides" data-src="slides/lecture-01.html" data-title="Презентация лекции 1"></div>
+
+    <section id="program">
+      <h2>Программа, алгоритм, интерпретатор</h2>
+      <p>Человек понимает смысл текста, но медленно и с ошибками считает. Компьютер выполняет миллиарды операций в секунду, но смысла не понимает вовсе. Программирование распределяет работу между ними: рутинный счет отдается машине, постановка задачи и смысл результата остаются человеку. В этом курсе машина будет считать GC-состав, частоты кодонов и искать мотивы в последовательностях.</p>
+      <p class="def"><span class="term">Алгоритм</span>&nbsp;— способ решения задачи, записанный словами, схемой или псевдокодом без привязки к языку программирования.</p>
+      <p class="def"><span class="term">Программа</span>&nbsp;— алгоритм, записанный инструкциями на конкретном языке для конкретного исполнителя.</p>
+      <p>Решение идет цепочкой «задача, алгоритм, программа, исполнение». Большинство ошибок появляется на переходе от алгоритма к программе: способ решения верный, а записан он неточно.</p>
+      <div class="more">
+        <p>Программа хранится во внешней памяти (на диске) и переживает выключение компьютера. Чтобы заработать, она загружается в оперативную память, а команды выполняет процессор. Переменная <code>x</code> после <code>x = 123</code> находится в оперативной памяти, а не в процессоре и не на диске. Поэтому при внезапной перезагрузке значения переменных теряются, а файл с программой остается.</p>
+      </div>
+
+      <div class="ask" data-slide="S84">
+        <p class="ask-q">Почему процессор не может выполнить файл <code>.py</code> сам?</p>
+        <p class="ask-hint">Подсказка: процессор выполняет только свои команды. Похож ли на них текст, набранный в редакторе?</p>
+        <div class="ask-a"><p>Процессор понимает только машинный код, а файл <code>.py</code> содержит обычный текст. Значит, между текстом программы и процессором нужен переводчик.</p></div>
+      </div>
+
+      <p class="def"><span class="term">Машинный код</span>&nbsp;— команды процессора в двоичном виде; они привязаны к архитектуре процессора и к операционной системе.</p>
+      <p>Писать машинный код вручную умеют немногие. Поэтому программу пишут на языке высокого уровня, например на Python, а программа-переводчик превращает ее в команды процессора. Отсюда практическое следствие: исходный текст на Python один для Windows, macOS и Linux, а машинный код для каждой системы свой.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Компилятор</th><th>Интерпретатор</th></tr></thead>
+        <tbody>
+          <tr><td>переводит программу целиком</td><td>читает и исполняет программу по ходу</td></tr>
+          <tr><td>создает файл с машинным кодом</td><td>выдает результат сразу, файла с машинным кодом нет</td></tr>
+          <tr><td>запуск потом, когда угодно</td><td>можно вводить строку за строкой</td></tr>
+        </tbody>
+      </table></div>
+      <p>Python интерпретируемый язык. У этого есть цена: часть ошибок проявляется только тогда, когда строка с ошибкой действительно выполняется.</p>
+
+      <div class="quiz" data-id="machine-code" data-slide="S30">
+        <p class="quiz-q">Интерпретатор исполняет файл <code>.py</code>, не превращая его в машинный код. Что из перечисленного содержит машинный код?</p>
+        <ul>
+          <li data-correct>а) интерпретатор Python</li>
+          <li>б) вывод программы на экране</li>
+          <li>в) файл с исходным кодом Python</li>
+          <li>г) документ текстового процессора</li>
+        </ul>
+        <p class="quiz-why">Интерпретатор тоже программа: он написан на языке C и скомпилирован в машинный код. Файл <code>.py</code> остается текстом, поэтому вариант «в» выбирают те, кто считает файл с исходным кодом программой для процессора. Вывод на экране и документ текстового процессора тоже данные, а не команды: вариант «б» путает программу с результатом ее работы.</p>
+      </div>
+
+      <h3>Что именно установлено на компьютере</h3>
+      <p>Слово «Python» означает три разные вещи: язык (общие правила), реализацию CPython (интерпретатор, написанный на C) и конкретную версию на вашем компьютере. Код выполняет именно версия на вашей машине. В курсе нужен Python 3.11 или новее. Версию показывает команда в терминале: на macOS и Linux <code>python3 --version</code>, на Windows <code>python --version</code>.</p>
+      <p>Python работает в двух режимах. В интерактивном режиме (REPL, цикл «чтение, вычисление, вывод») строка выполняется сразу после ввода, но ничего не сохраняется. Файл-скрипт с расширением <code>.py</code> можно сохранить, запустить снова и показать другим: все, что вы сдаете, пишется в файлах. Правило простое: эксперимент в REPL, результат в файле.</p>
+      <p>Редакторы на этой странице работают как маленькие файлы. Запустите пример кнопкой или сочетанием Ctrl+Enter, затем замените текст в кавычках и запустите снова.</p>
+      <div class="runner" data-file="hello.py"><textarea>
+# Первая программа
+print("Hello Python world!")
+</textarea></div>
+
+      <h3>От файла до результата</h3>
+      <p>CPython сначала разбирает весь файл целиком, затем переводит его в байт-код и выполняет байт-код на своей виртуальной машине. <span class="term">Байт-код</span> состоит из внутренних команд Python, а не из машинного кода процессора.</p>
+      <p>Из этого порядка следует, когда какая ошибка себя покажет.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Ошибка</th><th>Когда видна</th><th>Пример</th><th>Что происходит</th></tr></thead>
+        <tbody>
+          <tr><td>синтаксическая</td><td>до запуска</td><td><code>million! = 1000000</code></td><td>не выполняется ни одна строка, Python сообщает сразу</td></tr>
+          <tr><td>времени выполнения</td><td>во время работы</td><td><code>'126' / 3</code></td><td>программа стартовала и остановилась на строке с ошибкой</td></tr>
+          <tr><td>семантическая (логическая)</td><td>никогда</td><td><code>1 + 3 / 2</code> вместо <code>(1 + 3) / 2</code></td><td>программа отработала, сообщения нет, результат не тот</td></tr>
+        </tbody>
+      </table></div>
+      <p>Первые две ошибки Python найдет за вас. Третью найдете только вы, сравнив результат с ожидаемым.</p>
+      <div class="more">
+        <p>Байт-код импортируемых модулей CPython сохраняет в папку <code>__pycache__</code> в файлы <code>.pyc</code>, чтобы при следующем запуске не разбирать их заново. Эту папку можно удалить: при запуске она появится снова.</p>
+      </div>
+      <p>Сообщение об ошибке читается снизу вверх. Последняя строка называет тип ошибки и причину, строка <code>File …, line N</code> показывает место, где ошибку обнаружили. Запустите пример: в нем пропущены кавычки, и Python принимает <code>good</code> за имя переменной.</p>
+      <div class="runner" data-file="hello.py" data-error><textarea>
+print(good-bye)
+</textarea></div>
+      <aside class="note warn"><p>Python указывает место, где ошибка обнаружена, а не место, где ее допустили. Причина часто стоит строкой-двумя выше. Сначала прочитайте последнюю строку, сформулируйте гипотезу и только потом меняйте код.</p></aside>
+    </section>
+
+    <section id="ecosystem">
+      <h2>Экосистема Python и среда разработки</h2>
+      <p>Python состоит из трех слоев. Ядро языка небольшое: числа, строки, списки, множества, словари. Стандартная библиотека уже установлена вместе с Python: модули <code>sys</code>, <code>random</code>, <code>math</code>, <code>os</code> и многие другие. Сторонние пакеты развиваются отдельно от языка, хранятся в каталоге PyPI (pypi.org) и ставятся вручную командой <code>python3 -m pip install</code> с именем пакета.</p>
+      <p>Модуль стандартной библиотеки подключается командой <code>import</code> без установки. Запустите пример.</p>
+      <div class="runner" data-file="layers.py"><textarea>
+import math
+
+print(math.sqrt(16))
+</textarea></div>
+      <p>Пакет Biopython для работы с биологическими последовательностями сторонний. Пока его не установили, импорт завершается ошибкой <code>ModuleNotFoundError</code>.</p>
+      <div class="runner" data-file="layers.py" data-error><textarea>
+import Bio
+</textarea></div>
+
+      <div class="quiz" data-id="module-not-found" data-slide="S85">
+        <p class="quiz-q">Вы скопировали пример из интернета, а он падает на первой строке <code>import numpy</code> с <code>ModuleNotFoundError</code>. В чем причина?</p>
+        <ul>
+          <li>а) в примере синтаксическая ошибка</li>
+          <li>б) пример написан под Windows, а у вас macOS</li>
+          <li>в) у вас установлен Python 2</li>
+          <li data-correct>г) пакет <code>numpy</code> у вас не установлен</li>
+        </ul>
+        <p class="quiz-why"><code>numpy</code> сторонний пакет, его нет в стандартной библиотеке, и пока его не поставили через <code>pip</code>, импорт не находит модуль. Синтаксическая ошибка дала бы <code>SyntaxError</code>, а не <code>ModuleNotFoundError</code>: название ошибки уже ставит диагноз. Операционная система здесь ни при чем. Python 2 исключается самим названием ошибки: <code>ModuleNotFoundError</code> появился в Python 3.6, в Python 2 сообщение было бы <code>ImportError</code>.</p>
+      </div>
+
+      <p>В анализе биологических данных у каждого этапа есть свой пакет: <code>requests</code> скачивает данные из баз NCBI, UniProt и Ensembl, Biopython читает форматы FASTA и FASTQ, <code>pandas</code> работает с таблицами, NumPy с числами, <code>matplotlib</code> строит графики. Все это второй семестр. В первом семестре программы пишутся на чистом Python.</p>
+
+      <div class="ask" data-slide="S86">
+        <p class="ask-q">Кто прочитает ваш код чаще всех?</p>
+        <p class="ask-hint">Подсказка: вспомните, что происходит с программой после первого запуска.</p>
+        <div class="ask-a"><p>Чаще всех код читаете вы сами: при каждой отладке и доработке. Код читают чаще, чем пишут, поэтому оформлять его нужно по общему стилю, а не по личному вкусу.</p></div>
+      </div>
+
+      <p class="def"><span class="term">PEP 8</span>&nbsp;— соглашение сообщества Python об оформлении кода.</p>
+      <p>PEP 8 требует четыре пробела на уровень отступа, строки до 79 символов и <code>имена_с_подчеркиванием</code>. Общий стиль можно применять автоматически: автоформатер <code>black</code> переписывает код по правилам, линтер <code>pylint</code> находит нарушения.</p>
+      <p>Редактор кода защищает от типовых ошибок новичка. Подсветка синтаксиса показывает опечатку в имени функции. Автозамена табуляции на четыре пробела не дает смешать табы и пробелы, а отступы в Python значимы. Вертикальная линейка на 79–80 символах показывает, где строка ушла за край. К первому практическому занятию выберите VS Code или PyCharm Community.</p>
+      <p>Файл с программой&nbsp;— обычный текст в кодировке UTF-8 с расширением <code>.py</code>. Текст после <code>#</code> до конца строки называется комментарием: интерпретатор его пропускает, он нужен человеку. Полезный комментарий объясняет, зачем написана строка, а не пересказывает ее.</p>
+      <pre class="code">v = 8  # присвоить 8 переменной v (бесполезно)
+v = 8  # скорость в милях в час (полезно)</pre>
+      <p>Чтобы запустить файл из терминала, нужны три шага: перейти в папку с файлом командой <code>cd</code>, убедиться, что файл там (<code>dir</code> на Windows, <code>ls</code> на macOS и Linux), и запустить его командой <code>python hello_world.py</code> (на macOS и Linux <code>python3</code>). Терминал всегда находится в какой-то папке, и команда запуска ищет файл именно в ней.</p>
+      <aside class="note warn"><p>Ошибка «файл не найден» при запуске почти всегда означает, что не сделан первый шаг: терминал открыт не в той папке.</p></aside>
+      <aside class="note"><p>К практическому занятию 1 проверьте: Python 3.11 или новее, редактор с табуляцией в 4 пробела и линейкой на 80 символах, установленный Git и папку проекта с именем из строчных букв и подчеркиваний.</p></aside>
+    </section>
+
+    <section id="variables">
+      <h2>Переменные и ссылочная модель</h2>
+      <p>Каждое значение в Python имеет тип, и тип определяет, что со значением можно делать. Числа складываются, строки склеиваются, а поделить строку на число нельзя. Тип значения возвращает функция <code>type()</code>.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Значение</th><th>Тип</th><th>Что это</th></tr></thead>
+        <tbody>
+          <tr><td><code>17</code></td><td><code>int</code></td><td>целое число</td></tr>
+          <tr><td><code>4.2</code></td><td><code>float</code></td><td>вещественное число</td></tr>
+          <tr><td><code>'Hello, World!'</code></td><td><code>str</code></td><td>строка символов</td></tr>
+          <tr><td><code>True</code></td><td><code>bool</code></td><td>истина или ложь</td></tr>
+        </tbody>
+      </table></div>
+      <p>Запустите пример, затем замените <code>17</code> на <code>'17'</code> в кавычках.</p>
+      <div class="runner" data-file="types.py"><textarea>
+print(type(17))
+print(type('Hello, World!'))
+print(type(4.2))
+</textarea></div>
+      <p>Кавычки служат признаком строки: <code>17</code> и <code>'17'</code> разные значения разных типов.</p>
+      <p>Знак <code>=</code> в Python означает присваивание, а не равенство. В строке <code>x = x - 1</code> сначала вычисляется правая часть, затем имя слева привязывается к результату. Порядок исполнения обратен порядку чтения.</p>
+      <div class="runner" data-file="assign.py"><textarea>
+x = 43
+x = x - 1
+print(x)
+</textarea></div>
+
+      <div class="ask" data-slide="S87">
+        <p class="ask-q">Создали список <code>a = [1, 2, 3]</code>, затем написали <code>b = a</code>. Сколько списков теперь в памяти?</p>
+        <p class="ask-hint">Подсказка: квадратные скобки создают список, подробно о списках будет в лекции 5. Подумайте, копирует ли <code>b = a</code> что-нибудь.</p>
+        <div class="ask-a"><p>Список один. Если вы ответили «два», вы пользуетесь моделью «переменная как коробка», в которой у каждого имени своя копия значения. Python устроен иначе, и следующий абзац объясняет как.</p></div>
+      </div>
+
+      <p class="def"><span class="term">Переменная</span>&nbsp;— имя, привязанное к объекту; у одного объекта может быть несколько имен.</p>
+      <p>Удобнее представлять имя не коробкой со значением внутри, а ярлыком на объекте. Присваивание прикрепляет ярлык и ничего не копирует. После <code>b = a</code> в памяти остается один список с двумя ярлыками. Метод <code>append()</code> дописывает элемент в конец списка: изменили список через <code>a</code>, увидели изменение через <code>b</code>.</p>
+      <div class="runner" data-file="labels.py"><textarea>
+a = [1, 2, 3]
+b = a
+a.append(4)
+print(b)
+</textarea></div>
+      <p>Оператор <code>==</code> сравнивает значения, а <code>is</code> проверяет, один ли это объект. Запустите пример и сравните две пары имен.</p>
+      <div class="runner" data-file="is_eq.py"><textarea>
+a = [1, 2, 3]
+b = a
+c = [1, 2, 3]
+print(a == b, a is b)
+print(a == c, a is c)
+</textarea></div>
+      <div class="more">
+        <p>У каждого объекта есть тождество, которое не меняется за всю его жизнь. Функция <code>id()</code> возвращает его числом, оператор <code>is</code> его сравнивает. Чаще всего <code>is</code> нужен для проверки <code>x is None</code>: значение <code>None</code> означает «значения нет», и такой объект в программе один. Функция <code>id()</code> полезна при отладке, когда нужно понять, один это объект или два.</p>
+      </div>
+      <p>Два имени опасны только у изменяемого объекта. Список можно поменять на месте: <code>b[0] = 17</code> кладет 17 на место номер 0, первое в списке. Строку изменить нельзя: <code>b[0] = 'B'</code> для строки дает <code>TypeError</code>, поэтому и сюрприза с двумя именами нет.</p>
+
+      <div class="quiz" data-id="list-alias" data-slide="S42">
+        <p class="quiz-q">Только что список изменили через одно имя и увидели изменение через другое. Что напечатает программа?</p>
+        <pre class="code">a = [1, 2, 3]
+b = a
+b[0] = 17
+print(a)</pre>
+        <ul>
+          <li>а) <code>[1, 2, 3]</code></li>
+          <li>б) <code>[17]</code></li>
+          <li data-correct>в) <code>[17, 2, 3]</code></li>
+          <li>г) ошибку: <code>a</code> не менялась</li>
+        </ul>
+        <p class="quiz-why">Объект один, <code>b[0] = 17</code> меняет его, поэтому <code>print(a)</code> показывает <code>[17, 2, 3]</code>. Ярлыки равноправны: неважно, через какой меняли и через какой смотрят. Ответ <code>[1, 2, 3]</code> дает модель коробок, ответ <code>[17]</code> получается, если считать, что <code>b[0] = 17</code> заменяет весь список.</p>
+      </div>
+
+      <p>Имя переменной не может начинаться с цифры, содержать пробел или символы вроде <code>@</code> и не может совпадать с одним из 35 ключевых слов (<code>class</code>, <code>for</code>, <code>if</code>, <code>None</code> и другие). Все такие ошибки дают <code>SyntaxError</code>. Регистр важен: <code>LaTeX</code> и <code>latex</code> разные имена.</p>
+      <div class="runner" data-file="names.py" data-error><textarea>
+76trombones = 76
+</textarea></div>
+      <p>Для интерпретатора имена не важны: программы с именами <code>a</code>, <code>b</code>, <code>c</code> и <code>hours</code>, <code>rate</code>, <code>pay</code> одинаковы. Для человека понятное (мнемоническое) имя напоминает, зачем переменная заведена.</p>
+      <pre class="code">hours = 35.0
+rate = 12.50
+pay = hours * rate
+print(pay)</pre>
+    </section>
+
+    <section id="arithmetic">
+      <h2>Встроенные типы и арифметика</h2>
+      <p class="def"><span class="term">Выражение</span>&nbsp;— сочетание значений (операндов) и операторов, которое вычисляется в одно значение.</p>
+      <p>Выражение <code>2 + 3 * 4</code> сворачивается по шагам: сначала <code>2 + 12</code>, затем <code>14</code>. Порядок шагов задают правила приоритета, а не порядок чтения.</p>
+      <div class="more">
+        <p>Одно и то же число можно записать по-разному: <code>42</code>, <code>0b101010</code> (двоичная запись), <code>0o52</code> (восьмеричная), <code>0x2a</code> (шестнадцатеричная). Подчеркивание помогает читать длинные числа: <code>123_456_789</code> хранится как <code>123456789</code>. Форма записи принадлежит исходному тексту, а не числу.</p>
+      </div>
+      <aside class="note warn"><p>Запятая не разделяет разряды. Python видит в <code>print(1,000,000)</code> три значения и печатает <code>1 0 0</code>.</p></aside>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Оператор</th><th>Действие</th><th>Пример</th></tr></thead>
+        <tbody>
+          <tr><td><code>x + y</code></td><td>сложение</td><td><code>30 + 12</code> дает <code>42</code></td></tr>
+          <tr><td><code>x - y</code></td><td>вычитание</td><td><code>43 - 1</code> дает <code>42</code></td></tr>
+          <tr><td><code>x * y</code></td><td>умножение</td><td><code>6 * 7</code> дает <code>42</code></td></tr>
+          <tr><td><code>x / y</code></td><td>деление</td><td><code>84 / 2</code> дает <code>42.0</code></td></tr>
+          <tr><td><code>x // y</code></td><td>деление с округлением вниз</td><td><code>85 // 2</code> дает <code>42</code></td></tr>
+          <tr><td><code>x % y</code></td><td>остаток от деления</td><td><code>7 % 3</code> дает <code>1</code></td></tr>
+          <tr><td><code>x ** y</code></td><td>возведение в степень</td><td><code>7 ** 2</code> дает <code>49</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>Операторы <code>//</code> и <code>%</code> работают парой: целая часть и остаток вместе восстанавливают исходное число. Запустите пример, затем замените 105 на 200.</p>
+      <div class="runner" data-file="minutes.py"><textarea>
+minutes = 105
+print(minutes // 60)  # полных часов
+print(minutes % 60)   # оставшихся минут
+</textarea></div>
+      <p>В Python 3 оператор <code>/</code> всегда дает <code>float</code>, даже при делении нацело: <code>4 / 2</code> дает <code>2.0</code>. Целую часть дает только <code>//</code>. Достаточно одного <code>float</code> в выражении, чтобы результат стал <code>float</code>: <code>1 + 2.0</code> дает <code>3.0</code>.</p>
+      <p>Приоритет операторов убывает от скобок к сложению: сначала <code>( )</code>, затем <code>**</code>, затем <code>*</code>, <code>/</code>, <code>//</code>, <code>%</code> и последними <code>+</code> и <code>-</code>. При равном приоритете вычисление идет слева направо. Ответьте сами, затем нажимайте «Дальше».</p>
+      <div class="anim" data-slide="S49" data-title="Кто считается первым">
+        <div class="table-wrap"><table>
+          <thead><tr><th>Ловушка</th><th>Кажется</th><th>На самом деле</th></tr></thead>
+          <tbody>
+            <tr><td><code>2 ** 1 + 1</code></td><td><code>4</code></td><td><span class="fx-box" data-fx="in@1 ok@1">3</span></td></tr>
+            <tr><td><code>2 * 3 - 1</code></td><td><code>4</code></td><td><span class="fx-box" data-fx="in@1 ok@1">5</span></td></tr>
+            <tr><td><code>5 - 3 - 1</code></td><td><code>3</code></td><td><span class="fx-box" data-fx="in@1 ok@1">1</span></td></tr>
+          </tbody>
+        </table></div>
+        <p data-fx="in@1">Степень выполняется раньше сложения, умножение раньше вычитания, а два вычитания идут слева направо. Исключение из правила «слева направо» одно: степень вычисляется справа налево, поэтому <code>2 ** 3 ** 2</code> дает <code>512</code>, а не <code>64</code>.</p>
+      </div>
+      <aside class="note"><p>Если задумались о приоритете дольше секунды, ставьте скобки: они меняют порядок и делают его очевидным читателю.</p></aside>
+
+      <div class="ask" data-slide="S88">
+        <p class="ask-q">Сколько будет <code>0.2 + 0.1</code>?</p>
+        <p class="ask-hint">Подсказка: запомните свой ответ и проверьте его в редакторе ниже.</p>
+        <div class="ask-a"><p>Школьный ответ <code>0.3</code>, а Python печатает <code>0.30000000000000004</code>. Причина в том, как устроен тип <code>float</code>.</p></div>
+      </div>
+
+      <p>Тип <code>float</code> хранит число в 64 битах по стандарту IEEE 754, из них 53 бита отведены под значащие цифры. Число 1/3 нельзя точно записать десятичной дробью: <code>0.333…</code> никогда не кончается. Так же число 1/10 в двоичной записи превращается в бесконечную периодическую дробь, а места есть только под 53 бита. Большинство десятичных дробей в <code>float</code> хранится приближенно, и так ведут себя C, Java, Fortran и другие языки.</p>
+      <p>Запустите пример: выражения похожи, а результаты отличаются.</p>
+      <div class="runner" data-file="float_tail.py"><textarea>
+print(0.1 + 0.1)
+print(0.2 + 0.1)
+print(2 * 0.1)
+print(3 * 0.1)
+</textarea></div>
+      <p>По виду выражения нельзя предсказать, даст ли <code>float</code> ожидаемый результат. Даже перестановка множителей меняет последнюю цифру: <code>5 / 3 * 0.1</code> дает <code>0.16666666666666669</code>, а <code>0.1 * 5 / 3</code> дает <code>0.16666666666666666</code>. Поэтому сравнение вещественных чисел через <code>==</code> ненадежно.</p>
+
+      <div class="quiz" data-id="float-eq" data-slide="S89">
+        <p class="quiz-q">Только что вы видели, что <code>3 * 0.1</code> дает <code>0.30000000000000004</code>. Что напечатает программа?</p>
+        <pre class="code">print(0.1 * 3 == 0.3)</pre>
+        <ul>
+          <li>а) <code>True</code></li>
+          <li data-correct>б) <code>False</code></li>
+          <li>в) <code>0.3</code></li>
+          <li>г) <code>0.30000000000000004</code></li>
+        </ul>
+        <p class="quiz-why"><code>0.1 * 3</code> дает <code>0.30000000000000004</code>, это не <code>0.3</code>, поэтому <code>==</code> возвращает <code>False</code>. Ответ <code>True</code> дает школьная арифметика. Ответы <code>0.3</code> и <code>0.30000000000000004</code> упускают, что результат сравнения логическое значение, а не число.</p>
+      </div>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>Ситуация</th><th>Инструмент</th><th>Как</th></tr></thead>
+        <tbody>
+          <tr><td>сравнить два вычисленных числа</td><td>сравнение с допуском</td><td><code>math.isclose(a, b)</code></td></tr>
+          <tr><td>показать число человеку</td><td>округление при выводе</td><td><code>round(x, 2)</code></td></tr>
+          <tr><td>нужен точный десятичный результат</td><td>класс <code>Decimal</code></td><td><code>Decimal("1.45")</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="runner" data-file="isclose.py"><textarea>
+import math
+
+x = 0.1 * 3
+print(x == 0.3)
+print(math.isclose(x, 0.3))
+print(round(x, 2))
+</textarea></div>
+      <div class="more">
+        <p>Допуск задается явно: <code>math.isclose(a, b, rel_tol=0.05)</code> разрешает разницу в 5&nbsp;%. Сравнение с нулем особое: <code>math.isclose(x, 0)</code> без параметра <code>abs_tol</code> дает <code>False</code> для любого ненулевого <code>x</code>. <code>Decimal</code> создают из строки: <code>Decimal(1.45)</code> унаследует неточность <code>float</code>.</p>
+      </div>
+      <p>Тип <code>bool</code> имеет ровно два значения, <code>True</code> и <code>False</code>, и это не строки. В условии любое значение считается истиной или ложью: ложью считаются <code>False</code>, <code>0</code>, <code>0.0</code>, пустая строка <code>''</code>, пустой список <code>[]</code> и <code>None</code>, истиной все остальное. Функция <code>bool()</code> показывает, чем значение считается.</p>
+      <div class="runner" data-file="truth.py"><textarea>
+print(bool(0), bool(17))
+print(bool(''), bool('ACGT'))
+print(bool(None))
+</textarea></div>
+      <p>Смысл оператора определяют типы операндов. Для чисел <code>+</code> складывает, для строк склеивает: <code>'100' + '150'</code> дает <code>'100150'</code>. Строка, умноженная на целое число, повторяется: <code>'Test ' * 3</code> дает <code>'Test Test Test '</code>. Сочетания <code>'Hello' + 3</code>, <code>'Hello' * 3.0</code> и <code>'Hello' / 5</code> дают <code>TypeError</code>.</p>
+      <aside class="note warn"><p>Кавычки в коде только прямые. Обратная кавычка и «елочки», скопированные из Word, дают <code>SyntaxError</code>.</p></aside>
+      <p>Python никогда сам не истолковывает содержимое строки как число. Переход между типами пишется явно: <code>int()</code>, <code>float()</code>, <code>str()</code>. Запустите пример и обратите внимание на <code>int(42.9)</code>: дробная часть отбрасывается, округления нет.</p>
+      <div class="runner" data-file="convert.py"><textarea>
+print(int('101'))
+print(int('101', 2))  # строка в двоичной записи
+print(int(42.9))
+print(float(42))
+print(int('37') + int('42'))
+</textarea></div>
+      <p>Операция над значением может закончиться тремя исходами. Если все сходится, <code>int('126') / 3</code> дает <code>42.0</code>. Если тип верный, а содержимое негодное, <code>int('hello')</code> дает <code>ValueError</code>. Если тип вообще не тот, <code>'126' / 3</code> дает <code>TypeError</code>. Название ошибки уже ставит диагноз.</p>
+      <div class="runner" data-file="value_error.py" data-error><textarea>
+print(int('126') / 3)
+print(int('hello'))
+</textarea></div>
+    </section>
+
+    <section id="io">
+      <h2>Ввод и вывод</h2>
+      <p>Функция <code>print()</code> принимает любое число значений, печатает их через разделитель <code>sep</code> (по умолчанию пробел) и заканчивает строку значением <code>end</code> (по умолчанию перевод строки). Запустите пример, затем замените <code>sep='-'</code> на <code>sep=''</code>.</p>
+      <div class="runner" data-file="print_args.py"><textarea>
+print('Pay:', 96.25)
+print(1,000,000)
+print('A', 'T', sep='-')
+print('G', 'C', end='')
+print('A')
+</textarea></div>
+      <p>Вторая строка разгадывает загадку из прошлого раздела: <code>print(1,000,000)</code> получил три значения и напечатал их через пробел.</p>
+      <p class="def"><span class="term">f-строка</span>&nbsp;— строка с буквой <code>f</code> перед кавычками, в которой выражение в фигурных скобках заменяется своим значением.</p>
+      <p>Склейка <code>'I am number ' + 42</code> дает <code>TypeError</code>, а <code>'I am number ' + str(42)</code> работает, но громоздко. f-строка подставляет значение без ручного преобразования, а после двоеточия в скобках можно задать формат.</p>
+      <div class="runner" data-file="fstring.py"><textarea>
+camels = 42
+print(f'I have spotted {camels} camels.')
+x = 123.456
+print(f'Value is {x:0.2f}')
+print(f'Twice: {camels * 2}')
+</textarea></div>
+      <p>Функция <code>input()</code> печатает приглашение и останавливает программу, пока человек не наберет текст и не нажмет Enter. Затем она возвращает набранную строку. Символ <code>\n</code> в конце приглашения переводит строку, чтобы ввод оказался под вопросом. В редакторах этого сайта ввод задается заранее в поле «Ввод».</p>
+      <div class="runner" data-file="name.py" data-stdin="Vasilisa"><textarea>
+name = input('What is your name?\n')
+print(f'Hello, {name}')
+</textarea></div>
+      <aside class="note warn"><p><code>input()</code> без текста-приглашения делает программу плохой, даже если она работает: человек не знает, что вводить, и программа кажется зависшей.</p></aside>
+
+      <div class="ask" data-slide="S90">
+        <p class="ask-q">Человек набрал <code>17</code>. Что получила программа: число или текст?</p>
+        <p class="ask-hint">Подсказка: с клавиатуры приходят символы.</p>
+        <div class="ask-a"><p>Программа получила текст из двух символов, строку <code>'17'</code>. Функция <code>input()</code> всегда возвращает строку, даже если набраны одни цифры.</p></div>
+      </div>
+
+      <p>Для арифметики ввод нужно преобразовать, и лучше сразу при вводе: потом легко забыть, откуда пришло значение. Запустите пример, затем уберите <code>int()</code> и запустите снова.</p>
+      <div class="runner" data-file="speed.py" data-stdin="17"><textarea>
+speed = int(input('Speed: '))
+print(speed + 5)
+</textarea></div>
+
+      <div class="quiz" data-id="input-repeat" data-slide="S91">
+        <p class="quiz-q">Пользователь набрал <code>5</code> и нажал Enter. Что напечатает программа?</p>
+        <pre class="code">n = input('Число: ')
+print(n * 2)</pre>
+        <ul>
+          <li>а) <code>10</code></li>
+          <li>б) <code>TypeError</code></li>
+          <li>в) <code>ValueError</code></li>
+          <li data-correct>г) <code>55</code></li>
+        </ul>
+        <p class="quiz-why"><code>n</code> равно строке <code>'5'</code>, а <code>*</code> для строки повторяет ее, поэтому печатается <code>55</code>. Ответ <code>10</code> выбирают те, кто забыл, что <code>input()</code> дает строку. Ответ <code>TypeError</code> выбирают те, кто помнит про строку, но не помнит повторение. <code>ValueError</code> возникает при неудачном преобразовании, а здесь преобразования нет. Программа отработает без сообщений и напечатает неверное число: это семантическая ошибка.</p>
+      </div>
+
+      <p>Ввод не под контролем программы. Если пользователь ввел <code>17</code>, <code>int(speed)</code> дает 17, и программа продолжается. Если он ввел слово, программа останавливается с <code>ValueError: invalid literal for int() with base 10</code>. Это ошибка времени выполнения; сегодня достаточно понимать ее причину, обрабатывать такие случаи вы научитесь позже.</p>
+      <p>Почти любая программа устроена как ввод, обработка и вывод. Сегодня ввод делает <code>input()</code>, обработку арифметика, вывод <code>print()</code> и f-строки. Дальше в обработку добавятся ветвления, циклы и функции, а к концу семестра программа будет читать файл FASTA, считать GC-состав и выводить таблицу. Каркас останется тем же, усложнится только середина.</p>
+      <p>Короткая программа уже показывает все три части. Запустите ее, затем замените в поле «Ввод» 35 на слово.</p>
+      <div class="runner" data-file="pay.py" data-stdin="35\n2.75"><textarea>
+hours = input('Enter Hours: ')
+rate = input('Enter Rate: ')
+
+pay = float(hours) * float(rate)
+
+print(f'Pay: {pay}')
+</textarea></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Что видите</th><th>Причина</th><th>Что делать</th></tr></thead>
+        <tbody>
+          <tr><td><code>TypeError</code> при арифметике</td><td>значение осталось строкой</td><td>преобразовать сразу при вводе</td></tr>
+          <tr><td><code>ValueError: invalid literal</code></td><td>во вводе не число</td><td>проверять данные до преобразования</td></tr>
+          <tr><td>программа «висит»</td><td><code>input()</code> ждет ввода, приглашения нет</td><td>передать текст в <code>input()</code></td></tr>
+          <tr><td>числа склеились: <code>'3542'</code></td><td><code>+</code> над строками склеивает</td><td><code>int()</code> перед сложением</td></tr>
+        </tbody>
+      </table></div>
+      <p>Три симптома из четырех следуют из одного факта: <code>input()</code> возвращает строку.</p>
+    </section>
+
+    <section id="bio">
+      <h2>Биологические данные в программе</h2>
+      <p>Специального «биологического» типа в Python нет, и он не нужен. Нуклеотидная или белковая последовательность, идентификатор и описание записи хранятся строками <code>str</code>. Значит, к последовательности применимо все, что известно о строках: <code>len()</code>, индексы, срезы и методы из лекции 2.</p>
+      <p>Алфавит ДНК: A, T, C, G (аденин, тимин, цитозин, гуанин). Буква <code>N</code> обозначает неопределенный нуклеотид, строчные буквы обычно отмечают замаскированные повторы.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Величина</th><th>Тип</th><th>Почему</th></tr></thead>
+        <tbody>
+          <tr><td>идентификатор записи</td><td><code>str</code></td><td>текст, не число</td></tr>
+          <tr><td>последовательность</td><td><code>str</code></td><td>последовательность символов</td></tr>
+          <tr><td>длина последовательности</td><td><code>int</code></td><td>считаем штуки</td></tr>
+          <tr><td>GC-состав</td><td><code>float</code></td><td>доля, не целое</td></tr>
+          <tr><td>«последовательность корректна?»</td><td><code>bool</code></td><td>два исхода</td></tr>
+          <tr><td>описание отсутствует</td><td><code>None</code></td><td>не пустая строка, а «ничего нет»</td></tr>
+        </tbody>
+      </table></div>
+      <aside class="note"><p>Длина всегда целая. Если длина получилась <code>float</code>, где-то в расчете стоит деление через <code>/</code>.</p></aside>
+      <p class="def"><span class="term">Запись FASTA</span>&nbsp;— строка описания, начинающаяся с <code>&gt;</code>, и следующие за ней строки последовательности.</p>
+      <pre class="code">&gt;gene_00284728 length=231;type=dna
+GAGAACTGATTCTGTTACCGCAGGGCATTCGG</pre>
+      <p>Идентификатор идет сразу после <code>&gt;</code> до первого пробела. Все после первого пробела относится к описанию, а описания может не быть вовсе, тогда это <code>None</code>. Последовательность продолжается до следующего <code>&gt;</code> или до конца файла. Типичные ошибки разбора: лишний пробел после <code>&gt;</code> и повторяющиеся идентификаторы.</p>
+
+      <div class="quiz" data-id="fasta-id" data-slide="S92">
+        <p class="quiz-q">Строка описания: <code>&gt;gene_1 length=231</code>. Что программа должна взять как идентификатор?</p>
+        <ul>
+          <li data-correct>а) <code>gene_1</code></li>
+          <li>б) <code>&gt;gene_1</code></li>
+          <li>в) <code>gene_1 length=231</code></li>
+          <li>г) <code>length=231</code></li>
+        </ul>
+        <p class="quiz-why">Знак <code>&gt;</code> только отмечает строку описания, а идентификатор идет после него до первого пробела. Ответ <code>&gt;gene_1</code> дают те, кто берет строку до пробела целиком вместе со скобкой. Ответ <code>gene_1 length=231</code> дают те, кто считает идентификатором всю строку. <code>length=231</code> относится к описанию.</p>
+      </div>
+
+      <div class="ask" data-slide="S93">
+        <p class="ask-q">Считаем <code>gc = (g + c) / n * 100</code> и отбираем записи с GC-составом ровно 55&nbsp;%. Что может пойти не так?</p>
+        <p class="ask-hint">Подсказка: вспомните раздел о вещественных числах.</p>
+        <div class="ask-a"><p>GC-состав получается делением, значит, это <code>float</code>, а сравнение <code>float</code> через <code>==</code> ненадежно. Запись с GC-составом 55&nbsp;% может не пройти проверку <code>gc == 55</code>.</p></div>
+      </div>
+
+      <p class="def"><span class="term">GC-состав</span>&nbsp;— доля гуанина и цитозина среди всех нуклеотидов последовательности, обычно в процентах.</p>
+      <p>Доля означает <code>float</code>, а <code>float</code> означает, что <code>==</code> ненадежно. В последовательности из 20 нуклеотидов 6 гуанинов и 5 цитозинов: GC-состав ровно 55&nbsp;%, а программа считает иначе. Запустите пример.</p>
+      <div class="runner" data-file="gc.py"><textarea>
+import math
+
+g = 6
+c = 5
+n = 20
+gc = (g + c) / n * 100
+print(gc)
+print(gc == 55)
+print(math.isclose(gc, 55))
+print(f'{gc:0.3f}')
+</textarea></div>
+      <p>Вычисленный GC-состав сравнивают с допуском через <code>math.isclose()</code>, округляют только при выводе, а записи фильтруют по порогу через <code>&gt;</code> и <code>&lt;</code>, а не через <code>==</code>.</p>
+      <aside class="note warn"><p>GC-состав бывает равен нулю, а <code>math.isclose(gc, 0.0)</code> без параметра <code>abs_tol</code> дает <code>False</code> для любого ненулевого <code>gc</code>.</p></aside>
+      <p>Риск двух имен зависит от изменяемости, а не от того, что данные биологические. Одна последовательность хранится строкой, строка неизменяема, и два имени на ней безопасны. Набор последовательностей хранится списком, список изменяем, и два имени на одном наборе становятся источником тихих ошибок.</p>
+      <p>Практические занятия семестра последовательно развивают одну программу: проверка входных данных, разбор файла FASTA, статистики и GC-состав, частоты нуклеотидов, поиск мотивов, фильтрация и отчет. Типы, переменные, ввод и вывод из этой лекции нужны на каждом этапе.</p>
+    </section>
+
+    <section id="summary">
+      <h2>Итоги</h2>
+      <p>Проверьте себя: ответьте на каждый вопрос сами, затем нажимайте «Дальше». Если хотя бы один ответ вызывает сомнение, вернитесь к разделу до практического занятия 2.</p>
+      <div class="anim" data-slide="S78" data-title="Пять вопросов, на которые вы сможете ответить">
+        <div class="table-wrap"><table>
+          <thead><tr><th>Вопрос</th><th>Ответ</th></tr></thead>
+          <tbody>
+            <tr><td>Что стоит между вами и процессором?</td><td><span data-fx="in@1">интерпретатор: разбор, байт-код, выполнение</span></td></tr>
+            <tr><td>Что такое переменная?</td><td><span data-fx="in@2">ярлык на объекте, а не коробка со значением</span></td></tr>
+            <tr><td>Когда обнаружится ошибка?</td><td><span data-fx="in@3">синтаксическая до запуска, времени выполнения по ходу, семантическая никогда</span></td></tr>
+            <tr><td>Почему <code>0.2 + 0.1</code> не дает ровно <code>0.3</code>?</td><td><span data-fx="in@4"><code>float</code> хранит число в конечном двоичном формате IEEE 754</span></td></tr>
+            <tr><td>Что возвращает <code>input()</code>?</td><td><span data-fx="in@5">всегда строку</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <p>Три интуитивные установки мешают учиться сильнее, чем незнание синтаксиса.</p>
+      <div class="anim" data-slide="S79" data-title="Кажется и на самом деле">
+        <div class="table-wrap"><table>
+          <thead><tr><th>Кажется</th><th>На самом деле</th></tr></thead>
+          <tbody>
+            <tr><td>Переменная хранит значение внутри себя</td><td><span data-fx="in@1">Переменная привязана к объекту; объектов может быть меньше, чем имен</span></td></tr>
+            <tr><td>Странный хвост в вещественном числе означает поломку</td><td><span data-fx="in@2">Так устроен двоичный формат с плавающей точкой; так же ведут себя C, Java, Fortran</span></td></tr>
+            <tr><td>Программа упала, значит, я плохо соображаю</td><td><span data-fx="in@3">Сообщение об ошибке ставит диагноз: тип ошибки и место обнаружения</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <p>Ошибки служат рабочим инструментом, а не оценкой ваших способностей. Все ловушки лекции следуют из одного свойства: Python ничего не угадывает и делает ровно то, что написано. Он не переведет строку в число сам, не отвечает за порядок операций, который вы имели в виду, и не проверяет смысл ваших имен.</p>
+      <p>Для самостоятельного чтения достаточно выбрать одну книгу и держаться ее весь семестр: Э. Мэтиз «Изучаем Python», М. Лутц «Изучаем Python» или Б. Любанович «Простой Python». Следующая лекция посвящена строкам: индексам, срезам, методам, f-строкам и кодировкам.</p>
+    </section>
+
+    <section id="test">
+      <h2>Итоговый тест</h2>
+      <p>Десять вопросов по всей лекции. Ответьте на все и нажмите «Проверить»: тест засчитывается от восьми верных ответов, пересдавать можно сколько угодно раз.</p>
+      <div class="final-test" data-id="final">
+        <div class="ft-q">
+          <p class="quiz-q">Чем интерпретатор отличается от компилятора?</p>
+          <ul>
+            <li>Интерпретатор переводит программу целиком и сохраняет файл с машинным кодом</li>
+            <li data-correct>Интерпретатор исполняет программу сам и файла с машинным кодом не создает</li>
+            <li>Интерпретатор работает только в интерактивном режиме</li>
+            <li>Интерпретатор не находит синтаксических ошибок</li>
+          </ul>
+          <p class="quiz-why">Файл с машинным кодом создает компилятор. Интерпретатор исполняет программу по ходу и умеет работать как с отдельными строками в REPL, так и с файлом. Синтаксические ошибки CPython находит при разборе файла.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">В пятой строке программы из десяти строк забыта закрывающая скобка. Что увидит студент при запуске?</p>
+          <ul>
+            <li>Выполнятся первые четыре строки, затем появится <code>SyntaxError</code></li>
+            <li>Программа выполнится, но пятая строка будет пропущена</li>
+            <li data-correct><code>SyntaxError</code>, и не выполнится ни одна строка</li>
+            <li>Программа отработает без сообщений, но результат будет неверным</li>
+          </ul>
+          <p class="quiz-why">Python разбирает весь файл до выполнения, поэтому синтаксическая ошибка обнаруживается раньше первой строки. Первый вариант описывает ошибку времени выполнения, последний описывает семантическую ошибку.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Нужен модуль <code>random</code> из стандартной библиотеки. Что сделать перед <code>import random</code>?</p>
+          <ul>
+            <li>Выполнить <code>python3 -m pip install random</code></li>
+            <li>Скачать модуль с сайта pypi.org</li>
+            <li>Переустановить Python</li>
+            <li data-correct>Ничего: стандартная библиотека установлена вместе с Python</li>
+          </ul>
+          <p class="quiz-why">Через <code>pip</code> из каталога PyPI ставятся только сторонние пакеты. Модули стандартной библиотеки, в том числе <code>random</code>, уже установлены, и <code>import</code> работает сразу.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Команда <code>python3 gc.py</code> сообщает, что файл не найден, хотя файл существует. Что вероятнее всего?</p>
+          <ul>
+            <li data-correct>Терминал открыт не в той папке, где лежит файл</li>
+            <li>В файле синтаксическая ошибка</li>
+            <li>Файл сохранен не в UTF-8</li>
+            <li>Python не установлен</li>
+          </ul>
+          <p class="quiz-why">Команда запуска ищет файл в папке, в которой находится терминал. Синтаксическая ошибка и неверная кодировка дали бы <code>SyntaxError</code>, а без Python не нашлась бы сама команда <code>python3</code>.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что напечатает программа?</p>
+          <pre class="code">x = [5, 6]
+y = x
+x.append(7)
+print(y)</pre>
+          <ul>
+            <li><code>[5, 6]</code></li>
+            <li data-correct><code>[5, 6, 7]</code></li>
+            <li><code>[7]</code></li>
+            <li><code>NameError</code></li>
+          </ul>
+          <p class="quiz-why"><code>y = x</code> не копирует список: появляется второй ярлык на том же объекте. Изменение через <code>x</code> видно через <code>y</code>. Ответ <code>[5, 6]</code> дает модель коробок.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">После <code>a = [1, 2]</code> и <code>b = [1, 2]</code> чему равны <code>a == b</code> и <code>a is b</code>?</p>
+          <ul>
+            <li><code>True</code> и <code>True</code></li>
+            <li><code>False</code> и <code>False</code></li>
+            <li data-correct><code>True</code> и <code>False</code></li>
+            <li><code>False</code> и <code>True</code></li>
+          </ul>
+          <p class="quiz-why">Две записи <code>[1, 2]</code> создают два разных объекта с одинаковым содержимым. <code>==</code> сравнивает значения и дает <code>True</code>, <code>is</code> проверяет, один ли это объект, и дает <code>False</code>.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Прочтение длиной 74 нуклеотида делят на кодоны. Что выведет <code>print(74 // 3, 74 % 3)</code>?</p>
+          <ul>
+            <li><code>24.666666666666668 2</code></li>
+            <li><code>25 2</code></li>
+            <li><code>24 1</code></li>
+            <li data-correct><code>24 2</code></li>
+          </ul>
+          <p class="quiz-why"><code>//</code> дает целую часть деления, 24 полных кодона, а <code>%</code> дает остаток, 2 нуклеотида: 24 × 3 + 2 = 74. Первый ответ получается с оператором <code>/</code>, ответ 25 путает деление вниз с округлением.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Как надежно проверить, что вычисленное значение <code>x</code> равно 0,7?</p>
+          <ul>
+            <li><code>x == 0.7</code></li>
+            <li data-correct><code>math.isclose(x, 0.7)</code></li>
+            <li><code>x is 0.7</code></li>
+            <li><code>str(x) == '0.7'</code></li>
+          </ul>
+          <p class="quiz-why"><code>float</code> хранит большинство десятичных дробей приближенно, поэтому вычисленное число может отличаться в последней цифре. <code>math.isclose()</code> сравнивает с допуском. <code>==</code> и сравнение строк чувствительны к этой цифре, а <code>is</code> проверяет тождество объектов, а не значение.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Программа выполняет <code>n = input()</code>, пользователь набирает <code>3</code>. Что выведет <code>print(n + n)</code>?</p>
+          <ul>
+            <li><code>6</code></li>
+            <li data-correct><code>33</code></li>
+            <li><code>TypeError</code></li>
+            <li><code>3 3</code></li>
+          </ul>
+          <p class="quiz-why"><code>input()</code> всегда возвращает строку, а <code>+</code> для строк склеивает их: <code>'3' + '3'</code> дает <code>'33'</code>. Ответ 6 получился бы после <code>int(input())</code>. <code>TypeError</code> возникает, если сложить строку с числом, а не две строки.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">В последовательности 40 нуклеотидов, из них 9 гуанинов и 13 цитозинов. Какое выражение дает GC-состав в процентах?</p>
+          <ul>
+            <li><code>(9 + 13) // 40 * 100</code></li>
+            <li><code>9 + 13 / 40 * 100</code></li>
+            <li data-correct><code>(9 + 13) / 40 * 100</code></li>
+            <li><code>(9 + 13) % 40 * 100</code></li>
+          </ul>
+          <p class="quiz-why">GC-состав&nbsp;— доля, поэтому нужно деление <code>/</code>, а скобки заставляют сначала сложить: получается 55&nbsp;%. Без скобок деление выполняется раньше сложения. <code>//</code> отбросит дробную часть и даст 0, а <code>%</code> дает остаток, а не долю.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="finish" data-slot="finish"></div>
+  </main>
+
+  <nav class="toc" data-slot="toc" aria-label="Разделы лекции"></nav>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="claude:viewport-fit-sides" content="cover">
+  <title>Логика и ветвления</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Unbounded:wght@500;600&display=swap">
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/course.js"></script>
+  <script src="assets/app.js"></script>
+</head>
+<body data-lecture="03">
+<div class="read-progress" aria-hidden="true"><i></i></div>
+<header class="topbar">
+  <button class="icon-btn menu-btn" type="button" aria-label="Содержание курса"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+  <a class="brand" href="index.html" data-logo><span class="brand-name">PYTHON</span></a>
+  <nav class="crumbs" aria-label="Путь"></nav>
+  <div class="tools">
+    <button class="icon-btn theme-btn" type="button" aria-label="Сменить тему"></button>
+  </div>
+</header>
+<div class="scrim"></div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Лекции курса"></aside>
+
+  <main class="lecture">
+    <header class="lecture-head rise">
+      <p class="eyebrow" data-slot="eyebrow"></p>
+      <h1>Логика и ветвления</h1>
+      <p class="lead">Как программа принимает решения: логический тип, сравнения, логические операторы, ветвление if/elif/else, истинность значений и None.</p>
+      <div class="meta" data-slot="meta"></div>
+    </header>
+
+    <div class="goals rise" style="--i:1">
+      <p>После лекции вы сможете</p>
+      <ul>
+        <li>записывать условия сравнениями и операторами <code>and</code>, <code>or</code>, <code>not</code>, <code>in</code> и предсказывать их значение;</li>
+        <li>выбирать выполняемый код инструкциями <code>if</code>, <code>elif</code>, <code>else</code> и проверять, в какую ветвь попадут граничные значения;</li>
+        <li>проверять истинность значений и <code>None</code> и записывать проверку заголовка FASTA плоской цепочкой условий.</li>
+      </ul>
+    </div>
+
+    <div class="slides" data-src="slides/lecture-03.html" data-title="Презентация лекции 3"></div>
+
+    <section id="bool-compare">
+      <h2>Тип <code>bool</code> и сравнения</h2>
+      <div class="ask" data-slide="S4">
+        <p class="ask-q">Как записать в программе ответ «да» или «нет»?</p>
+        <p class="ask-hint">Подсказка: какие типы данных мы уже знаем?</p>
+        <div class="ask-a"><p>Можно взять строку <code>"да"</code> или число 1, но тогда легко ошибиться в написании или перепутать значения. Для ответа «да» или «нет» в Python есть отдельный тип с двумя значениями, <code>bool</code>.</p></div>
+      </div>
+      <p>До сих пор программы выполнялись сверху вниз, строка за строкой, и при любых данных одинаково. Настоящая программа постоянно принимает решения: перед ней заголовок или строка последовательности, допустима ли буква, не пуста ли строка. Чтобы принять решение, программа задает данным вопрос и получает ответ «да» или «нет».</p>
+      <p class="def"><span class="term">Логическое значение</span>&nbsp;— ответ «да» или «нет». В Python у него отдельный тип <code>bool</code> и ровно два значения: <code>True</code> и <code>False</code>.</p>
+      <p>Значения пишутся без кавычек и с прописной буквы. Слово <code>true</code> Python не узнает, а <code>"True"</code> в кавычках уже обычная строка из четырех букв. В арифметике <code>True</code> ведет себя как 1, а <code>False</code> как 0. Запустите пример, затем замените <code>True + 1</code> на <code>True + True</code> и запустите снова.</p>
+      <div class="runner" data-file="bool_type.py"><textarea>
+print(type(True), type(False))
+print(type("True"))   # в кавычках: строка
+print(True + 1)       # True ведет себя как 1
+print(False * 10)     # False ведет себя как 0
+</textarea></div>
+      <div class="more">
+        <p>Тип <code>bool</code> появился в Python 2.3 (PEP 285) и устроен как частный случай целого числа, поэтому <code>isinstance(True, int)</code> дает <code>True</code>. До него ответ «да» или «нет» хранили числами 0 и 1. Отдельный тип удобнее: <code>True</code> в коде сразу говорит читателю, что это ответ на вопрос, а не количество.</p>
+        <p>Сложение логических значений позволяет посчитать, сколько условий выполнено: сумма нескольких сравнений равна числу истинных. Например, <code>(5 &gt; 3) + (2 &gt; 3) + (1 == 1)</code> дает <code>2</code>.</p>
+      </div>
+      <div class="quiz" data-id="true-sum-int" data-slide="S5q">
+        <p class="quiz-q">Что выведет <code>print(True + True)</code>?</p>
+        <ul>
+          <li>а) <code>True</code></li>
+          <li>б) <code>TypeError</code></li>
+          <li>в) <code>"TrueTrue"</code></li>
+          <li data-correct>г) <code>2</code></li>
+        </ul>
+        <p class="quiz-why">В арифметике <code>True</code> равно 1, поэтому сумма двух <code>True</code> дает целое число <code>2</code>, а не логическое значение. <code>True</code> выбирают, если считают <code>+</code> логическим «или», а <code>TypeError</code>, если думают, что <code>bool</code> нельзя складывать. <code>"TrueTrue"</code> получилось бы только у строк: <code>"True" + "True"</code>.</p>
+      </div>
+      <h3>Сравнение дает <code>True</code> или <code>False</code></h3>
+      <p>Любое сравнение дает значение типа <code>bool</code>. Вопрос «не длиннее ли строка 80 символов» Python записывает как <code>len(seq) &lt;= 80</code>: NCBI рекомендует строки последовательности в файле FASTA не длиннее 80 символов. Равенство проверяют два знака <code>==</code>. Сравнение строк учитывает регистр, поэтому те же буквы в нижнем регистре уже не равны.</p>
+      <div class="runner" data-file="compare.py"><textarea>
+seq = "ATGCGTAC"
+print(len(seq))
+print(len(seq) &lt;= 80)
+print(seq == "ATGCGTAC")
+print(seq == "atgcgtac")   # регистр учитывается
+print(type(seq == "AT"))
+</textarea></div>
+      <p>Шесть операторов сравнения знакомы по математике, отличается только запись. «Не равно» пишется как <code>!=</code>, «меньше или равно» как <code>&lt;=</code>: два символа без пробела, знак равенства второй. Операторов <code>=&lt;</code> и <code>=&gt;</code> в Python нет.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Оператор</th><th>Вопрос</th><th>Пример при <code>n = 8</code></th><th>Результат</th></tr></thead>
+        <tbody>
+          <tr><td><code>==</code></td><td>равно?</td><td><code>n == 8</code></td><td><code>True</code></td></tr>
+          <tr><td><code>!=</code></td><td>не равно?</td><td><code>n != 8</code></td><td><code>False</code></td></tr>
+          <tr><td><code>&lt;</code></td><td>меньше?</td><td><code>n &lt; 80</code></td><td><code>True</code></td></tr>
+          <tr><td><code>&lt;=</code></td><td>меньше или равно?</td><td><code>n &lt;= 8</code></td><td><code>True</code></td></tr>
+          <tr><td><code>&gt;</code></td><td>больше?</td><td><code>n &gt; 80</code></td><td><code>False</code></td></tr>
+          <tr><td><code>&gt;=</code></td><td>больше или равно?</td><td><code>n &gt;= 10</code></td><td><code>False</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>Условие чаще всего стоит после слова <code>if</code>: строка с отступом под ним выполняется, только если условие истинно. Подробно инструкция <code>if</code> разобрана в разделе 3, а здесь она нужна, чтобы показать самую частую ошибку первых недель.</p>
+      <aside class="note warn"><p>Один знак <code>=</code> присваивает значение переменной, два знака <code>==</code> сравнивают и отвечают <code>True</code> или <code>False</code>. Присваивание на месте условия дает <code>SyntaxError</code>. Python находит такую ошибку до запуска, поэтому в примере ниже не выполнится даже первая, правильная проверка.</p></aside>
+      <div class="runner" data-file="assign_error.py" data-error><textarea>
+count = 5
+if count == 5:    # сравнение
+    print("пять")
+if count = 5:     # присваивание вместо сравнения
+    print("пять")
+</textarea></div>
+      <p>Прочитайте последнюю строку сообщения: интерпретатор подсказывает, что вы, вероятно, имели в виду <code>==</code>. Оператор <code>:=</code> из той же подсказки устроен иначе, в этой лекции он не нужен.</p>
+      <h3>Сравнение строк и разных типов</h3>
+      <p>Строки Python сравнивает как слова в словаре: первый символ с первым, при совпадении второй со вторым, до первого различия. Поэтому <code>"GC" &lt; "GT"</code>: первые буквы равны, а <code>C</code> меньше <code>T</code>. «Меньше» здесь означает меньший номер символа в таблице Unicode, а не место в алфавите. Все прописные латинские буквы стоят в этой таблице раньше строчных, поэтому любая прописная буква меньше любой строчной.</p>
+      <p>Когда регистр не важен, обе строки приводят к одному регистру методом <code>upper()</code> или <code>lower()</code>. Числа разных типов сравниваются по значению: <code>2 == 2.0</code> истинно. Строка и число просто не равны, а спросить, какое из них меньше, нельзя: программа останавливается с ошибкой <code>TypeError</code>. Запустите пример: шесть строк напечатаются, на седьмой программа остановится.</p>
+      <div class="runner" data-file="str_compare.py" data-error><textarea>
+print("A" &lt; "C")
+print("a" == "A")
+print("GC" &lt; "GT")
+print("gc".upper() == "GC")
+print(2 == 2.0)
+print("5" == 5)
+print("5" &lt; 5)    # строку и число на порядок не сравнивают
+</textarea></div>
+      <p>Посимвольное сравнение касается и цифр в строках. Строки из цифр упорядочены не как числа: <code>"10" &lt; "9"</code> истинно, потому что первый символ <code>"1"</code> меньше <code>"9"</code>.</p>
+      <aside class="note warn"><p>Функция <code>input()</code> всегда возвращает строку. Сравнение такой строки с числом дает <code>False</code> вместо равенства или <code>TypeError</code> при сравнении на порядок. Строку сначала переводят в число: <code>int(input()) == 5</code>.</p></aside>
+      <div class="more">
+        <p>Номер символа показывает функция <code>ord()</code> из лекции о строках: <code>ord("A")</code> дает 65, <code>ord("B")</code> дает 66, <code>ord("a")</code> дает 97. Документация насчитывает восемь операций сравнения: к шести из таблицы добавляются <code>is</code> и <code>is not</code>, которые сравнивают не значения (раздел 4).</p>
+      </div>
+      <div class="quiz" data-id="compare-char-codes" data-slide="S10">
+        <p class="quiz-q">Что выведет <code>print("a" &lt; "B")</code>?</p>
+        <ul>
+          <li>а) <code>True</code></li>
+          <li data-correct>б) <code>False</code></li>
+          <li>в) <code>None</code></li>
+          <li>г) <code>TypeError</code></li>
+        </ul>
+        <p class="quiz-why">Python сравнивает номера символов: у строчной <code>a</code> номер 97, у прописной <code>B</code> 66. Прописные буквы идут раньше строчных, поэтому ответ <code>False</code>. <code>True</code> получается при сравнении по алфавиту без учета регистра, а <code>TypeError</code> бывает при сравнении строки с числом на порядок. <code>None</code> сравнение не дает никогда: его результат всегда <code>bool</code>.</p>
+      </div>
+    </section>
+
+    <section id="logic">
+      <h2>Логические операторы</h2>
+      <div class="ask" data-slide="S14">
+        <p class="ask-q">Последовательность длиннее 100 букв и без N: как проверить оба условия сразу?</p>
+        <p class="ask-hint">Подсказка: как бы вы сказали это по-русски?</p>
+        <div class="ask-a"><p>По-русски условия соединяет союз «и»: длиннее 100 букв <i>и</i> без N. В Python для этого есть логический оператор <code>and</code>, а также <code>or</code> и <code>not</code>.</p></div>
+      </div>
+      <p>Одно сравнение отвечает на один вопрос, а в реальной проверке вопросов обычно несколько. Например, для анализа нужны последовательности длиннее 100 букв и без буквы N, которая обозначает неизвестный нуклеотид. Каждое условие мы уже умеем записать отдельно. Осталось соединить их так же, как соединяет их союз «и» в речи.</p>
+      <p class="def"><span class="term">Логические операторы</span> <code>and</code>, <code>or</code> и <code>not</code> соединяют условия в одно. <code>and</code> истинно, когда истинны обе части, <code>or</code>&nbsp;— когда истинна хотя бы одна, <code>not</code> меняет истину на ложь и обратно.</p>
+      <p>Логическое «или» не исключающее. На вопрос «чай или кофе» в кафе ждут что-то одно, а <code>or</code> истинно и тогда, когда верны обе части. Каждая часть остается полным условием: <code>len(seq) &gt; 100 and seq.count("N") == 0</code>.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th><code>a</code></th><th><code>b</code></th><th><code>a and b</code></th><th><code>a or b</code></th><th><code>not a</code></th></tr></thead>
+        <tbody>
+          <tr><td><code>True</code></td><td><code>True</code></td><td><code>True</code></td><td><code>True</code></td><td><code>False</code></td></tr>
+          <tr><td><code>True</code></td><td><code>False</code></td><td><code>False</code></td><td><code>True</code></td><td><code>False</code></td></tr>
+          <tr><td><code>False</code></td><td><code>True</code></td><td><code>False</code></td><td><code>True</code></td><td><code>True</code></td></tr>
+          <tr><td><code>False</code></td><td><code>False</code></td><td><code>False</code></td><td><code>False</code></td><td><code>True</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>У <code>and</code> единственная строка с <code>True</code> та, где истинны обе части. У <code>or</code> единственная строка с <code>False</code> та, где обе части ложны. Таблицу не нужно заучивать: ее восстанавливают по смыслу союзов «и», «или», «не».</p>
+      <p>Результат сравнения можно сохранить в переменную с именем-вопросом и собирать условие из таких имен почти как фразу: «длинная и не содержит N». Запустите пример, затем замените последовательность на <code>"ATGCGGGTAC"</code> и запустите снова.</p>
+      <div class="runner" data-file="compound.py"><textarea>
+seq = "ATGCNNGTAC"
+is_long = len(seq) &gt; 8
+has_n = seq.count("N") &gt; 0
+print(is_long, has_n)
+print(is_long and not has_n)   # длинная и без N
+print(is_long or has_n)
+</textarea></div>
+      <p>Для исходной последовательности обе переменные равны <code>True</code>: букв 10, и N в строке есть. <code>not has_n</code> дает <code>False</code>, поэтому <code>and</code> дает <code>False</code>. Для <code>or</code> хватает одной истинной части.</p>
+      <h3>Порядок вычисления</h3>
+      <p>В арифметике умножение выполняется раньше сложения, и у логических операторов тоже есть порядок. Сначала вычисляются сравнения, затем <code>not</code>, потом <code>and</code>, последним <code>or</code>. Поэтому <code>not a == b</code> означает <code>not (a == b)</code>, а <code>a or b and c</code> означает <code>a or (b and c)</code>. Если сомневаетесь в порядке, поставьте скобки: в условиях они не лишние.</p>
+      <div class="more">
+        <p>Аналогия с арифметикой такая: <code>and</code> похоже на умножение, <code>or</code> на сложение. Полная таблица приоритетов приведена в справочнике языка, The Python Language Reference, раздел 6.17. Знаки <code>&amp;</code> и <code>|</code> похожи на <code>and</code> и <code>or</code>, но это побитовые операторы с другим приоритетом: при <code>a = 10</code> выражение <code>a &lt;= 10 &amp; 1 &lt; a</code> дает <code>False</code>. В условиях пишите <code>and</code> и <code>or</code>.</p>
+      </div>
+      <h3>Цепочка сравнений</h3>
+      <p>Сравнения, стоящие подряд, Python соединяет в цепочку. Запись <code>0.4 &lt; gc &lt; 0.6</code> читается как в математике и означает <code>0.4 &lt; gc and gc &lt; 0.6</code>. В цепочку встает любое сравнение, в том числе <code>==</code>, потому что у всех сравнений один приоритет. Строка <code>gc &gt; 0.4 == True</code> поэтому спрашивает, больше ли <code>gc</code> чем 0,4 и равно ли 0,4 значению <code>True</code>. Вторая пара ложна. Другой порядок задают скобки. Пример ниже сначала показывает порядок логических операторов, затем цепочки.</p>
+      <div class="runner" data-file="order_chain.py"><textarea>
+print(True or True and False)     # True or (True and False)
+print((True or True) and False)
+x = 5
+print(not x == 5)                 # not (x == 5)
+gc = 0.5
+print(0.4 &lt; gc &lt; 0.6)
+print(gc &gt; 0.4 == True)     # gc &gt; 0.4 and 0.4 == True
+print((gc &gt; 0.4) == True)
+</textarea></div>
+      <div class="more">
+        <p>В цепочке средняя часть вычисляется один раз, а при ложной первой паре остальные пары не проверяются. Цепочки вроде <code>1 &lt; x &gt; 3</code> или <code>a == b == c</code> допустимы, но читаются плохо; пишите только <code>a &lt; x &lt; b</code> и <code>a &lt;= x &lt;= b</code>. С <code>True</code> через <code>==</code> в настоящих условиях не сравнивают (раздел 4): здесь сравнение показывает только устройство цепочки.</p>
+      </div>
+      <h3>Ловушка «равно A или C»</h3>
+      <p>По-русски «буква равна A или C» звучит естественно, и так же хочется написать в программе: <code>base == "A" or "C"</code>. Python разбирает эту строку по правилам приоритета как <code>(base == "A") or "C"</code>. Непустая строка <code>"C"</code> в условии считается истиной (почему, объясняет раздел 4). В итоге условие выполняется для любой буквы.</p>
+      <div class="runner" data-file="or_trap.py"><textarea>
+base = "G"
+if base == "A" or "C":             # верно для любой буквы
+    print("A или C (неверная проверка)")
+if base == "A" or base == "C":     # сравнение в каждой части
+    print("A или C (верная проверка)")
+</textarea></div>
+      <aside class="note warn"><p>Такая ошибка не дает никакого сообщения: программа работает, но неверно. Оператор <code>or</code> соединяет целые выражения, а не варианты значения, поэтому сравнение пишут полностью в каждой части: <code>base == "A" or base == "C"</code>.</p></aside>
+      <h3>Проверка вхождения <code>in</code></h3>
+      <p>Оператор <code>in</code> спрашивает «входит ли». Для строк это значит «встречается ли такой кусок подряд». <code>not in</code> задает обратный вопрос: <code>x not in s</code> то же, что <code>not (x in s)</code>. Допустимые буквы удобно хранить строкой и спрашивать <code>base in "ACGT"</code>. В РНК вместо T стоит урацил U, поэтому <code>"U" not in seq</code> отвечает на вопрос «это ДНК, а не РНК?».</p>
+      <div class="runner" data-file="in_check.py"><textarea>
+seq = "GATTACA"
+print("A" in seq)
+print("TTA" in seq)
+print("U" not in seq)
+base = "G"
+print(base in "ACGT")
+print("AC" in "ACGT")   # кусок строки тоже входит
+print("" in "ACGT")     # пустая строка входит в любую
+</textarea></div>
+      <aside class="note warn"><p>Для строк <code>in</code> ищет подстроку, а не одну букву из набора. Проверка <code>base in "ACGT"</code> надежна, только если <code>base</code> ровно одна буква: строки <code>"AC"</code> и <code>""</code> тоже ее проходят. Надежная запись: <code>len(base) == 1 and base in "ACGT"</code>.</p></aside>
+      <h3>Сокращенное вычисление</h3>
+      <p class="def"><span class="term">Сокращенное вычисление</span> (short-circuit evaluation)&nbsp;— правило, по которому <code>and</code> и <code>or</code> вычисляют правую часть, только если без нее ответ неизвестен.</p>
+      <p>Если левая часть <code>and</code> ложна, все выражение уже ложно, и правая часть не вычисляется. Если левая часть <code>or</code> истинна, ответ уже <code>True</code>. Это видно на делении на ноль: <code>10 / x</code> при <code>x = 0</code> останавливает программу ошибкой. Запустите пример: две первые проверки отвечают по левой части, а в третьей деление стоит слева и выполняется первым.</p>
+      <div class="runner" data-file="short_circuit.py" data-error><textarea>
+x = 0
+print(x != 0 and 10 / x &gt; 1)   # слева False: деления нет
+print(x == 0 or 10 / x &gt; 1)    # слева True: деления нет
+print(10 / x &gt; 1 and x != 0)   # деление слева: ошибка
+</textarea></div>
+      <div class="more">
+        <p>Сокращенная запись делает то же, что полная запись через <code>if</code> и <code>else</code> из раздела 3. Для первой проверки полная запись выглядит так:</p>
+        <pre class="code">
+if x != 0:
+    print(10 / x &gt; 1)
+else:
+    print(False)
+</pre>
+        <p>Python делит, только если левая часть истинна, а иначе сразу печатает <code>False</code>. У умножения, с которым сравнивали <code>and</code>, такого правила нет: на этом аналогия с арифметикой заканчивается.</p>
+      </div>
+      <h3>Безопасная проверка ставится слева</h3>
+      <p>Сокращенное вычисление защищает от ошибки. В реальных данных бывают пустые строки, и обращение <code>seq[0]</code> к пустой строке дает <code>IndexError</code>. Если слева поставить проверку длины, до опасного обращения дело не дойдет: для пустой строки получится <code>False</code>, для заголовка <code>True</code>. Такое условие называют охранником (guardian pattern), и оно всегда стоит слева от опасной части.</p>
+      <div class="runner" data-file="guard.py"><textarea>
+seq = ""
+print(len(seq) &gt; 0 and seq[0] == "&gt;")
+seq = "&gt;Seq1"
+print(len(seq) &gt; 0 and seq[0] == "&gt;")
+</textarea></div>
+      <div class="quiz" data-id="guard-left" data-slide="S22">
+        <p class="quiz-q">Что выведет программа <code>seq = ""</code>, <code>print(seq[0] == "&gt;" and len(seq) &gt; 0)</code>?</p>
+        <ul>
+          <li>а) <code>True</code></li>
+          <li>б) <code>False</code></li>
+          <li data-correct>в) <code>IndexError</code></li>
+          <li>г) <code>SyntaxError</code></li>
+        </ul>
+        <p class="quiz-why"><code>and</code> вычисляется слева направо, и первым идет обращение к символу пустой строки: <code>IndexError</code>. Охранник стоит справа и ни от чего не защищает. <code>False</code> получилось бы, если поменять части местами. <code>SyntaxError</code> означает ошибку записи, а здесь запись правильная и ошибка возникает при выполнении.</p>
+      </div>
+    </section>
+
+    <section id="if-elif-else">
+      <h2><code>if</code>, <code>elif</code>, <code>else</code></h2>
+      <div class="ask" data-slide="S26">
+        <p class="ask-q">Как сделать, чтобы строка кода выполнялась не всегда?</p>
+        <p class="ask-hint">Подсказка: файл FASTA состоит из строк двух видов.</p>
+        <div class="ask-a"><p>Строку кода нужно поставить под условие: выполнять ее, только если условие истинно. Для заголовков FASTA одно действие, для строк последовательности другое. Это делает инструкция <code>if</code>.</p></div>
+      </div>
+      <p>Условия мы писать научились, теперь программа будет действовать по ним. В файле FASTA есть строки двух видов: заголовки, которые начинаются со знака <code>&gt;</code>, и строки с нуклеотидами. С заголовком нужно сделать одно, с последовательностью другое, поэтому часть кода должна выполняться не всегда.</p>
+      <p class="def"><span class="term">Ветвление</span>&nbsp;— выбор по значению условия, какой код выполнить. Условием называют логическое выражение после <code>if</code>, а <span class="term">ветвью</span> блок, который выполняется при одном из ответов.</p>
+      <p>Инструкция <code>if</code> без <code>else</code> выполняет блок, если условие истинно, и пропускает его, если ложно. С <code>else</code> выполняется ровно одна из двух ветвей: условие не может быть одновременно истинным и ложным. В обоих случаях после инструкции программа продолжается одинаково.</p>
+      <p>В примере ниже условие задает метод <code>startswith()</code>: он возвращает <code>True</code> или <code>False</code>, и этого достаточно. В ветви <code>if</code> две строки, а ветвь <code>else</code> пропущена целиком. Последняя строка стоит без отступа, не принадлежит ни одной ветви и выполняется в любом случае. Запустите пример, затем замените строку на <code>"ATGCGT"</code>.</p>
+      <div class="runner" data-file="fasta_line.py"><textarea>
+line = "&gt;Seq1"
+if line.startswith("&gt;"):
+    print("заголовок")
+    print("ID:", line[1:])
+else:
+    print("нуклеотиды")
+print("строка обработана")
+</textarea></div>
+      <p>Метод <code>startswith()</code> безопасен и для пустой строки, в отличие от <code>line[0]</code>: для <code>""</code> он просто вернет <code>False</code>.</p>
+      <h3>Блок и отступ</h3>
+      <p>Во многих языках ветвь заключают в фигурные скобки, а в Python ее границы задает отступ. Двоеточие в конце строки <code>if</code> говорит, что дальше будет блок. Отступ, обычно в четыре пробела, показывает, какие строки в него входят. Блок кончается там, где кончается отступ: сдвиньте строку влево, и она окажется вне ветви.</p>
+      <p>Без отступа после двоеточия Python сообщает <code>IndentationError</code>. Та же ошибка возникает при лишнем пробеле перед строкой. Запустите пример и прочитайте последнюю строку сообщения.</p>
+      <div class="runner" data-file="indent_error.py" data-error><textarea>
+line = "&gt;Seq1"
+if line.startswith("&gt;"):
+print("заголовок")    # нет отступа: строка не вошла в блок
+</textarea></div>
+      <p>В блоке должна быть хотя бы одна инструкция. Если ветвь нужна, а написать в ней пока нечего, ставят <code>pass</code>, инструкцию, которая ничего не делает.</p>
+      <pre class="code">
+if line.startswith("&gt;"):
+    pass    # обработку заголовка напишем позже
+else:
+    print("нуклеотиды")
+</pre>
+      <div class="more">
+        <p>Настройте редактор так, чтобы клавиша Tab вставляла четыре пробела, и не смешивайте табуляцию с пробелами. На экране они выглядят одинаково, а для Python это разные отступы.</p>
+      </div>
+      <div class="ask" data-slide="S30">
+        <p class="ask-q">А если вариантов больше двух?</p>
+        <p class="ask-hint">Подсказка: низкий, средний или высокий GC-состав.</p>
+        <div class="ask-a"><p><code>if</code> с <code>else</code> выбирает из двух вариантов. Для трех и больше между ними ставят ветви <code>elif</code>: условия проверяются сверху вниз до первого истинного.</p></div>
+      </div>
+      <h3>Цепочка <code>if</code>, <code>elif</code>, <code>else</code></h3>
+      <p>Инструкция <code>if</code> с <code>else</code> выбирает из двух вариантов, но вариантов часто больше: у последовательности может быть низкая, средняя или высокая доля нуклеотидов G и C. Для этого служит цепочка <code>if</code>, <code>elif</code>, <code>else</code>. Слово <code>elif</code> означает «else if»: следующее условие проверяется, только если все предыдущие ложны.</p>
+      <p class="def"><span class="term">Цепочка <code>elif</code></span>&nbsp;— инструкция, в которой условия проверяются сверху вниз и выполняется только первая истинная ветвь, даже если истинны несколько.</p>
+      <p>Как только условие истинно, выполняется его ветвь, и на этом вся инструкция заканчивается: остальные условия даже не вычисляются. <code>else</code> срабатывает, если ложны все условия. Число <code>elif</code> не ограничено, а <code>else</code> можно не писать; тогда при всех ложных условиях не выполнится ничего.</p>
+      <p>В примере доля G и C равна 0,6: шесть букв из десяти. Пороги 0,4 и 0,6 учебные, это не биологическая норма. Во втором условии не нужно писать <code>gc &gt;= 0.4</code>: программа доходит до него, только если первое условие уже ложно. Значение ровно 0,6 не меньше 0,6, поэтому вторая ветвь пропущена и сработал <code>else</code>. Запустите пример, затем замените во втором условии <code>&lt;</code> на <code>&lt;=</code> и посмотрите, куда попадет граница.</p>
+      <div class="runner" data-file="gc_class.py"><textarea>
+seq = "GCGCATGCTA"
+n_g = seq.count("G")
+n_c = seq.count("C")
+gc = (n_g + n_c) / len(seq)
+print(gc)
+if gc &lt; 0.4:
+    print("низкий GC")
+elif gc &lt; 0.6:
+    print("средний GC")
+else:
+    print("высокий GC")
+</textarea></div>
+      <p>Проверяя цепочку, подставьте значение из каждой группы и каждое граничное значение: так видно, в какую ветвь оно попадет.</p>
+      <aside class="note warn"><p>Цепочка останавливается на первом истинном условии. Если широкое условие стоит раньше узкого, узкая ветвь не выполнится никогда. В примере ниже при <code>gc = 0.7</code> истинны оба условия, но программа печатает «средний»: любое число больше 0,6 больше и 0,3. Python об этом не предупредит, код синтаксически правильный. Узкое условие ставят раньше широкого или записывают условия так, чтобы они не пересекались.</p></aside>
+      <div class="runner" data-file="gc_order.py"><textarea>
+gc = 0.7
+if gc &gt; 0.3:
+    print("средний")
+elif gc &gt; 0.6:        # сюда программа не дойдет
+    print("высокий")
+</textarea></div>
+      <div class="quiz" data-id="if-series-both" data-slide="S34">
+        <p class="quiz-q">Что выведет программа при <code>gc = 0.7</code>?</p>
+        <pre class="code">
+gc = 0.7
+if gc &gt; 0.6:
+    print("высокий")
+if gc &gt; 0.3:
+    print("средний")
+</pre>
+        <ul>
+          <li>а) <code>высокий</code></li>
+          <li>б) <code>средний</code></li>
+          <li>в) ничего</li>
+          <li data-correct>г) <code>высокий</code> и <code>средний</code></li>
+        </ul>
+        <p class="quiz-why">Здесь две независимые инструкции <code>if</code>, а не цепочка: каждая проверяет свое условие. При <code>gc = 0.7</code> оба условия истинны, поэтому напечатаны оба слова. Только «высокий» напечатала бы цепочка <code>elif</code>, а «средний» получился в ловушке выше, где широкое условие стояло первым. Если должна сработать одна ветвь из нескольких, пишут цепочку <code>elif</code>; если проверки независимы, пишут серию <code>if</code>.</p>
+      </div>
+    </section>
+
+    <section id="truth-none">
+      <h2>Истинность и <code>None</code></h2>
+      <div class="ask" data-slide="S38">
+        <p class="ask-q">Можно ли написать <code>if seq:</code>, когда <code>seq</code> строка?</p>
+        <p class="ask-hint">Подсказка: вспомните ловушку с <code>or "C"</code>.</p>
+        <div class="ask-a"><p>Можно. В ловушке <code>base == "A" or "C"</code> строка <code>"C"</code> уже сработала как условие. У каждого значения есть истинность: непустая строка считается истиной, пустая ложью.</p></div>
+      </div>
+      <p>До сих пор в условиях стояли сравнения. Но в ловушке <code>base == "A" or "C"</code> условием сработала просто строка <code>"C"</code>, и Python ее принял. Значит, проверить на истинность можно любое значение, а не одни <code>True</code> и <code>False</code>.</p>
+      <p class="def"><span class="term">Истинность</span> значения&nbsp;— то, чем оно считается в условии: истиной или ложью. Ее показывает функция <code>bool()</code>, а в <code>if</code> Python вызывает ее сам.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Что проверяем</th><th>Ложно: <code>bool(x)</code> дает <code>False</code></th><th>Истинно: <code>bool(x)</code> дает <code>True</code></th></tr></thead>
+        <tbody>
+          <tr><td>логическое значение</td><td><code>False</code></td><td><code>True</code></td></tr>
+          <tr><td>число</td><td><code>0</code>, <code>0.0</code></td><td><code>42</code>, <code>-1</code>, <code>0.5</code></td></tr>
+          <tr><td>строка</td><td><code>""</code> (пустая)</td><td><code>"ACGT"</code> (непустая)</td></tr>
+          <tr><td>коллекция</td><td>пустая</td><td>непустая</td></tr>
+          <tr><td>отсутствие значения</td><td><code>None</code></td><td>истинного варианта нет</td></tr>
+        </tbody>
+      </table></div>
+      <p>Правило короткое: ложны ноль и пустота, все остальное истинно. К нулю относятся <code>0</code> и <code>0.0</code>, к пустоте <code>None</code>, пустая строка и пустые коллекции. Коллекции появятся в следующих лекциях, правило для них то же. Строка ложна, только если в ней нет ни одного символа. Запустите пример, затем замените <code>seq</code> на пустую строку.</p>
+      <div class="runner" data-file="truthy.py"><textarea>
+print(bool(0), bool(0.0), bool(42), bool(-1))
+print(bool(""), bool("ACGT"), bool(None))
+seq = "ATGC"
+if seq:
+    print("строка не пустая")
+</textarea></div>
+      <p>Раз пустая строка ложна, проверку «есть ли что-нибудь в строке» записывают одним словом. Логическую переменную тоже не сравнивают с <code>True</code>: <code>is_long</code> уже равна <code>True</code> или <code>False</code>, и вопрос «правда ли, что правда» лишний. Так рекомендует руководство по оформлению кода PEP 8.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Длинная запись</th><th>Короткая запись</th></tr></thead>
+        <tbody>
+          <tr><td><code>if len(seq) &gt; 0:</code></td><td><code>if seq:</code></td></tr>
+          <tr><td><code>if seq == "":</code></td><td><code>if not seq:</code></td></tr>
+          <tr><td><code>if is_long == True:</code></td><td><code>if is_long:</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>У короткой записи есть граница. Если <code>0</code> или <code>0.0</code> осмысленное значение, например результат измерения, сравнивайте явно: <code>if gc == 0.0:</code>. Пример такой путаницы приведен ниже, в ловушке с <code>None</code>.</p>
+      <div class="more">
+        <p>PEP 285 объясняет, почему с <code>True</code> не сравнивают через <code>==</code>: если бы любое истинное значение было равно <code>True</code>, то из <code>6 == True == 7</code> следовало бы ложное <code>6 == 7</code>. Полный список ложных значений в документации длиннее таблицы: в него входят, например, пустые списки и словари, которые появятся позже.</p>
+      </div>
+      <h3><code>or</code> и <code>and</code> возвращают операнд</h3>
+      <p>Теперь видно, почему сработала ловушка с <code>or "C"</code>. Операторы <code>and</code> и <code>or</code> не превращают результат в <code>True</code> или <code>False</code>, а возвращают одно из своих значений, то, на котором остановилось вычисление. <code>x or y</code> дает <code>x</code>, если <code>x</code> истинно, иначе <code>y</code>. <code>x and y</code> устроен зеркально: дает <code>x</code>, если <code>x</code> ложно, иначе <code>y</code>.</p>
+      <p>На <code>or</code> строится значение по умолчанию: <code>seq_id or "без имени"</code> дает идентификатор, а если он пустой, запасную строку. В <code>0 and 5</code> левый ноль ложен, выражение уже ложно, и <code>and</code> возвращает этот ноль. В <code>0 or 5</code> левый ноль ложен, но для <code>or</code> это еще не ответ, и возвращается <code>5</code>.</p>
+      <div class="runner" data-file="operands.py"><textarea>
+seq_id = ""
+name = seq_id or "без имени"
+print(name)
+print("ACGT" or "N")
+print(0 and 5)
+print(0 or 5)
+print(bool("" or "N"))
+</textarea></div>
+      <div class="more">
+        <p>Общее правило: <code>a or b</code> дает первое истинное значение или последнее, <code>a and b</code> дает первое ложное или последнее. Прием с <code>or</code> заменит и законный ноль: <code>0 or 5</code> дает <code>5</code>, даже если 0 был настоящим результатом. Сложную логику на <code>and</code> и <code>or</code> не строят, для нее пишут <code>if</code>.</p>
+      </div>
+      <div class="ask" data-slide="S42">
+        <p class="ask-q">Как записать «значения пока нет»?</p>
+        <p class="ask-hint">Подсказка: пустая строка уже означает «строка есть, но пустая».</p>
+        <div class="ask-a"><p>Ноль и пустая строка сами бывают настоящими значениями. Для «значения нет» в Python есть отдельный объект <code>None</code>.</p></div>
+      </div>
+      <h3>Значение <code>None</code></h3>
+      <p>Пусть GC-состав еще не посчитан. Записать <code>0</code> нельзя: ноль бывает настоящим ответом. Пустая строка тоже значение, просто пустое. Нужно значение, которое означает именно «пока ничего нет».</p>
+      <p class="def"><span class="term"><code>None</code></span>&nbsp;— специальный объект, который означает «значения нет». Это единственный объект типа <code>NoneType</code>: второго <code>None</code> в программе не бывает.</p>
+      <p>Пустая строка&nbsp;— настоящая строка с типом <code>str</code> и длиной 0, а <code>None</code> значит, что строки нет вообще. Поэтому <code>None == ""</code> и <code>None == 0</code> дают <code>False</code>, хотя в условии все три значения ложны. <code>None</code> возвращает функция, которая ничего не возвращает явно, например <code>print()</code>: она печатает, но результата не отдает.</p>
+      <div class="runner" data-file="none_value.py"><textarea>
+s = ""
+print(type(s), len(s))
+print(type(None))
+print(None == "", None == 0)
+result = print("A")    # печатает A и возвращает None
+print(result)
+</textarea></div>
+      <div class="more">
+        <p>В биоинформатике <code>None</code> встречается сразу. Функция readfq из книги «Bioinformatics Data Skills» (V. Buffalo) читает записи FASTA и FASTQ и для каждой возвращает строку качества прочтения. У записи FASTA качества нет, и вместо него приходит <code>None</code>. Вызов <code>len(None)</code> дает <code>TypeError</code>: у отсутствующего значения нет длины.</p>
+      </div>
+      <h3><code>==</code> и <code>is</code></h3>
+      <p>Оператор <code>==</code> отвечает на вопрос «равны ли значения», а <code>is</code> на вопрос «один ли это объект». Равные значения не обязаны быть одним объектом, как два близнеца не один человек. Все переменные со значением <code>None</code> ссылаются на один и тот же объект, поэтому <code>None</code> проверяют через <code>is</code>: <code>x is None</code> и <code>x is not None</code>. В остальных случаях сравнивают через <code>==</code>.</p>
+      <div class="more">
+        <p>С небольшими целыми числами <code>is</code> иногда дает <code>True</code>, потому что CPython хранит числа от &minus;5 до 256 в одном экземпляре. Полагаться на это нельзя: числа и строки сравнивают через <code>==</code>.</p>
+      </div>
+      <aside class="note warn"><p>Проверка <code>if not x</code> не отличает отсутствие значения от нуля и пустой строки: для <code>not</code> значения <code>None</code>, <code>0.0</code> и <code>""</code> одинаково ложны. У последовательности из одних A и T GC-состав равен нулю, и это честный ответ. Первая проверка в примере принимает его за отсутствие результата, вторая спрашивает ровно то, что нужно.</p></aside>
+      <div class="runner" data-file="not_vs_none.py"><textarea>
+gc = 0.0    # посчитан: в последовательности нет G и C
+if not gc:
+    print("not gc: GC не посчитан")
+if gc is None:
+    print("is None: GC не посчитан")
+print(gc is None, gc == 0, None is None)
+</textarea></div>
+      <div class="quiz" data-id="falsy-zero-float" data-slide="S46">
+        <p class="quiz-q">Какое из значений Python считает ложным?</p>
+        <ul>
+          <li data-correct>а) <code>0.0</code></li>
+          <li>б) <code>"0"</code></li>
+          <li>в) <code>" "</code></li>
+          <li>г) <code>"False"</code></li>
+        </ul>
+        <p class="quiz-why">Ложны ноль и пустота, поэтому ложно только <code>0.0</code>. Строка ложна, только если она пустая, а в <code>"0"</code>, <code>" "</code> и <code>"False"</code> есть символы. Пробел тоже символ, а <code>"False"</code> в кавычках строка, а не значение <code>False</code>. Поэтому введенный через <code>input()</code> текст <code>"0"</code> в условии окажется истиной.</p>
+      </div>
+    </section>
+
+    <section id="fasta-check">
+      <h2>Простые условия и проверка FASTA</h2>
+      <div class="ask" data-slide="S50">
+        <p class="ask-q">Как прочитать проверку с тремя уровнями отступов?</p>
+        <p class="ask-hint">Подсказка: найдите, где обрабатывается запись без знака <code>&gt;</code>.</p>
+        <div class="ask-a"><p>Приходится вести глазами отступ от последней строки вверх, до третьего уровня. Такую «лесенку» читать трудно, поэтому ниже ее выпрямляют в плоскую цепочку: сначала ошибки, затем нормальный случай.</p></div>
+      </div>
+      <p>Проверка данных обычно состоит из нескольких правил, и каждое правило хочется записать отдельным <code>if</code> внутри предыдущего. Получается лесенка. По правилам NCBI заголовок записи FASTA начинается с <code>&gt;</code>, а идентификатор SeqID не содержит пробелов и не длиннее 25 символов. В нашем учебном формате заголовок содержит только SeqID.</p>
+      <p>Найдите в примере, где программа сообщает об отсутствии знака <code>&gt;</code>: для этого придется проследить отступ от последней строки до третьей. Чем больше правил, тем глубже лесенка и тем дальше сообщение от своей проверки. Запустите пример, затем замените заголовок на <code>"&gt;"</code>.</p>
+      <div class="runner" data-file="header_nested.py"><textarea>
+header = "&gt;Seq1"
+sid = header[1:]
+if header.startswith("&gt;"):
+    if " " not in sid:
+        if len(sid) &lt;= 25:
+            print("OK")
+        else:
+            print("длина ID")
+    else:
+        print("пробел в ID")
+else:
+    print("нет &gt;")
+</textarea></div>
+      <p>В этом коде есть незаметная ошибка: заголовок из одного знака <code>&gt;</code> проходит все проверки и получает «OK», хотя идентификатора в нем нет.</p>
+      <h3>Как выпрямить лесенку</h3>
+      <p>Четыре приема делают проверку плоской.</p>
+      <ul>
+        <li>Вложенные <code>if</code> без <code>else</code> заменяют одним условием с <code>and</code>.</li>
+        <li>Двойное сравнение <code>1 &lt;= n and n &lt;= 25</code> записывают цепочкой <code>1 &lt;= n &lt;= 25</code>.</li>
+        <li>Ошибки проверяют первыми ветвями цепочки, а нормальный случай оставляют в <code>else</code>.</li>
+        <li>Выбор из двух значений записывают условным выражением.</li>
+      </ul>
+      <p>Ниже та же проверка цепочкой <code>elif</code>. Условия перевернулись: вместо «начинается с <code>&gt;</code>» стоит «не начинается», потому что каждая ветвь описывает ошибку и тут же сообщает о ней. Проверку читают сверху вниз, как список требований. Цепочка <code>1 &lt;= len(sid) &lt;= 25</code> заодно исправляет ошибку лесенки: пустой идентификатор теперь не проходит. Запустите пример с заголовками <code>"&gt;Seq1"</code>, <code>"&gt;"</code> и <code>"Seq1"</code>.</p>
+      <div class="runner" data-file="header_flat.py"><textarea>
+header = "&gt;Seq1"
+sid = header[1:]
+if not header.startswith("&gt;"):
+    print("нет &gt;")
+elif " " in sid:
+    print("пробел в ID")
+elif not 1 &lt;= len(sid) &lt;= 25:
+    print("длина ID")
+else:
+    print("OK")
+</textarea></div>
+      <div class="more">
+        <p>Запись <code>not 1 &lt;= len(sid) &lt;= 25</code> читается как <code>not (1 &lt;= len(sid) &lt;= 25)</code>, потому что сравнения связывают сильнее <code>not</code>. По правилам NCBI после SeqID через пробел могут идти модификаторы вида <code>[organism=…]</code>, и тогда SeqID занимает часть заголовка до первого пробела. Разрешенные символы SeqID (буквы, цифры и несколько знаков) проверяют по одному, и для этого нужен цикл.</p>
+      </div>
+      <h3>Условное выражение</h3>
+      <p class="def"><span class="term">Условное выражение</span> <code>a if условие else b</code> дает <code>a</code>, если условие истинно, и <code>b</code>, если ложно. Им записывают выбор одного из двух значений.</p>
+      <p>Сначала вычисляется условие, затем одна из двух частей; <code>else</code> обязателен. Сложную логику в условное выражение не прячут: для нее пишут обычный <code>if</code>. Запустите пример, затем замените в последовательности U на T.</p>
+      <div class="runner" data-file="cond_expr.py"><textarea>
+seq = "AUGC"
+kind = "РНК" if "U" in seq else "ДНК"
+print(kind)
+</textarea></div>
+      <h3>Коды IUPAC</h3>
+      <p>Прежде чем проверять буквы последовательности, нужно договориться, какие буквы допустимы. Для этого есть стандартный код IUPAC. Четыре буквы означают конкретные нуклеотиды, остальные описывают позицию, где возможны несколько оснований. NCBI требует, чтобы в последовательности были только символы IUPAC, а неизвестную позицию обозначали буквой N.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Код</th><th>Основания</th><th>Подсказка</th></tr></thead>
+        <tbody>
+          <tr><td>A, C, G, T</td><td>одно основание</td><td></td></tr>
+          <tr><td>N</td><td>A, C, G, T</td><td>aNy</td></tr>
+          <tr><td>R / Y</td><td>A, G / C, T</td><td>puRine / pYrimidine</td></tr>
+          <tr><td>S / W</td><td>G, C / A, T</td><td>Strong / Weak</td></tr>
+          <tr><td>K / M</td><td>G, T / A, C</td><td>Keto / aMino</td></tr>
+          <tr><td>B / D / H / V</td><td>все, кроме A / C / G / T</td><td>в алфавите идут сразу после A / C / G / U</td></tr>
+        </tbody>
+      </table></div>
+      <p>Для РНК вместо T используют U. Регистр в коде IUPAC смысла не несет, поэтому букву перед проверкой приводят к прописной.</p>
+      <p>Классификация буквы собирает приемы всей лекции. Первая ветвь отсекает пустую строку и сочетания из нескольких букв: без нее ловушка <code>"" in "ACGT"</code> пропустила бы пустую строку как однозначную букву. Дальше идут две строки-алфавита, однозначные и неоднозначные коды. Все, что не попало ни в один алфавит, недопустимо. Запустите пример, затем проверьте буквы <code>"G"</code>, <code>"X"</code> и пустую строку.</p>
+      <div class="runner" data-file="iupac.py"><textarea>
+base = "r"
+b = base.upper()     # код IUPAC не зависит от регистра
+if len(b) != 1:
+    print("не одна буква")
+elif b in "ACGT":
+    print("однозначная")
+elif b in "RYSWKMBDHVN":
+    print("неоднозначная")
+else:
+    print("недопустимая")
+</textarea></div>
+      <div class="more">
+        <p>С учетом U код IUPAC содержит 16 символов. Строчные буквы в геномных файлах часто означают замаскированные повторы, поэтому перед приведением регистра полезно знать, откуда взяты данные. Чтобы проверить всю последовательность, проверку повторяют для каждой буквы, и это работа для цикла.</p>
+      </div>
+      <div class="quiz" data-id="flat-chain-first-true" data-slide="S56">
+        <p class="quiz-q">Что выведет плоская проверка из примера <code>header_flat.py</code>, если заменить заголовок на <code>header = "&gt;seq 1"</code>?</p>
+        <ul>
+          <li>а) <code>нет &gt;</code></li>
+          <li data-correct>б) <code>пробел в ID</code></li>
+          <li>в) <code>длина ID</code></li>
+          <li>г) <code>OK</code></li>
+        </ul>
+        <p class="quiz-why">Первое условие ложно: заголовок начинается с <code>&gt;</code>. Второе истинно: в <code>"seq 1"</code> есть пробел, поэтому цепочка печатает «пробел в ID» и заканчивается, длина уже не проверяется. «нет &gt;» выбирают, если не заметили <code>not</code> в первом условии, а «длина ID», если думают, что проверяются все правила. Пробел в учебном формате недопустим, поэтому «OK» неверно.</p>
+      </div>
+    </section>
+
+    <section id="summary">
+      <h2>Итоги и типичные ошибки</h2>
+      <ul>
+        <li>Сравнение дает значение типа <code>bool</code>; строки сравниваются по номерам символов с учетом регистра.</li>
+        <li>Условие собирается из сравнений, <code>in</code>, <code>and</code>, <code>or</code>, <code>not</code>; порядок вычисления и порядок частей важны.</li>
+        <li>Сравнения подряд образуют цепочку: <code>a &lt; b &lt; c</code> означает <code>a &lt; b and b &lt; c</code>.</li>
+        <li>Цепочка <code>elif</code> выполняет первую истинную ветвь; узкое условие ставят раньше широкого.</li>
+        <li>Ложны ноль, пустота и <code>None</code>; отсутствие значения проверяют через <code>is None</code>.</li>
+        <li>Читаемая проверка плоская: сначала ошибки, затем нормальный случай в <code>else</code>.</li>
+      </ul>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Так не работает</th><th>Так правильно</th></tr></thead>
+        <tbody>
+          <tr><td><code>if count = 5:</code></td><td><code>if count == 5:</code></td></tr>
+          <tr><td><code>"5" &lt; 5</code></td><td><code>int("5") &lt; 5</code></td></tr>
+          <tr><td><code>base == "A" or "C"</code></td><td><code>base == "A" or base == "C"</code></td></tr>
+          <tr><td><code>seq[0] == "&gt;" and len(seq) &gt; 0</code></td><td><code>len(seq) &gt; 0 and seq[0] == "&gt;"</code></td></tr>
+          <tr><td><code>base in "ACGT"</code> для строки любой длины</td><td><code>len(base) == 1 and base in "ACGT"</code></td></tr>
+          <tr><td>широкое условие первым в цепочке <code>elif</code></td><td>узкое условие раньше широкого</td></tr>
+          <tr><td>строка <code>if</code> без двоеточия или ветвь без отступа</td><td>двоеточие и отступ в четыре пробела</td></tr>
+          <tr><td><code>if is_long == True:</code></td><td><code>if is_long:</code></td></tr>
+          <tr><td><code>if not gc:</code> для проверки «значения нет»</td><td><code>if gc is None:</code></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="self-check">
+      <h2>Задачи для самопроверки</h2>
+      <p>Пять задач на чтение кода из резерва презентации, от простой к трудной. В каждой предскажите вывод целиком, включая ошибку, если она будет, и только потом открывайте разбор.</p>
+      <div class="walk" data-slide="S59t1">
+        <p class="task"><b>Задача 1.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">a = "GC"
+b = "gc"
+print(a &lt; b, a.lower() == b)
+print(True + ("G" in a) + ("G" in b))
+print("10" &lt; "9", 10 &lt; 9)</pre>
+        <div class="anim" data-id="compare-str-bool-sum" data-title="Разбор задачи 1">
+          <div class="table-wrap"><table>
+            <thead><tr><th>строка</th><th>напечатано</th><th>почему</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>print(a &lt; b, a.lower() == b)</code></td><td><code>True True</code></td><td>строки сравниваются по кодам символов: <code>"G"</code> (71) меньше <code>"g"</code> (103); после <code>lower()</code> строки равны</td></tr>
+              <tr data-fx="in@2"><td><code>print(True + ("G" in a) + ("G" in b))</code></td><td><code>2</code></td><td><code>True</code> равно 1, <code>"G" in a</code> истинно, а <code>"G" in b</code> ложно: <code>in</code> учитывает регистр; 1 + 1 + 0 = 2</td></tr>
+              <tr data-fx="in@3"><td><code>print("10" &lt; "9", 10 &lt; 9)</code></td><td><code>True False</code></td><td>строки сравниваются посимвольно, <code>"1"</code> меньше <code>"9"</code>; числа сравниваются по значению</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@4">True True
+2
+True False</pre>
+          <p data-fx="in@4">Ответ <code>3</code> во второй строке дают те, кто забыл, что <code>in</code> различает <code>G</code> и <code>g</code>. Ответ <code>False</code> в третьей строке получается, если сравнивать строки как числа.</p>
+        </div>
+        <p>Запустите код, затем замените <code>b = "gc"</code> на <code>b = "GC"</code> и предскажите вывод заново.</p>
+        <div class="runner" data-file="task_1.py"><textarea>
+a = "GC"
+b = "gc"
+print(a &lt; b, a.lower() == b)
+print(True + ("G" in a) + ("G" in b))
+print("10" &lt; "9", 10 &lt; 9)
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S59t2">
+        <p class="task"><b>Задача 2.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">seq = "ACGTN"
+n = seq.count("N")
+if n:
+    print("есть N:", n)
+elif seq:
+    print("без N")
+if n &gt; 1 or "n" in seq:
+    print("много N")
+elif not n is None:
+    print("N посчитан")</pre>
+        <div class="anim" data-id="count-n-elif" data-title="Разбор задачи 2">
+          <div class="table-wrap"><table>
+            <thead><tr><th>строка</th><th>напечатано</th><th>почему</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>if n: … elif seq:</code></td><td><code>есть N: 1</code></td><td><code>n</code> равно 1, число 1 истинно: срабатывает первая ветвь, <code>elif</code> уже не проверяется</td></tr>
+              <tr data-fx="in@2"><td><code>if n &gt; 1 or "n" in seq:</code></td><td><code></code></td><td>обе части ложны: <code>N</code> одна, строчной <code>n</code> в строке нет; ничего не печатается</td></tr>
+              <tr data-fx="in@3"><td><code>elif not n is None:</code></td><td><code>N посчитан</code></td><td><code>is</code> связывает сильнее <code>not</code>: условие читается как <code>not (n is None)</code>, а 1 не <code>None</code></td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@4">есть N: 1
+N посчитан</pre>
+          <p data-fx="in@4">Частая ошибка: напечатать и «без N», считая, что проверяются обе ветви первой цепочки. По PEP 8 последнее условие пишут <code>n is not None</code>; запись <code>not n is None</code> здесь нарочно запутанная.</p>
+        </div>
+        <p>Запустите код, затем замените последовательность на <code>"ACGTNN"</code>.</p>
+        <div class="runner" data-file="task_2.py"><textarea>
+seq = "ACGTN"
+n = seq.count("N")
+if n:
+    print("есть N:", n)
+elif seq:
+    print("без N")
+if n &gt; 1 or "n" in seq:
+    print("много N")
+elif not n is None:
+    print("N посчитан")
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S59t3">
+        <p class="task"><b>Задача 3.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">name = None
+gc = 0.0
+label = name or gc or "нет данных"
+print(label)
+print(gc is None or gc == 0)
+print(name and name.upper())
+print((gc or 0.5) * 2)</pre>
+        <div class="anim" data-id="or-and-operand" data-title="Разбор задачи 3">
+          <div class="table-wrap"><table>
+            <thead><tr><th>строка</th><th>напечатано</th><th>почему</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>print(label)</code></td><td><code>нет данных</code></td><td><code>or</code> возвращает первый истинный операнд: <code>None</code> и <code>0.0</code> ложны</td></tr>
+              <tr data-fx="in@2"><td><code>print(gc is None or gc == 0)</code></td><td><code>True</code></td><td><code>gc is None</code> ложно, а <code>gc == 0</code> истинно</td></tr>
+              <tr data-fx="in@3"><td><code>print(name and name.upper())</code></td><td><code>None</code></td><td><code>name</code> ложно, <code>and</code> возвращает его и до <code>name.upper()</code> не доходит: ошибки нет</td></tr>
+              <tr data-fx="in@4"><td><code>print((gc or 0.5) * 2)</code></td><td><code>1.0</code></td><td><code>gc or 0.5</code> дает 0.5, умноженное на 2 это 1.0</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@5">нет данных
+True
+None
+1.0</pre>
+          <p data-fx="in@5">Главная ловушка в третьей строке: у <code>None</code> нет метода <code>upper()</code>, но программа не падает, потому что <code>and</code> не вычисляет правую часть.</p>
+        </div>
+        <p>Запустите код, затем замените <code>name = None</code> на <code>name = "seq1"</code>.</p>
+        <div class="runner" data-file="task_3.py"><textarea>
+name = None
+gc = 0.0
+label = name or gc or "нет данных"
+print(label)
+print(gc is None or gc == 0)
+print(name and name.upper())
+print((gc or 0.5) * 2)
+</textarea></div>
+      </div>
+      <div class="walk" data-slide="S59t4">
+        <p class="task"><b>Задача 4.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">x = 5
+print(1 &lt; x &lt; 10 == True)
+print((1 &lt; x &lt; 10) == True)
+print(not x == 5 or x &gt; 3 and x &lt; 4)
+print(x &gt; 3 == 1, (x &gt; 3) == 1)</pre>
+        <div class="anim" data-id="chain-compare-precedence" data-title="Разбор задачи 4">
+          <div class="table-wrap"><table>
+            <thead><tr><th>строка</th><th>напечатано</th><th>почему</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>print(1 &lt; x &lt; 10 == True)</code></td><td><code>False</code></td><td>цепочка: <code>1 &lt; x and x &lt; 10 and 10 == True</code>, а 10 не равно <code>True</code></td></tr>
+              <tr data-fx="in@2"><td><code>print((1 &lt; x &lt; 10) == True)</code></td><td><code>True</code></td><td>скобки разрывают цепочку: <code>True == True</code></td></tr>
+              <tr data-fx="in@3"><td><code>print(not x == 5 or …)</code></td><td><code>False</code></td><td><code>(not (x == 5)) or (x &gt; 3 and x &lt; 4)</code> дает <code>False or (True and False)</code></td></tr>
+              <tr data-fx="in@4"><td><code>print(x &gt; 3 == 1, (x &gt; 3) == 1)</code></td><td><code>False True</code></td><td>без скобок цепочка <code>x &gt; 3 and 3 == 1</code>, со скобками <code>True == 1</code>, а <code>True</code> равно 1</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@5">False
+True
+False
+False True</pre>
+          <p data-fx="in@5">Это самая трудная задача на чтение: ответы <code>True</code> в первой строке и <code>True True</code> в последней дают те, кто читает выражения слева направо по парам. Подробнее о скобках, которые расставляет Python, рассказывает таблица ниже.</p>
+        </div>
+        <p>Запустите код, затем расставьте скобки в каждой строке так, как их расставляет Python, и проверьте, что вывод не изменился.</p>
+        <div class="runner" data-file="task_4.py"><textarea>
+x = 5
+print(1 &lt; x &lt; 10 == True)
+print((1 &lt; x &lt; 10) == True)
+print(not x == 5 or x &gt; 3 and x &lt; 4)
+print(x &gt; 3 == 1, (x &gt; 3) == 1)
+</textarea></div>
+      </div>
+      <p>Разберите задачу 4 так, как ее читает Python: перед каждым шагом сами расставьте скобки в строке.</p>
+      <div class="anim" data-slide="S59t4a" data-title="Задача 4: как Python расставляет скобки">
+        <div class="table-wrap"><table>
+          <thead><tr><th>Выражение в <code>print</code></th><th>Как читает Python при <code>x = 5</code></th><th>Итог</th></tr></thead>
+          <tbody>
+            <tr><td><code>1 &lt; x &lt; 10 == True</code></td><td><span data-fx="in@1"><code>1 &lt; x and x &lt; 10 and 10 == True</code> → <code>True and True and False</code></span></td><td><span data-fx="in@1"><code>False</code></span></td></tr>
+            <tr><td><code>(1 &lt; x &lt; 10) == True</code></td><td><span data-fx="in@2">скобки разрывают цепочку → <code>True == True</code></span></td><td><span data-fx="in@2"><code>True</code></span></td></tr>
+            <tr><td><code>not x == 5 or x &gt; 3 and x &lt; 4</code></td><td><span data-fx="in@3"><code>(not (x == 5)) or (x &gt; 3 and x &lt; 4)</code> → <code>False or (True and False)</code></span></td><td><span data-fx="in@3"><code>False</code></span></td></tr>
+            <tr><td><code>x &gt; 3 == 1</code><br><code>(x &gt; 3) == 1</code></td><td><span data-fx="in@4"><code>x &gt; 3 and 3 == 1</code> → <code>True and False</code>; скобки разрывают цепочку → <code>True == 1</code></span></td><td><span data-fx="in@4"><code>False</code>, <code>True</code></span></td></tr>
+          </tbody>
+        </table></div>
+        <p data-fx="in@4">Правило одно: сравнения подряд связываются в цепочку, и Python режет ее на соседние пары, соединенные через <code>and</code>. Сравнения связывают сильнее всего, затем <code>not</code>, затем <code>and</code>, последним <code>or</code>.</p>
+      </div>
+      <div class="walk" data-slide="S59t5">
+        <p class="task"><b>Задача 5.</b> Что выведет программа? Сначала ответьте сами, затем нажимайте «Дальше».</p>
+        <pre class="code">seq = "&gt;"
+header = seq[0] == "&gt;"
+size = len(seq) - header
+print(header, size)
+if size and seq[1] == "A":
+    print("начинается с A")
+elif seq[1:] == "":
+    print("пустой ID")
+print(seq[1] == "A")
+print("конец")</pre>
+        <div class="anim" data-id="guard-slice-index" data-title="Разбор задачи 5">
+          <div class="table-wrap"><table>
+            <thead><tr><th>строка</th><th>напечатано</th><th>почему</th></tr></thead>
+            <tbody>
+              <tr data-fx="in@1"><td><code>print(header, size)</code></td><td><code>True 0</code></td><td><code>header</code> равно <code>True</code>, то есть 1, длина строки тоже 1, поэтому <code>size</code> равно 0</td></tr>
+              <tr data-fx="in@2"><td><code>if size and seq[1] == "A":</code></td><td><code></code></td><td>0 ложно, <code>and</code> до <code>seq[1]</code> не доходит</td></tr>
+              <tr data-fx="in@3"><td><code>elif seq[1:] == "":</code></td><td><code>пустой ID</code></td><td>срез за пределами строки пустой и ошибки не дает</td></tr>
+              <tr data-fx="in@4"><td><code>print(seq[1] == "A")</code></td><td><code>IndexError</code></td><td>индекс без охранника останавливает программу; «конец» не печатается</td></tr>
+            </tbody>
+          </table></div>
+          <pre class="out" data-fx="in@5">True 0
+пустой ID
+IndexError: string index out of range</pre>
+          <p data-fx="in@5">Главное в задаче: срез за пределами строки дает пустую строку, а индекс вызывает ошибку. Ответ с «конец» в последней строке дают те, кто забыл, что после ошибки программа останавливается.</p>
+        </div>
+        <p>Запустите код, затем поставьте перед <code>seq[1]</code> охранник <code>len(seq) &gt; 1 and</code>.</p>
+        <div class="runner" data-file="task_5.py" data-error><textarea>
+seq = "&gt;"
+header = seq[0] == "&gt;"
+size = len(seq) - header
+print(header, size)
+if size and seq[1] == "A":
+    print("начинается с A")
+elif seq[1:] == "":
+    print("пустой ID")
+print(seq[1] == "A")
+print("конец")
+</textarea></div>
+      </div>
+    </section>
+
+    <section id="test">
+      <h2>Итоговый тест</h2>
+      <p>Десять вопросов по всей лекции. Ответьте на все и нажмите «Проверить»: тест засчитывается от восьми верных ответов. Пройти его можно сколько угодно раз, в прогресс идет лучший результат.</p>
+      <div class="final-test" data-id="final">
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет <code>print("100" &lt; "25", 100 &lt; 25)</code>?</p>
+          <ul>
+            <li><code>False False</code></li>
+            <li><code>True True</code></li>
+            <li data-correct><code>True False</code></li>
+            <li><code>TypeError</code></li>
+          </ul>
+          <p class="quiz-why">Строки сравниваются посимвольно: первый символ <code>"1"</code> меньше <code>"2"</code>, поэтому <code>"100" &lt; "25"</code> истинно, хотя число 100 больше 25. Числа сравниваются по значению, и <code>100 &lt; 25</code> ложно. <code>False False</code> получается, если сравнивать строки как числа, а <code>TypeError</code> бывает только при сравнении строки с числом.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет <code>print(n &gt; 3 or n &lt; 4 and n == 0)</code> при <code>n = 5</code>?</p>
+          <ul>
+            <li><code>False</code></li>
+            <li data-correct><code>True</code></li>
+            <li><code>5</code></li>
+            <li><code>SyntaxError</code></li>
+          </ul>
+          <p class="quiz-why"><code>and</code> вычисляется раньше <code>or</code>, поэтому Python читает выражение как <code>n &gt; 3 or (n &lt; 4 and n == 0)</code>. Левая часть <code>or</code> истинна, и ответ <code>True</code>. <code>False</code> получается, если вычислять слева направо: <code>(n &gt; 3 or n &lt; 4) and n == 0</code>. Обе части <code>or</code> здесь сравнения, поэтому результат логический, а не число <code>5</code>.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет <code>print(0 &lt; n &lt;= 10 != 5)</code> при <code>n = 5</code>?</p>
+          <ul>
+            <li><code>False</code></li>
+            <li data-correct><code>True</code></li>
+            <li><code>SyntaxError</code></li>
+            <li><code>TypeError</code></li>
+          </ul>
+          <p class="quiz-why">Сравнения подряд образуют цепочку: <code>0 &lt; n and n &lt;= 10 and 10 != 5</code>. Последняя пара сравнивает 10 с 5, а не <code>n</code> с 5, поэтому все три части истинны. <code>False</code> выбирают те, кто читает <code>!= 5</code> как проверку <code>n</code>. Запись правильная, ошибок нет.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа?</p>
+          <pre class="code">
+base = "T"
+if base == "A" or "G":
+    print("пурин")
+else:
+    print("не пурин")
+</pre>
+          <ul>
+            <li data-correct><code>пурин</code></li>
+            <li><code>не пурин</code></li>
+            <li>ничего</li>
+            <li><code>SyntaxError</code></li>
+          </ul>
+          <p class="quiz-why">Python читает условие как <code>(base == "A") or "G"</code>. Сравнение ложно, но непустая строка <code>"G"</code> истинна, поэтому условие выполняется для любой буквы и программа печатает «пурин». «не пурин» напечатала бы правильная проверка <code>base == "A" or base == "G"</code>. Запись синтаксически верна, поэтому <code>SyntaxError</code> нет.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа при <code>gc = 0.4</code>?</p>
+          <pre class="code">
+gc = 0.4
+if gc &lt; 0.4:
+    print("низкий GC")
+elif gc &lt; 0.6:
+    print("средний GC")
+else:
+    print("высокий GC")
+</pre>
+          <ul>
+            <li><code>низкий GC</code></li>
+            <li data-correct><code>средний GC</code></li>
+            <li><code>высокий GC</code></li>
+            <li><code>низкий GC</code> и <code>средний GC</code></li>
+          </ul>
+          <p class="quiz-why">0,4 не меньше 0,4, поэтому первое условие ложно. Второе условие <code>gc &lt; 0.6</code> истинно: цепочка печатает «средний GC» и заканчивается. «низкий GC» получился бы при <code>gc &lt;= 0.4</code>, а две строки напечатала бы только серия отдельных <code>if</code>.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа?</p>
+          <pre class="code">
+seq = "ACGTN"
+n = seq.count("N")
+if n:
+    print("есть N:", n)
+elif seq:
+    print("без N")
+if n &gt; 1 or "n" in seq:
+    print("много N")
+elif n is not None:
+    print("N посчитан")
+</pre>
+          <ul>
+            <li><code>есть N: 1</code>, <code>без N</code> и <code>N посчитан</code></li>
+            <li><code>есть N: 1</code> и <code>много N</code></li>
+            <li data-correct><code>есть N: 1</code> и <code>N посчитан</code></li>
+            <li><code>без N</code> и <code>N посчитан</code></li>
+          </ul>
+          <p class="quiz-why">Число 1 истинно, поэтому срабатывает первая ветвь первой цепочки, и <code>elif seq</code> уже не проверяется. Во второй цепочке обе части <code>or</code> ложны: буква N одна, а строчной <code>n</code> в строке нет, потому что <code>in</code> учитывает регистр. Остается <code>elif</code>: 1 не <code>None</code>, и печатается «N посчитан». «без N» выбирают, если считают, что <code>elif</code> проверяется всегда, а «много N», если забыли о регистре.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа <code>seq_id = ""</code>, <code>count = 0</code>, <code>print(seq_id or count or None)</code>?</p>
+          <ul>
+            <li>пустую строку</li>
+            <li><code>0</code></li>
+            <li data-correct><code>None</code></li>
+            <li><code>False</code></li>
+          </ul>
+          <p class="quiz-why"><code>or</code> возвращает первый истинный операнд, а если истинных нет, последний. Пустая строка и 0 ложны, последний операнд <code>None</code>, его и печатает <code>print</code>. <code>False</code> неверно: <code>or</code> возвращает сам операнд, а не логическое значение.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа <code>seq = ""</code>, <code>print(seq and seq[0])</code>?</p>
+          <ul>
+            <li><code>IndexError</code></li>
+            <li data-correct>пустую строку</li>
+            <li><code>False</code></li>
+            <li><code>None</code></li>
+          </ul>
+          <p class="quiz-why">Пустая строка ложна, и <code>and</code> возвращает ее, не вычисляя <code>seq[0]</code>. Поэтому ошибки <code>IndexError</code> нет, а <code>print</code> печатает пустую строку. <code>and</code> возвращает сам операнд, а не <code>False</code> и не <code>None</code>.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Что выведет программа?</p>
+          <pre class="code">
+seq = "&gt;"
+header = seq[0] == "&gt;"
+size = len(seq) - header
+print(header, size)
+if size and seq[1] == "A":
+    print("начинается с A")
+elif seq[1:] == "":
+    print("пустой ID")
+print(seq[1] == "A")
+print("конец")
+</pre>
+          <ul>
+            <li><code>True 0</code>, <code>пустой ID</code>, <code>False</code>, <code>конец</code></li>
+            <li data-correct><code>True 0</code>, <code>пустой ID</code>, затем <code>IndexError</code></li>
+            <li><code>True 0</code>, затем <code>IndexError</code></li>
+            <li><code>True 1</code>, <code>пустой ID</code>, затем <code>IndexError</code></li>
+          </ul>
+          <p class="quiz-why"><code>header</code> равно <code>True</code>, то есть 1, поэтому <code>size</code> равно 0. Ноль ложен, и <code>and</code> не доходит до <code>seq[1]</code>, а срез <code>seq[1:]</code> пустой и ошибки не дает: печатается «пустой ID». Строка <code>print(seq[1] == "A")</code> обращается к индексу без охранника и останавливает программу с <code>IndexError</code>, поэтому «конец» не печатается. <code>True 1</code> получается, если забыть, что <code>True</code> в арифметике равно 1.</p>
+        </div>
+        <div class="ft-q">
+          <p class="quiz-q">Из классификации буквы убрали проверку длины. Что выведет программа для пустой строки?</p>
+          <pre class="code">
+b = ""
+if b in "ACGT":
+    print("однозначная")
+elif b in "RYSWKMBDHVN":
+    print("неоднозначная")
+else:
+    print("недопустимая")
+</pre>
+          <ul>
+            <li><code>недопустимая</code></li>
+            <li><code>неоднозначная</code></li>
+            <li>ничего</li>
+            <li data-correct><code>однозначная</code></li>
+          </ul>
+          <p class="quiz-why">Для строк <code>in</code> ищет подстроку, а пустая строка входит в любую строку, поэтому <code>"" in "ACGT"</code> истинно и срабатывает первая ветвь. «недопустимая» ждут те, кто считает, что <code>in</code> проверяет одну букву из набора. Цепочка с <code>else</code> всегда печатает одну строку, поэтому вариант «ничего» невозможен. Именно поэтому полная классификация начинается с <code>if len(b) != 1</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="finish" data-slot="finish"></div>
+  </main>
+
+  <nav class="toc" data-slot="toc" aria-label="Разделы лекции"></nav>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</body>
+</html>
